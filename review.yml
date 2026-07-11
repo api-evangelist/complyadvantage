@@ -1,0 +1,107 @@
+aid: complyadvantage
+name: ComplyAdvantage
+review:
+  question: Does ComplyAdvantage expose a documented public WebSocket API?
+  answer: false
+  date: '2026-07-11'
+  reviewer: API Evangelist
+  asyncapiSpecCreated: false
+  asyncapiScopeNote: |
+    No AsyncAPI document was authored. ComplyAdvantage's public API surface is
+    request/response REST over HTTPS - the classic screening API
+    (api.complyadvantage.com plus US and APAC regional bases) and the newer
+    Mesh platform API. The only push transport is outbound webhooks
+    (match_status_updated, search_status_updated, monitored_search_updated on
+    the classic API, plus configurable webhook notifications on Mesh), which
+    are provider-to-endpoint HTTP callbacks rather than a WebSocket or SSE
+    surface worth a standalone AsyncAPI document at this time.
+findings:
+  summary: |
+    ComplyAdvantage does not publish a documented public WebSocket API.
+    ComplyAdvantage is an AML and financial-crime risk detection provider -
+    sanctions and watchlist screening, PEPs and RCAs, adverse media, ongoing
+    monitoring, and (on the Mesh platform) transaction monitoring and fraud
+    detection. The classic REST API is publicly documented at
+    docs.complyadvantage.com with regional bases at
+    https://api.complyadvantage.com (EU), https://api.us.complyadvantage.com
+    (US), and https://api.ap.complyadvantage.com (APAC), authenticated with an
+    api key sent as "Authorization: Token YOUR_API_KEY". It is pure
+    request/response REST: searches, monitored searches, comments, tags,
+    users, and references. Change notification is handled by outbound
+    webhooks, not server push to a connected client. The newer Mesh platform
+    API (docs.mesh.complyadvantage.com) uses OAuth2 bearer tokens with
+    24-hour validity and is likewise REST plus webhook/email notifications.
+    No ws:// or wss:// endpoint is documented on either surface as of the
+    review date.
+  accessModel: |
+    Documentation is fully public, but API keys are account-gated - they are
+    generated inside the ComplyAdvantage web platform. The Starter Plan (from
+    $99/month, 100-2,000 monitored entities) is self-serve with all
+    functionality available via the API; Enterprise (payments screening,
+    transaction monitoring, higher volume) is contact-sales. Sandbox accounts
+    exist for integration testing (rate-limited to 300 calls/minute versus
+    600 on standard contracts).
+  transports:
+    - protocol: REST
+      scheme: https
+      baseURL: https://api.complyadvantage.com
+      documented: true
+      note: Classic screening API. Regional bases api.us.complyadvantage.com and api.ap.complyadvantage.com. Api-key auth via "Authorization Token" header.
+    - protocol: REST
+      scheme: https
+      baseURL: https://api.mesh.complyadvantage.com
+      documented: true
+      note: Mesh platform API (customers, cases, alerts, transactions). OAuth2 bearer tokens valid 24 hours. Documented at docs.mesh.complyadvantage.com with its own OpenAPI schema.
+    - protocol: Webhook
+      scheme: https
+      documented: true
+      note: Outbound events match_status_updated, search_status_updated, and monitored_search_updated on the classic API; configurable webhook and email notifications on Mesh. Provider-to-endpoint HTTP, not WebSocket.
+    - protocol: WebSocket
+      scheme: wss
+      documented: false
+      note: No WebSocket endpoint is documented in the classic API reference or the Mesh documentation as of the review date.
+  endpointsConfirmedRest:
+    - POST   https://api.complyadvantage.com/searches
+    - GET    https://api.complyadvantage.com/searches
+    - GET    https://api.complyadvantage.com/searches/{id}
+    - GET    https://api.complyadvantage.com/searches/{id}/details
+    - GET    https://api.complyadvantage.com/searches/{ref}/entities/{entity_provider}
+    - GET    https://api.complyadvantage.com/searches/{id}/certificate
+    - PATCH  https://api.complyadvantage.com/searches/{id}
+    - PATCH  https://api.complyadvantage.com/searches/{id}/entities
+    - DELETE https://api.complyadvantage.com/searches/{id}
+    - POST   https://api.complyadvantage.com/searches/references
+    - GET    https://api.complyadvantage.com/searches/{id}/monitors
+    - PATCH  https://api.complyadvantage.com/searches/{id}/monitors
+    - PATCH  https://api.complyadvantage.com/searches/{id}/search-profile
+    - GET    https://api.complyadvantage.com/searches/{id}/monitor/differences
+    - POST   https://api.complyadvantage.com/searches/{id}/monitor/acknowledge
+    - POST   https://api.complyadvantage.com/searches/{id}/comments
+    - GET    https://api.complyadvantage.com/searches/{id}/comments
+    - DELETE https://api.complyadvantage.com/searches/{id}/tags/{tag_name}
+    - GET    https://api.complyadvantage.com/users
+sources:
+  - url: https://docs.complyadvantage.com/
+    type: Documentation
+    note: API reference introduction - regional base URLs, Token auth header, 600/300 per-minute rate limits, exponential backoff guidance. No WebSocket mentioned.
+  - url: https://docs.complyadvantage.com/api-docs/
+    type: APIReference
+    note: Full classic API reference - searches, monitored searches, comments, tags, users, references, webhooks, pagination, match types.
+  - url: https://docs.mesh.complyadvantage.com/
+    type: Documentation
+    note: Mesh platform API - OAuth2 bearer auth (24h tokens), customers, screening, cases, alerts, transactions, notifications, admin. REST plus webhooks; no WebSocket.
+  - url: https://complyadvantage.com/pricing/
+    type: Plans
+    note: Starter Plan from $99/month (100-2,000 monitored entities, self-serve, API included) and custom-priced Enterprise; ComplyLaunch free startup program.
+  - url: https://github.com/complyadvantage
+    type: GitHubOrganization
+    note: Company GitHub organization.
+actions:
+  asyncapiPath: null
+  apisYmlUpdated: true
+  reason: |
+    No WebSocket protocol surface exists. Both public API surfaces (classic
+    screening API and the Mesh platform API) are request/response REST over
+    HTTPS, with outbound webhooks as the only push mechanism. No AsyncAPI
+    document was created because there is no server-push transport on a
+    connected client to model.

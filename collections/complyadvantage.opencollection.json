@@ -1,0 +1,239 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "ComplyAdvantage API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "apikey",
+      "apikey": {
+        "placement": "header",
+        "key": "Authorization",
+        "value": "Token {{apiKey}}"
+      }
+    }
+  },
+  "items": [
+    {
+      "info": { "name": "Searches", "type": "folder" },
+      "items": [
+        {
+          "info": { "name": "Create a new search.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://api.complyadvantage.com/searches",
+            "body": { "type": "json", "data": "{\n  \"search_term\": \"Robert Mugabe\",\n  \"fuzziness\": 0.6,\n  \"filters\": { \"types\": [\"sanction\", \"warning\", \"pep\", \"adverse-media\"] }\n}" }
+          },
+          "docs": "Screens a name against sanctions, warnings, fitness-probity, PEP, and adverse media data."
+        },
+        {
+          "info": { "name": "List previous searches.", "type": "http" },
+          "http": { "method": "GET", "url": "https://api.complyadvantage.com/searches" },
+          "docs": "Lists previous searches with filtering, sorting, and pagination."
+        },
+        {
+          "info": { "name": "Retrieve a search.", "type": "http" },
+          "http": {
+            "method": "GET",
+            "url": "https://api.complyadvantage.com/searches/:id",
+            "params": [
+              { "name": "id", "value": "", "type": "path", "description": "The search ID or ref." }
+            ]
+          },
+          "docs": "Retrieves the overview of a single search by ID or ref."
+        },
+        {
+          "info": { "name": "Retrieve full search results.", "type": "http" },
+          "http": {
+            "method": "GET",
+            "url": "https://api.complyadvantage.com/searches/:id/details",
+            "params": [
+              { "name": "id", "value": "", "type": "path", "description": "The search ID or ref." }
+            ]
+          },
+          "docs": "Retrieves the full detail of a search including all hits with entity documents and match types."
+        },
+        {
+          "info": { "name": "Retrieve paginated search entities.", "type": "http" },
+          "http": {
+            "method": "GET",
+            "url": "https://api.complyadvantage.com/searches/:ref/entities/:entity_provider",
+            "params": [
+              { "name": "ref", "value": "", "type": "path", "description": "The search ref." },
+              { "name": "entity_provider", "value": "", "type": "path", "description": "The entity data provider." }
+            ]
+          },
+          "docs": "Retrieves the matching entities of a search in paginated form."
+        },
+        {
+          "info": { "name": "Download search certificate.", "type": "http" },
+          "http": {
+            "method": "GET",
+            "url": "https://api.complyadvantage.com/searches/:id/certificate",
+            "params": [
+              { "name": "id", "value": "", "type": "path", "description": "The search ID or ref." }
+            ]
+          },
+          "docs": "Downloads a PDF certificate of the search for audit purposes."
+        },
+        {
+          "info": { "name": "Update search details.", "type": "http" },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.complyadvantage.com/searches/:id",
+            "params": [
+              { "name": "id", "value": "", "type": "path", "description": "The search ID or ref." }
+            ],
+            "body": { "type": "json", "data": "{\n  \"match_status\": \"true_positive\",\n  \"risk_level\": \"high\"\n}" }
+          },
+          "docs": "Updates the assigned user, match status, and risk level of a search."
+        },
+        {
+          "info": { "name": "Update entity details on a search.", "type": "http" },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.complyadvantage.com/searches/:id/entities",
+            "params": [
+              { "name": "id", "value": "", "type": "path", "description": "The search ID or ref." }
+            ],
+            "body": { "type": "json", "data": "{}" }
+          },
+          "docs": "Updates whitelist status, risk level, and match status on matched entities."
+        },
+        {
+          "info": { "name": "Create search references.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://api.complyadvantage.com/searches/references",
+            "body": { "type": "json", "data": "{}" }
+          },
+          "docs": "Creates search references for tracking searches by your own identifiers."
+        },
+        {
+          "info": { "name": "Delete a search.", "type": "http" },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.complyadvantage.com/searches/:id",
+            "params": [
+              { "name": "id", "value": "", "type": "path", "description": "The search ID or ref." }
+            ]
+          },
+          "docs": "Deletes a search from your account."
+        }
+      ]
+    },
+    {
+      "info": { "name": "Monitored Searches", "type": "folder" },
+      "items": [
+        {
+          "info": { "name": "Get monitored search details.", "type": "http" },
+          "http": {
+            "method": "GET",
+            "url": "https://api.complyadvantage.com/searches/:id/monitors",
+            "params": [
+              { "name": "id", "value": "", "type": "path", "description": "The search ID or ref." }
+            ]
+          },
+          "docs": "Retrieves the monitoring configuration and state of a search."
+        },
+        {
+          "info": { "name": "Update monitored search details.", "type": "http" },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.complyadvantage.com/searches/:id/monitors",
+            "params": [
+              { "name": "id", "value": "", "type": "path", "description": "The search ID or ref." }
+            ],
+            "body": { "type": "json", "data": "{\n  \"is_monitored\": true\n}" }
+          },
+          "docs": "Starts or stops ongoing monitoring for a search."
+        },
+        {
+          "info": { "name": "Update associated search profile.", "type": "http" },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.complyadvantage.com/searches/:id/search-profile",
+            "params": [
+              { "name": "id", "value": "", "type": "path", "description": "The search ID or ref." }
+            ],
+            "body": { "type": "json", "data": "{}" }
+          },
+          "docs": "Updates which search profile a monitored search uses."
+        },
+        {
+          "info": { "name": "Retrieve monitored search changes.", "type": "http" },
+          "http": {
+            "method": "GET",
+            "url": "https://api.complyadvantage.com/searches/:id/monitor/differences",
+            "params": [
+              { "name": "id", "value": "", "type": "path", "description": "The search ID or ref." }
+            ]
+          },
+          "docs": "Retrieves new, updated, and removed matching entities since the last acknowledgement."
+        },
+        {
+          "info": { "name": "Acknowledge monitored search changes.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://api.complyadvantage.com/searches/:id/monitor/acknowledge",
+            "params": [
+              { "name": "id", "value": "", "type": "path", "description": "The search ID or ref." }
+            ]
+          },
+          "docs": "Acknowledges the pending changes on a monitored search."
+        }
+      ]
+    },
+    {
+      "info": { "name": "Case Management", "type": "folder" },
+      "items": [
+        {
+          "info": { "name": "Create a comment on a search.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://api.complyadvantage.com/searches/:id/comments",
+            "params": [
+              { "name": "id", "value": "", "type": "path", "description": "The search ID or ref." }
+            ],
+            "body": { "type": "json", "data": "{\n  \"comment\": \"\"\n}" }
+          },
+          "docs": "Adds an analyst comment to a search for case audit trails."
+        },
+        {
+          "info": { "name": "Retrieve comments on a search.", "type": "http" },
+          "http": {
+            "method": "GET",
+            "url": "https://api.complyadvantage.com/searches/:id/comments",
+            "params": [
+              { "name": "id", "value": "", "type": "path", "description": "The search ID or ref." }
+            ]
+          },
+          "docs": "Lists the comments attached to a search."
+        },
+        {
+          "info": { "name": "Detach a tag from a search.", "type": "http" },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.complyadvantage.com/searches/:id/tags/:tag_name",
+            "params": [
+              { "name": "id", "value": "", "type": "path", "description": "The search ID or ref." },
+              { "name": "tag_name", "value": "", "type": "path", "description": "The tag name to detach." }
+            ]
+          },
+          "docs": "Removes a key-value tag from a search."
+        }
+      ]
+    },
+    {
+      "info": { "name": "Users", "type": "folder" },
+      "items": [
+        {
+          "info": { "name": "List account users.", "type": "http" },
+          "http": { "method": "GET", "url": "https://api.complyadvantage.com/users" },
+          "docs": "Lists the users on your ComplyAdvantage account for search and case assignment."
+        }
+      ]
+    }
+  ]
+}

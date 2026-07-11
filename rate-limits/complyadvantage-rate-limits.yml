@@ -1,0 +1,65 @@
+specification: API Commons Rate Limits
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
+provider: ComplyAdvantage
+providerId: complyadvantage
+created: '2026-07-11'
+modified: '2026-07-11'
+reconciled: true
+tags:
+- Anti-Money Laundering
+- AML
+- Sanctions Screening
+- Compliance
+- Rate Limiting
+- Quotas
+description: >-
+  ComplyAdvantage documents explicit numeric rate limits for its REST API.
+  Standard contracts allow 600 API calls per minute; sandbox accounts are
+  limited to 300 calls per minute. Higher limits can be configured on request
+  through your account manager. Exceeding the limit returns HTTP 429 Too Many
+  Requests, and the documentation prescribes an exponential backoff retry
+  strategy starting at 2 seconds, doubling on each attempt, and capped at 60
+  seconds. In addition to the request-rate cap, search creation is paginated
+  at up to 100 results per request via offset and limit parameters.
+notes: >-
+  Limits apply per account across the regional bases (EU, US, APAC). Rate
+  limits on the newer Mesh platform API are documented separately in the Mesh
+  rate-limiting guide.
+sources:
+- https://docs.complyadvantage.com/
+- https://docs.complyadvantage.com/api-docs/
+- https://docs.mesh.complyadvantage.com/
+responseCodes:
+  throttled: 429
+limits:
+- name: Standard Contract API Requests
+  scope: account
+  metric: requests
+  limit: 600 per minute
+  notes: Default cap for standard contracts; higher limits configurable via your account manager.
+- name: Sandbox API Requests
+  scope: account
+  metric: requests
+  limit: 300 per minute
+  notes: Cap for sandbox accounts used during integration and testing.
+- name: Search Results Per Request
+  scope: request
+  metric: results
+  limit: 100
+  notes: Creating a search returns up to 100 results; paginate with offset and limit for more.
+- name: Common Pagination Depth
+  scope: request
+  metric: records
+  limit: 10000
+  notes: Offset-based (common) pagination on list endpoints is limited to 10,000 records; token-based pagination avoids the cap.
+policies:
+- name: Exponential Backoff
+  description: On 429 responses, retry with exponential backoff starting at 2 seconds, doubling each attempt, with a maximum backoff of 60 seconds.
+- name: Configurable Limits
+  description: Higher request-rate limits can be arranged on standard contracts by contacting your ComplyAdvantage account manager.
+- name: Webhook Delivery
+  description: Match, search, and monitoring updates can be received via webhooks (match_status_updated, search_status_updated, monitored_search_updated) instead of polling, reducing request volume.
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

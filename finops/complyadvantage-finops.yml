@@ -1,0 +1,103 @@
+specification: FinOps Framework
+specificationVersion: '1.0'
+schema: https://www.finops.org/framework/
+provider: ComplyAdvantage
+providerId: complyadvantage
+created: '2026-07-11'
+modified: '2026-07-11'
+reconciled: false
+tags:
+- Anti-Money Laundering
+- AML
+- Sanctions Screening
+- Fraud Detection
+- Compliance
+- FinOps
+- Cost Management
+- FOCUS
+description: >-
+  FinOps view of ComplyAdvantage spend. The self-serve Starter Plan is a
+  monthly subscription (from $99/month) sized by a monitored-entity allowance
+  of 100 to 2,000 entities - the dominant cost driver is how many customers
+  you keep under ongoing monitoring, with overages above the allowance charged
+  in the next billing cycle. Enterprise agreements (contact sales) cover
+  higher volumes plus payments screening and transaction monitoring, typically
+  negotiated on screening and monitoring volume. One-off screening searches,
+  monitoring re-screens, and API calls all draw on the same subscription
+  rather than being metered per call on the published plans.
+notes: >-
+  Per-tier Starter prices and enterprise per-screening rates are not
+  reconciled here; verify on the pricing page or in your order form. The
+  ComplyLaunch program provides free access for qualifying early-stage
+  startups.
+sources:
+- https://complyadvantage.com/pricing/
+- https://complyadvantage.com/starter-plan/
+- https://docs.complyadvantage.com/
+- https://focus.finops.org/focus-specification/v1-3/
+alignedWith:
+  framework: FinOps Foundation Framework
+  frameworkUrl: https://www.finops.org/framework/
+  dataSpec: FOCUS
+  dataSpecVersion: '1.3'
+  dataSpecUrl: https://focus.finops.org/focus-specification/v1-3/
+publisherName: ComplyAdvantage
+serviceCategory: Security, Identity, and Compliance
+billingModel:
+  pricingCategory: Subscription
+  billingFrequency: Monthly
+  billingCurrency: USD
+  chargeCategories:
+  - Purchase
+  - Usage
+  - Adjustment
+focusColumns:
+  ServiceName: ComplyAdvantage
+  ServiceCategory: Security, Identity, and Compliance
+  ProviderName: ComplyAdvantage
+  PublisherName: ComplyAdvantage
+  InvoiceIssuerName: ComplyAdvantage
+  BillingCurrency: USD
+  ChargeCategory: Purchase
+  PricingCategory: Subscription
+meters:
+- name: monitored_entities
+  description: Customers and companies kept under ongoing monitoring; the Starter Plan allowance (100-2,000) is the primary price driver, with overages billed the next cycle.
+  unit: entities
+  aggregation: max
+  dimensions:
+  - account
+  - client_ref
+- name: screening_searches
+  description: One-off screening searches created via POST /searches; included in the subscription on published plans, volume-negotiated on enterprise agreements.
+  unit: searches
+  aggregation: sum
+  dimensions:
+  - account
+  - assignee
+  - client_ref
+- name: monitoring_updates
+  description: Monitored-search re-screens and change notifications generated as sanctions, PEP, and adverse media data changes.
+  unit: updates
+  aggregation: sum
+  dimensions:
+  - account
+  - search
+- name: transactions_screened
+  description: Payments screened and transactions monitored on the enterprise Mesh platform (not available on Starter).
+  unit: transactions
+  aggregation: sum
+  dimensions:
+  - account
+principles:
+- name: Visibility
+  description: Track monitored-entity counts against your plan allowance and tag searches with client_ref so screening volume maps to customers and products.
+- name: Allocation
+  description: Use tags and client references to attribute screening and monitoring activity to teams, products, or business lines.
+- name: Optimization
+  description: Stop monitoring on offboarded customers to reclaim allowance, whitelist recurring false positives to cut analyst rework, and use webhooks instead of polling to stay under rate limits.
+- name: Accountability
+  description: Review monitored-entity growth monthly against the allowance tier and renegotiate before overages accumulate; assign case owners so match decisions are audited.
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

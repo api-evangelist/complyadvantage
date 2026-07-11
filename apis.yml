@@ -1,0 +1,160 @@
+aid: complyadvantage
+url: https://raw.githubusercontent.com/api-evangelist/complyadvantage/refs/heads/main/apis.yml
+name: ComplyAdvantage
+kind: company
+description: >-
+  ComplyAdvantage provides AI-driven anti-money laundering (AML) and financial
+  crime risk detection - screening people and companies against sanctions and
+  watchlists, politically exposed persons (PEPs and RCAs), and adverse media,
+  with ongoing monitoring that alerts you when a customer's risk profile
+  changes. The REST API (api.complyadvantage.com, with US and APAC regional
+  bases) exposes searches, monitored searches, case management, comments, tags,
+  and users with api-key auth, plus webhooks for match and monitoring updates.
+  The newer Mesh platform API adds customer lifecycle screening, cases and
+  alerts, transaction monitoring, and fraud detection workflows. Used by banks,
+  fintechs, payments, and crypto firms for KYC/AML compliance, sanctions
+  screening, and fraud prevention.
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+tags:
+- Anti-Money Laundering
+- AML
+- Fraud Detection
+- Sanctions Screening
+- Compliance
+- PEP Screening
+- Adverse Media
+- KYC
+- Watchlists
+- Transaction Monitoring
+- Financial Crime
+- RegTech
+created: '2026-07-11'
+modified: '2026-07-11'
+specificationVersion: '0.19'
+apis:
+- aid: complyadvantage:complyadvantage-search-api
+  name: ComplyAdvantage Search API
+  tags:
+  - Sanctions Screening
+  - PEP Screening
+  - Adverse Media
+  - AML
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://docs.complyadvantage.com/api-docs/
+  baseURL: https://api.complyadvantage.com
+  properties:
+  - url: https://docs.complyadvantage.com/
+    type: Documentation
+  - url: https://docs.complyadvantage.com/api-docs/
+    type: APIReference
+  - url: openapi/complyadvantage-openapi.yml
+    type: OpenAPI
+  description: >-
+    Screen a person, company, organisation, vessel, or aircraft against
+    ComplyAdvantage's sanctions, watchlists, warnings, fitness and probity,
+    PEP, and adverse media data. Create searches with fuzziness control,
+    exact-match mode, and filters (entity type, birth year, country codes,
+    risk types), list and retrieve past searches, pull full hit details and
+    paginated entities, update match status, risk level, and whitelisting on
+    hits, and download a search certificate PDF for your audit trail.
+- aid: complyadvantage:complyadvantage-monitored-search-api
+  name: ComplyAdvantage Monitored Search API
+  tags:
+  - Ongoing Monitoring
+  - AML
+  - Alerts
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://docs.complyadvantage.com/api-docs/
+  baseURL: https://api.complyadvantage.com
+  properties:
+  - url: https://docs.complyadvantage.com/api-docs/
+    type: APIReference
+  - url: openapi/complyadvantage-openapi.yml
+    type: OpenAPI
+  description: >-
+    Turn any search into ongoing monitoring so customers are automatically
+    re-screened as sanctions lists, PEP registries, and adverse media change.
+    Start and stop monitoring on a search, swap the associated search profile,
+    retrieve what changed (new, updated, and removed matching entities), and
+    acknowledge changes. The monitored_search_updated webhook pushes change
+    notifications to your systems.
+- aid: complyadvantage:complyadvantage-case-management-api
+  name: ComplyAdvantage Case Management API
+  tags:
+  - Case Management
+  - Compliance
+  - Audit Trail
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://docs.complyadvantage.com/api-docs/
+  baseURL: https://api.complyadvantage.com
+  properties:
+  - url: https://docs.complyadvantage.com/api-docs/
+    type: APIReference
+  - url: openapi/complyadvantage-openapi.yml
+    type: OpenAPI
+  description: >-
+    Treat screening results as managed compliance cases - assign a search to
+    an analyst, set match status (potential match, true positive, false
+    positive, no match) and risk level, add and retrieve comments on a search,
+    attach and detach key-value tags, and use client references for
+    client-scoped whitelisting of recurring false positives.
+- aid: complyadvantage:complyadvantage-users-api
+  name: ComplyAdvantage Users API
+  tags:
+  - Users
+  - Administration
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://docs.complyadvantage.com/api-docs/
+  baseURL: https://api.complyadvantage.com
+  properties:
+  - url: https://docs.complyadvantage.com/api-docs/
+    type: APIReference
+  - url: openapi/complyadvantage-openapi.yml
+    type: OpenAPI
+  description: >-
+    List the users on your ComplyAdvantage account so searches and cases can
+    be assigned to the right analyst by user ID.
+- aid: complyadvantage:complyadvantage-mesh-platform-api
+  name: ComplyAdvantage Mesh Platform API
+  tags:
+  - Customer Screening
+  - Transaction Monitoring
+  - Fraud Detection
+  - Cases
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  properties:
+  - url: https://docs.mesh.complyadvantage.com/
+    type: Documentation
+  description: >-
+    ComplyAdvantage's newer Mesh platform API, authenticated with OAuth2
+    bearer tokens (24-hour validity). Covers the full customer lifecycle -
+    customer creation and screening (sync or async), risk scoring, cases and
+    alerts with stage transitions and assignments, transaction screening and
+    monitoring for payments fraud, custom and lookup lists, webhook and email
+    notifications, data exports, user and role administration, and regulatory
+    reporting (CTR/SAR prefill). Documented separately at
+    docs.mesh.complyadvantage.com with its own OpenAPI schema for customers.
+common:
+- type: GitHubOrganization
+  url: https://github.com/complyadvantage
+- type: LinkedIn
+  url: https://www.linkedin.com/company/complyadvantage
+- type: Website
+  url: https://complyadvantage.com
+- type: Documentation
+  url: https://docs.complyadvantage.com
+- type: Pricing
+  url: https://complyadvantage.com/pricing/
+- type: Plans
+  url: plans/complyadvantage-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/complyadvantage-rate-limits.yml
+- type: FinOps
+  url: finops/complyadvantage-finops.yml
+- type: Blog
+  url: https://complyadvantage.com/insights/
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

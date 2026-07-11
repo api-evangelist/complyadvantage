@@ -1,0 +1,116 @@
+specification: API Commons Plans
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/Plans
+provider: ComplyAdvantage
+providerId: complyadvantage
+created: '2026-07-11'
+modified: '2026-07-11'
+reconciled: false
+tags:
+- Anti-Money Laundering
+- AML
+- Sanctions Screening
+- Fraud Detection
+- Compliance
+- Plans
+description: >-
+  ComplyAdvantage publishes a self-serve Starter Plan starting at $99 per
+  month, sized by monitored-entity allowance (tiers from 100 up to 2,000
+  monitored entities), covering customer screening, company screening,
+  sanctions and watchlists, PEPs and RCAs, adverse media, and ongoing
+  monitoring, with an agentic-workflows option. All functionality on the plan
+  is available via the API or case management, and setup takes about one
+  business day after payment. Above 2,000 monitored entities, or for payments
+  screening and transaction monitoring, an Enterprise plan with custom
+  (contact-sales) pricing applies. Early-stage startups can apply to the
+  ComplyLaunch program for free access.
+notes: >-
+  Starter tier prices scale with the monitored-entity allowance; the exact
+  per-tier price table is rendered dynamically on the pricing page and is not
+  reconciled here. Allowances can be adjusted at any time; overages are
+  charged in the next billing cycle. Verify current tiers and rates on the
+  pricing page during reconciliation.
+sources:
+- https://complyadvantage.com/pricing/
+- https://complyadvantage.com/starter-plan/
+- https://docs.complyadvantage.com/
+plans:
+- id: complyadvantage-starter
+  name: Starter Plan
+  type: paid
+  description: >-
+    Self-serve plan from $99 per month, sized by monitored-entity allowance
+    (100 to 2,000 entities). Includes customer screening, company screening,
+    sanctions and watchlists, PEPs and RCAs, adverse media, ongoing
+    monitoring, and an agentic-workflows option, all available via the API or
+    case management. Billed monthly on the subscription anniversary; major
+    credit cards accepted.
+  entries:
+  - label: Monitored Entities
+    name: starter_monitored_entities
+    type: usage
+    metric: entities
+    limit: 2000
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: from $99/month for 100 monitored entities, scaling by tier up to 2,000
+    userMultiplied: false
+  elements:
+  - name: Customer Screening
+  - name: Company Screening
+  - name: Sanctions and Watchlists
+  - name: PEPs and RCAs
+  - name: Adverse Media
+  - name: Ongoing Monitoring
+  - name: API Access
+  - name: Agentic Workflows Option
+- id: complyadvantage-enterprise
+  name: Enterprise
+  type: enterprise
+  description: >-
+    Custom-priced plan for more than 2,000 monitored entities or more complex
+    use cases. Adds payments screening, transaction monitoring, full agentic
+    AI workflows, unlimited usage, and premium support. Contact sales.
+  entries:
+  - label: Enterprise Agreement
+    name: enterprise
+    type: flat
+    metric: contract
+    limit: -1
+    timeFrame: year
+    geo: global
+    unit: 1
+    price: contact sales
+    userMultiplied: false
+  elements:
+  - name: Everything in Starter
+  - name: Payments Screening
+  - name: Transaction Monitoring
+  - name: Full Agentic AI Workflows
+  - name: Unlimited Usage
+  - name: Premium Support
+- id: complyadvantage-complylaunch
+  name: ComplyLaunch
+  type: free
+  description: >-
+    Free program giving qualifying early-stage startups access to
+    ComplyAdvantage's AML screening and monitoring tools. Application
+    required.
+  entries:
+  - label: Startup Program Access
+    name: complylaunch_access
+    type: flat
+    metric: program
+    limit: -1
+    timeFrame: year
+    geo: global
+    unit: 1
+    price: free for qualifying early-stage startups (application required)
+    userMultiplied: false
+  elements:
+  - name: AML Screening
+  - name: Ongoing Monitoring
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

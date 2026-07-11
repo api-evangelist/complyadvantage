@@ -1,0 +1,222 @@
+{
+  "info": {
+    "name": "ComplyAdvantage API",
+    "description": "AML screening and monitoring via the ComplyAdvantage REST API - sanctions and watchlist screening, PEPs and RCAs, adverse media, ongoing monitoring, case management, and users. Base URL: https://api.complyadvantage.com (EU), https://api.us.complyadvantage.com (US), or https://api.ap.complyadvantage.com (APAC). All requests require an api key sent as 'Authorization: Token YOUR_API_KEY'; keys are generated inside the ComplyAdvantage platform. Rate limit: 600 calls/minute standard, 300 sandbox.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      { "key": "key", "value": "Authorization", "type": "string" },
+      { "key": "value", "value": "Token {{apiKey}}", "type": "string" },
+      { "key": "in", "value": "header", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://api.complyadvantage.com", "type": "string" },
+    { "key": "apiKey", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Searches",
+      "item": [
+        {
+          "name": "Create a new search",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"search_term\": \"Robert Mugabe\",\n  \"client_ref\": \"customer-12345\",\n  \"fuzziness\": 0.6,\n  \"filters\": {\n    \"types\": [\"sanction\", \"warning\", \"pep\", \"adverse-media\"],\n    \"entity_type\": \"person\"\n  },\n  \"limit\": 100,\n  \"offset\": 0\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/searches", "host": ["{{baseUrl}}"], "path": ["searches"] },
+            "description": "Screens a name against sanctions, warnings, fitness-probity, PEP, and adverse media data, returning matching entities as hits."
+          }
+        },
+        {
+          "name": "List previous searches",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/searches", "host": ["{{baseUrl}}"], "path": ["searches"] },
+            "description": "Lists previous searches with filtering, sorting, and pagination."
+          }
+        },
+        {
+          "name": "Retrieve a search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/searches/:id", "host": ["{{baseUrl}}"], "path": ["searches", ":id"], "variable": [{ "key": "id", "value": "" }] },
+            "description": "Retrieves the overview of a single search by ID or ref."
+          }
+        },
+        {
+          "name": "Retrieve full search results",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/searches/:id/details", "host": ["{{baseUrl}}"], "path": ["searches", ":id", "details"], "variable": [{ "key": "id", "value": "" }] },
+            "description": "Retrieves the full detail of a search including all hits with entity documents and match types."
+          }
+        },
+        {
+          "name": "Retrieve paginated search entities",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/searches/:ref/entities/:entity_provider", "host": ["{{baseUrl}}"], "path": ["searches", ":ref", "entities", ":entity_provider"], "variable": [{ "key": "ref", "value": "" }, { "key": "entity_provider", "value": "" }] },
+            "description": "Retrieves the matching entities of a search in paginated form."
+          }
+        },
+        {
+          "name": "Download search certificate",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/searches/:id/certificate", "host": ["{{baseUrl}}"], "path": ["searches", ":id", "certificate"], "variable": [{ "key": "id", "value": "" }] },
+            "description": "Downloads a PDF certificate of the search for audit purposes."
+          }
+        },
+        {
+          "name": "Update search details",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"match_status\": \"true_positive\",\n  \"risk_level\": \"high\",\n  \"assignee_id\": 1\n}" },
+            "url": { "raw": "{{baseUrl}}/searches/:id", "host": ["{{baseUrl}}"], "path": ["searches", ":id"], "variable": [{ "key": "id", "value": "" }] },
+            "description": "Updates the assigned user, match status, and risk level of a search."
+          }
+        },
+        {
+          "name": "Update entity details on a search",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"entities\": [\"ENTITY_ID\"],\n  \"is_whitelisted\": true\n}" },
+            "url": { "raw": "{{baseUrl}}/searches/:id/entities", "host": ["{{baseUrl}}"], "path": ["searches", ":id", "entities"], "variable": [{ "key": "id", "value": "" }] },
+            "description": "Updates whitelist status, risk level, and match status on matched entities."
+          }
+        },
+        {
+          "name": "Create search references",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": { "raw": "{{baseUrl}}/searches/references", "host": ["{{baseUrl}}"], "path": ["searches", "references"] },
+            "description": "Creates search references for tracking searches by your own identifiers."
+          }
+        },
+        {
+          "name": "Delete a search",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/searches/:id", "host": ["{{baseUrl}}"], "path": ["searches", ":id"], "variable": [{ "key": "id", "value": "" }] },
+            "description": "Deletes a search from your account."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Monitored Searches",
+      "item": [
+        {
+          "name": "Get monitored search details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/searches/:id/monitors", "host": ["{{baseUrl}}"], "path": ["searches", ":id", "monitors"], "variable": [{ "key": "id", "value": "" }] },
+            "description": "Retrieves the monitoring configuration and state of a search."
+          }
+        },
+        {
+          "name": "Update monitored search details",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"is_monitored\": true\n}" },
+            "url": { "raw": "{{baseUrl}}/searches/:id/monitors", "host": ["{{baseUrl}}"], "path": ["searches", ":id", "monitors"], "variable": [{ "key": "id", "value": "" }] },
+            "description": "Starts or stops ongoing monitoring for a search."
+          }
+        },
+        {
+          "name": "Update associated search profile",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"search_profile\": \"\"\n}" },
+            "url": { "raw": "{{baseUrl}}/searches/:id/search-profile", "host": ["{{baseUrl}}"], "path": ["searches", ":id", "search-profile"], "variable": [{ "key": "id", "value": "" }] },
+            "description": "Updates which search profile a monitored search uses."
+          }
+        },
+        {
+          "name": "Retrieve monitored search changes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/searches/:id/monitor/differences", "host": ["{{baseUrl}}"], "path": ["searches", ":id", "monitor", "differences"], "variable": [{ "key": "id", "value": "" }] },
+            "description": "Retrieves new, updated, and removed matching entities since the last acknowledgement."
+          }
+        },
+        {
+          "name": "Acknowledge monitored search changes",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/searches/:id/monitor/acknowledge", "host": ["{{baseUrl}}"], "path": ["searches", ":id", "monitor", "acknowledge"], "variable": [{ "key": "id", "value": "" }] },
+            "description": "Acknowledges the pending changes on a monitored search."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Case Management",
+      "item": [
+        {
+          "name": "Create a comment on a search",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"comment\": \"Reviewed and escalated to compliance.\"\n}" },
+            "url": { "raw": "{{baseUrl}}/searches/:id/comments", "host": ["{{baseUrl}}"], "path": ["searches", ":id", "comments"], "variable": [{ "key": "id", "value": "" }] },
+            "description": "Adds an analyst comment to a search for case audit trails."
+          }
+        },
+        {
+          "name": "Retrieve comments on a search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/searches/:id/comments", "host": ["{{baseUrl}}"], "path": ["searches", ":id", "comments"], "variable": [{ "key": "id", "value": "" }] },
+            "description": "Lists the comments attached to a search."
+          }
+        },
+        {
+          "name": "Detach a tag from a search",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/searches/:id/tags/:tag_name", "host": ["{{baseUrl}}"], "path": ["searches", ":id", "tags", ":tag_name"], "variable": [{ "key": "id", "value": "" }, { "key": "tag_name", "value": "" }] },
+            "description": "Removes a key-value tag from a search."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List account users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] },
+            "description": "Lists the users on your ComplyAdvantage account for search and case assignment."
+          }
+        }
+      ]
+    }
+  ]
+}

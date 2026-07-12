@@ -137,6 +137,10 @@ apis:
     reporting (CTR/SAR prefill). Documented separately at
     docs.mesh.complyadvantage.com with its own OpenAPI schema for customers.
 common:
+- type: DomainSecurity
+  url: security/complyadvantage-domain-security.yml
+- type: Authentication
+  url: authentication/complyadvantage-authentication.yml
 - type: GitHubOrganization
   url: https://github.com/complyadvantage
 - type: LinkedIn

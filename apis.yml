@@ -137,6 +137,8 @@ apis:
     reporting (CTR/SAR prefill). Documented separately at
     docs.mesh.complyadvantage.com with its own OpenAPI schema for customers.
 common:
+- type: AgenticAccess
+  url: agentic-access/complyadvantage-agentic-access.yml
 - type: DomainSecurity
   url: security/complyadvantage-domain-security.yml
 - type: Authentication

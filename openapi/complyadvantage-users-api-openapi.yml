@@ -1,0 +1,52 @@
+openapi: 3.0.3
+info:
+  title: ComplyAdvantage Case Management Users API
+  description: 'The ComplyAdvantage REST API screens people and companies against sanctions and watchlists, warnings and fitness-probity lists, politically exposed persons (PEPs and RCAs), and adverse media, and keeps them under ongoing monitoring. It covers searches (create, list, retrieve, update, delete, certificates, entities), monitored searches (start/stop monitoring, differences, acknowledge), case management (assignment, match status, risk level, comments, tags), and account users. Authentication is an api key sent as "Authorization: Token YOUR_API_KEY"; keys are generated inside the ComplyAdvantage web platform, so an account is required. Standard contracts allow 600 API calls per minute (sandbox 300), with 429 responses requiring exponential backoff (start at 2 seconds, cap at 60). Webhook events match_status_updated, search_status_updated, and monitored_search_updated push changes to your systems. This document was modeled from the public API reference at docs.complyadvantage.com; the endpoint paths are documented publicly, while request/response schemas are summarized rather than exhaustive.'
+  version: '1.0'
+  contact:
+    name: ComplyAdvantage
+    url: https://complyadvantage.com
+servers:
+- url: https://api.complyadvantage.com
+  description: EU (default)
+- url: https://api.us.complyadvantage.com
+  description: US
+- url: https://api.ap.complyadvantage.com
+  description: APAC
+security:
+- apiKeyAuth: []
+tags:
+- name: Users
+  description: Users on your ComplyAdvantage account.
+paths:
+  /users:
+    get:
+      operationId: listUsers
+      tags:
+      - Users
+      summary: List account users
+      description: Lists the users on your ComplyAdvantage account for search and case assignment.
+      responses:
+        '200':
+          description: The users on the account.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  content:
+                    type: object
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  responses:
+    Unauthorized:
+      description: Missing or invalid API key.
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'API key sent as: Authorization: Token YOUR_API_KEY. Keys are generated in the ComplyAdvantage web platform.'

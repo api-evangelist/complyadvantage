@@ -1,0 +1,216 @@
+openapi: 3.0.3
+info:
+  title: ComplyAdvantage Case Management API
+  description: 'The ComplyAdvantage REST API screens people and companies against sanctions and watchlists, warnings and fitness-probity lists, politically exposed persons (PEPs and RCAs), and adverse media, and keeps them under ongoing monitoring. It covers searches (create, list, retrieve, update, delete, certificates, entities), monitored searches (start/stop monitoring, differences, acknowledge), case management (assignment, match status, risk level, comments, tags), and account users. Authentication is an api key sent as "Authorization: Token YOUR_API_KEY"; keys are generated inside the ComplyAdvantage web platform, so an account is required. Standard contracts allow 600 API calls per minute (sandbox 300), with 429 responses requiring exponential backoff (start at 2 seconds, cap at 60). Webhook events match_status_updated, search_status_updated, and monitored_search_updated push changes to your systems. This document was modeled from the public API reference at docs.complyadvantage.com; the endpoint paths are documented publicly, while request/response schemas are summarized rather than exhaustive.'
+  version: '1.0'
+  contact:
+    name: ComplyAdvantage
+    url: https://complyadvantage.com
+servers:
+- url: https://api.complyadvantage.com
+  description: EU (default)
+- url: https://api.us.complyadvantage.com
+  description: US
+- url: https://api.ap.complyadvantage.com
+  description: APAC
+security:
+- apiKeyAuth: []
+tags:
+- name: Case Management
+  description: Comments, tags, assignment, and match status workflow on searches.
+paths:
+  /searches/{id}:
+    patch:
+      operationId: updateSearch
+      tags:
+      - Case Management
+      summary: Update search details
+      description: Updates case-management details of a search - the assigned user, match status (no_match, false_positive, potential_match, true_positive, true_positive_approve, true_positive_reject), and risk level (low, medium, high, unknown).
+      parameters:
+      - $ref: '#/components/parameters/SearchId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                match_status:
+                  type: string
+                risk_level:
+                  type: string
+                assignee_id:
+                  type: integer
+      responses:
+        '200':
+          description: The updated search.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /searches/{id}/entities:
+    patch:
+      operationId: updateSearchEntities
+      tags:
+      - Case Management
+      summary: Update entity details on a search
+      description: Updates details of matched entities within a search - whitelist status (suppress recurring false positives), risk level, and per-entity match status.
+      parameters:
+      - $ref: '#/components/parameters/SearchId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entities:
+                  type: array
+                  items:
+                    type: string
+                is_whitelisted:
+                  type: boolean
+                match_status:
+                  type: string
+                risk_level:
+                  type: string
+      responses:
+        '200':
+          description: The updated entities.
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /searches/{id}/comments:
+    post:
+      operationId: createSearchComment
+      tags:
+      - Case Management
+      summary: Create a comment on a search
+      description: Adds an analyst comment to a search for case audit trails.
+      parameters:
+      - $ref: '#/components/parameters/SearchId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+      responses:
+        '200':
+          description: The created comment.
+        '404':
+          $ref: '#/components/responses/NotFound'
+    get:
+      operationId: listSearchComments
+      tags:
+      - Case Management
+      summary: Retrieve comments on a search
+      description: Lists the comments attached to a search.
+      parameters:
+      - $ref: '#/components/parameters/SearchId'
+      responses:
+        '200':
+          description: The comments on the search.
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /searches/{id}/tags/{tag_name}:
+    delete:
+      operationId: detachSearchTag
+      tags:
+      - Case Management
+      summary: Detach a tag from a search
+      description: Removes a key-value tag from a search.
+      parameters:
+      - $ref: '#/components/parameters/SearchId'
+      - name: tag_name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Tag removal confirmation.
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  schemas:
+    SearchEnvelope:
+      type: object
+      properties:
+        status:
+          type: string
+        content:
+          type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Search'
+    Hit:
+      type: object
+      properties:
+        doc:
+          type: object
+          description: The matched entity - id, name, entity_type, aka, associates, sources, types, fields, and media references.
+        match_types:
+          type: array
+          items:
+            type: string
+        match_types_details:
+          type: object
+        score:
+          type: number
+        is_whitelisted:
+          type: boolean
+        match_status:
+          type: string
+    Search:
+      type: object
+      properties:
+        id:
+          type: integer
+        ref:
+          type: string
+        search_term:
+          type: string
+        match_status:
+          type: string
+        risk_level:
+          type: string
+        total_hits:
+          type: integer
+        total_matches:
+          type: integer
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        tags:
+          type: array
+          items:
+            type: object
+        share_url:
+          type: string
+        hits:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hit'
+  parameters:
+    SearchId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: The search ID or ref.
+  responses:
+    NotFound:
+      description: The search or resource was not found.
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'API key sent as: Authorization: Token YOUR_API_KEY. Keys are generated in the ComplyAdvantage web platform.'

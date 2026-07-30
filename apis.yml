@@ -14,7 +14,20 @@ description: >-
   alerts, transaction monitoring, and fraud detection workflows. Used by banks,
   fintechs, payments, and crypto firms for KYC/AML compliance, sanctions
   screening, and fraud prevention.
-image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+accessModel:
+  pricing: paid
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Paid · Self-serve signup
+  confidence: high
+  source:
+  - plans
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/complyadvantage.png
 tags:
 - Anti-Money Laundering
 - AML
@@ -32,88 +45,6 @@ created: '2026-07-11'
 modified: '2026-07-11'
 specificationVersion: '0.19'
 apis:
-- aid: complyadvantage:complyadvantage-search-api
-  name: ComplyAdvantage Search API
-  tags:
-  - Sanctions Screening
-  - PEP Screening
-  - Adverse Media
-  - AML
-  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
-  humanURL: https://docs.complyadvantage.com/api-docs/
-  baseURL: https://api.complyadvantage.com
-  properties:
-  - url: https://docs.complyadvantage.com/
-    type: Documentation
-  - url: https://docs.complyadvantage.com/api-docs/
-    type: APIReference
-  - url: openapi/complyadvantage-openapi.yml
-    type: OpenAPI
-  description: >-
-    Screen a person, company, organisation, vessel, or aircraft against
-    ComplyAdvantage's sanctions, watchlists, warnings, fitness and probity,
-    PEP, and adverse media data. Create searches with fuzziness control,
-    exact-match mode, and filters (entity type, birth year, country codes,
-    risk types), list and retrieve past searches, pull full hit details and
-    paginated entities, update match status, risk level, and whitelisting on
-    hits, and download a search certificate PDF for your audit trail.
-- aid: complyadvantage:complyadvantage-monitored-search-api
-  name: ComplyAdvantage Monitored Search API
-  tags:
-  - Ongoing Monitoring
-  - AML
-  - Alerts
-  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
-  humanURL: https://docs.complyadvantage.com/api-docs/
-  baseURL: https://api.complyadvantage.com
-  properties:
-  - url: https://docs.complyadvantage.com/api-docs/
-    type: APIReference
-  - url: openapi/complyadvantage-openapi.yml
-    type: OpenAPI
-  description: >-
-    Turn any search into ongoing monitoring so customers are automatically
-    re-screened as sanctions lists, PEP registries, and adverse media change.
-    Start and stop monitoring on a search, swap the associated search profile,
-    retrieve what changed (new, updated, and removed matching entities), and
-    acknowledge changes. The monitored_search_updated webhook pushes change
-    notifications to your systems.
-- aid: complyadvantage:complyadvantage-case-management-api
-  name: ComplyAdvantage Case Management API
-  tags:
-  - Case Management
-  - Compliance
-  - Audit Trail
-  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
-  humanURL: https://docs.complyadvantage.com/api-docs/
-  baseURL: https://api.complyadvantage.com
-  properties:
-  - url: https://docs.complyadvantage.com/api-docs/
-    type: APIReference
-  - url: openapi/complyadvantage-openapi.yml
-    type: OpenAPI
-  description: >-
-    Treat screening results as managed compliance cases - assign a search to
-    an analyst, set match status (potential match, true positive, false
-    positive, no match) and risk level, add and retrieve comments on a search,
-    attach and detach key-value tags, and use client references for
-    client-scoped whitelisting of recurring false positives.
-- aid: complyadvantage:complyadvantage-users-api
-  name: ComplyAdvantage Users API
-  tags:
-  - Users
-  - Administration
-  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
-  humanURL: https://docs.complyadvantage.com/api-docs/
-  baseURL: https://api.complyadvantage.com
-  properties:
-  - url: https://docs.complyadvantage.com/api-docs/
-    type: APIReference
-  - url: openapi/complyadvantage-openapi.yml
-    type: OpenAPI
-  description: >-
-    List the users on your ComplyAdvantage account so searches and cases can
-    be assigned to the right analyst by user ID.
 - aid: complyadvantage:complyadvantage-mesh-platform-api
   name: ComplyAdvantage Mesh Platform API
   tags:
@@ -128,14 +59,69 @@ apis:
   - url: https://docs.mesh.complyadvantage.com/
     type: Documentation
   description: >-
-    ComplyAdvantage's newer Mesh platform API, authenticated with OAuth2
-    bearer tokens (24-hour validity). Covers the full customer lifecycle -
-    customer creation and screening (sync or async), risk scoring, cases and
-    alerts with stage transitions and assignments, transaction screening and
-    monitoring for payments fraud, custom and lookup lists, webhook and email
-    notifications, data exports, user and role administration, and regulatory
-    reporting (CTR/SAR prefill). Documented separately at
-    docs.mesh.complyadvantage.com with its own OpenAPI schema for customers.
+    ComplyAdvantage's newer Mesh platform API, authenticated with OAuth2 bearer tokens (24-hour validity).
+    Covers the full customer lifecycle - customer creation and screening (sync or async), risk scoring,
+    cases and alerts with stage transitions and assignments, transaction screening and monitoring for
+    payments fraud, custom and lookup lists, webhook and email notifications, data exports, user and role
+    administration, and regulatory reporting (CTR/SAR prefill). Documented separately at docs.mesh.complyadvantage.com
+    with its own OpenAPI schema for customers.
+- aid: complyadvantage:complyadvantage-case-management-api
+  name: ComplyAdvantage Case Management API
+  description: Comments, tags, assignment, and match status workflow on searches.
+  humanURL: https://docs.complyadvantage.com/api-docs/
+  baseURL: https://api.complyadvantage.com
+  tags:
+  - Case Management
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-case-management-api-openapi.yml
+  - type: Documentation
+    url: https://docs.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.complyadvantage.com/api-docs/
+- aid: complyadvantage:complyadvantage-monitored-searches-api
+  name: ComplyAdvantage Monitored Searches API
+  description: Ongoing monitoring of searches, change differences, and acknowledgement.
+  humanURL: https://docs.complyadvantage.com/api-docs/
+  baseURL: https://api.complyadvantage.com
+  tags:
+  - Monitored Searches
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-monitored-searches-api-openapi.yml
+  - type: Documentation
+    url: https://docs.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.complyadvantage.com/api-docs/
+- aid: complyadvantage:complyadvantage-searches-api
+  name: ComplyAdvantage Searches API
+  description: >-
+    Create and manage AML screening searches against sanctions, PEP, warning, and adverse media data.
+  humanURL: https://docs.complyadvantage.com/api-docs/
+  baseURL: https://api.complyadvantage.com
+  tags:
+  - Searches
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-searches-api-openapi.yml
+  - type: Documentation
+    url: https://docs.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.complyadvantage.com/api-docs/
+- aid: complyadvantage:complyadvantage-users-api
+  name: ComplyAdvantage Users API
+  description: Users on your ComplyAdvantage account.
+  humanURL: https://docs.complyadvantage.com/api-docs/
+  baseURL: https://api.complyadvantage.com
+  tags:
+  - Users
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-users-api-openapi.yml
+  - type: Documentation
+    url: https://docs.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.complyadvantage.com/api-docs/
 common:
 - type: AgenticAccess
   url: agentic-access/complyadvantage-agentic-access.yml

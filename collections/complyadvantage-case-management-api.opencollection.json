@@ -1,0 +1,138 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "ComplyAdvantage Case Management API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "apikey",
+      "key": "Authorization",
+      "value": "{{Authorization}}",
+      "placement": "header"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Case Management",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Update search details",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.complyadvantage.com/searches/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The search ID or ref."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates case-management details of a search - the assigned user, match status (no_match, false_positive, potential_match, true_positive, true_positive_approve, true_positive_reject), and risk level (low, medium, high, unknown)."
+        },
+        {
+          "info": {
+            "name": "Update entity details on a search",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.complyadvantage.com/searches/:id/entities",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The search ID or ref."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates details of matched entities within a search - whitelist status (suppress recurring false positives), risk level, and per-entity match status."
+        },
+        {
+          "info": {
+            "name": "Retrieve comments on a search",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.complyadvantage.com/searches/:id/comments",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The search ID or ref."
+              }
+            ]
+          },
+          "docs": "Lists the comments attached to a search."
+        },
+        {
+          "info": {
+            "name": "Create a comment on a search",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.complyadvantage.com/searches/:id/comments",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The search ID or ref."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Adds an analyst comment to a search for case audit trails."
+        },
+        {
+          "info": {
+            "name": "Detach a tag from a search",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.complyadvantage.com/searches/:id/tags/:tag_name",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The search ID or ref."
+              },
+              {
+                "name": "tag_name",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Removes a key-value tag from a search."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

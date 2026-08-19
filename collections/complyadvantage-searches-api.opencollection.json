@@ -1,0 +1,241 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "ComplyAdvantage Case Management Searches API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "apikey",
+      "key": "Authorization",
+      "value": "{{Authorization}}",
+      "placement": "header"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Searches",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List previous searches",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.complyadvantage.com/searches",
+            "params": [
+              {
+                "name": "search_term",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "client_ref",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "monitored",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "per_page",
+                "value": "",
+                "type": "query"
+              }
+            ]
+          },
+          "docs": "Lists previous searches with filtering (match status, risk level, assignee, searcher, created date range, client reference, tags, monitored state), sorting, and pagination."
+        },
+        {
+          "info": {
+            "name": "Create a new search",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.complyadvantage.com/searches",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Screens a search term (person, company, organisation, vessel, or aircraft name) against ComplyAdvantage's sanctions, warning, fitness-probity, PEP, and adverse media data, returning matching entities as hits. Supports fuzziness, exact match mode, filters, tags, client references, and pagination via offset/limit."
+        },
+        {
+          "info": {
+            "name": "Retrieve a search",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.complyadvantage.com/searches/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The search ID or ref."
+              }
+            ]
+          },
+          "docs": "Retrieves the overview of a single search by ID or ref."
+        },
+        {
+          "info": {
+            "name": "Update search details",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.complyadvantage.com/searches/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The search ID or ref."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates case-management details of a search - the assigned user, match status (no_match, false_positive, potential_match, true_positive, true_positive_approve, true_positive_reject), and risk level (low, medium, high, unknown)."
+        },
+        {
+          "info": {
+            "name": "Delete a search",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.complyadvantage.com/searches/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The search ID or ref."
+              }
+            ]
+          },
+          "docs": "Deletes a search from your account."
+        },
+        {
+          "info": {
+            "name": "Retrieve full search results",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.complyadvantage.com/searches/:id/details",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The search ID or ref."
+              }
+            ]
+          },
+          "docs": "Retrieves the full detail of a search including all hits, each with the matched entity document (name, aka, associates, sources, types, fields, media), match types, score, whitelisting, and match status."
+        },
+        {
+          "info": {
+            "name": "Retrieve paginated search entities",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.complyadvantage.com/searches/:ref/entities/:entity_provider",
+            "params": [
+              {
+                "name": "ref",
+                "value": "",
+                "type": "path",
+                "description": "The search ref."
+              },
+              {
+                "name": "entity_provider",
+                "value": "",
+                "type": "path",
+                "description": "The entity data provider."
+              }
+            ]
+          },
+          "docs": "Retrieves the matching entities of a search in paginated form."
+        },
+        {
+          "info": {
+            "name": "Download search certificate",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.complyadvantage.com/searches/:id/certificate",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The search ID or ref."
+              }
+            ]
+          },
+          "docs": "Downloads a PDF certificate of the search for audit and recordkeeping purposes."
+        },
+        {
+          "info": {
+            "name": "Update entity details on a search",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.complyadvantage.com/searches/:id/entities",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The search ID or ref."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates details of matched entities within a search - whitelist status (suppress recurring false positives), risk level, and per-entity match status."
+        },
+        {
+          "info": {
+            "name": "Create search references",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.complyadvantage.com/searches/references",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates search references for tracking searches by your own identifiers."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

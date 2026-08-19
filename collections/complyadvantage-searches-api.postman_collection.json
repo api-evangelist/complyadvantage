@@ -1,0 +1,1642 @@
+{
+  "item": [
+    {
+      "id": "278c8d9c-8b85-42fa-b77b-05f212cb16de",
+      "name": "Searches",
+      "description": {
+        "content": "Create and manage AML screening searches against sanctions, PEP, warning, and adverse media data.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "7d306b35-04ea-4e84-95a4-5fc59fba471d",
+          "name": "Create a new search",
+          "request": {
+            "name": "Create a new search",
+            "description": {
+              "content": "Screens a search term (person, company, organisation, vessel, or aircraft name) against ComplyAdvantage's sanctions, warning, fitness-probity, PEP, and adverse media data, returning matching entities as hits. Supports fuzziness, exact match mode, filters, tags, client references, and pagination via offset/limit.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "searches"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"search_term\": \"<string>\",\n  \"client_ref\": \"<string>\",\n  \"fuzziness\": \"<number>\",\n  \"exact_match\": \"<boolean>\",\n  \"search_profile\": \"<string>\",\n  \"offset\": 0,\n  \"limit\": 100,\n  \"share_url\": \"<integer>\",\n  \"tags\": \"<object>\",\n  \"filters\": {\n    \"types\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"birth_year\": \"<integer>\",\n    \"remove_deceased\": \"<string>\",\n    \"country_codes\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"entity_type\": \"<string>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "606c8165-d9e9-43b8-82b7-75ccfb18bb03",
+              "name": "The created search with matching hits.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"search_term\": \"<string>\",\n  \"client_ref\": \"<string>\",\n  \"fuzziness\": \"<number>\",\n  \"exact_match\": \"<boolean>\",\n  \"search_profile\": \"<string>\",\n  \"offset\": 0,\n  \"limit\": 100,\n  \"share_url\": \"<integer>\",\n  \"tags\": \"<object>\",\n  \"filters\": {\n    \"types\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"birth_year\": \"<integer>\",\n    \"remove_deceased\": \"<string>\",\n    \"country_codes\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"entity_type\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"string\",\n  \"content\": {\n    \"data\": {\n      \"id\": 5718,\n      \"ref\": \"string\",\n      \"search_term\": \"string\",\n      \"match_status\": \"string\",\n      \"risk_level\": \"string\",\n      \"total_hits\": 2954,\n      \"total_matches\": 320,\n      \"created_at\": \"string\",\n      \"updated_at\": \"string\",\n      \"share_url\": \"string\",\n      \"hits\": [\n        {\n          \"doc\": {},\n          \"match_types\": [\n            \"string\",\n            \"string\"\n          ],\n          \"match_types_details\": {},\n          \"score\": 5321.66141417234,\n          \"is_whitelisted\": false,\n          \"match_status\": \"string\"\n        },\n        {\n          \"doc\": {},\n          \"match_types\": [\n            \"string\",\n            \"string\"\n          ],\n          \"match_types_details\": {},\n          \"score\": 8889.454378365905,\n          \"is_whitelisted\": true,\n          \"match_status\": \"string\"\n        }\n      ]\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "2cc642b8-00e2-4c2a-aec2-4689eddfd88d",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"search_term\": \"<string>\",\n  \"client_ref\": \"<string>\",\n  \"fuzziness\": \"<number>\",\n  \"exact_match\": \"<boolean>\",\n  \"search_profile\": \"<string>\",\n  \"offset\": 0,\n  \"limit\": 100,\n  \"share_url\": \"<integer>\",\n  \"tags\": \"<object>\",\n  \"filters\": {\n    \"types\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"birth_year\": \"<integer>\",\n    \"remove_deceased\": \"<string>\",\n    \"country_codes\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"entity_type\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "7ba6a408-18c1-44ac-b619-57e202cb6450",
+              "name": "Rate limit exceeded (600 calls/minute on standard contracts, 300 on sandbox). Retry with exponential backoff starting at 2 seconds, capped at 60 seconds.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"search_term\": \"<string>\",\n  \"client_ref\": \"<string>\",\n  \"fuzziness\": \"<number>\",\n  \"exact_match\": \"<boolean>\",\n  \"search_profile\": \"<string>\",\n  \"offset\": 0,\n  \"limit\": 100,\n  \"share_url\": \"<integer>\",\n  \"tags\": \"<object>\",\n  \"filters\": {\n    \"types\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"birth_year\": \"<integer>\",\n    \"remove_deceased\": \"<string>\",\n    \"country_codes\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"entity_type\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "fa45f1af-81d4-45a8-9de7-f483e4ad5b5f",
+          "name": "List previous searches",
+          "request": {
+            "name": "List previous searches",
+            "description": {
+              "content": "Lists previous searches with filtering (match status, risk level, assignee, searcher, created date range, client reference, tags, monitored state), sorting, and pagination.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "searches"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "search_term",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "key": "client_ref",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "key": "monitored",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "key": "page",
+                  "value": "<integer>"
+                },
+                {
+                  "disabled": false,
+                  "key": "per_page",
+                  "value": "<integer>"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "6982a364-e01d-4206-ba59-6ab2a2ab0b2d",
+              "name": "A paginated list of searches.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "search_term",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "client_ref",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "monitored",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "page",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "<integer>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"string\",\n  \"content\": {\n    \"data\": [\n      {\n        \"id\": 6700,\n        \"ref\": \"string\",\n        \"search_term\": \"string\",\n        \"match_status\": \"string\",\n        \"risk_level\": \"string\",\n        \"total_hits\": 8036,\n        \"total_matches\": 2714,\n        \"created_at\": \"string\",\n        \"updated_at\": \"string\",\n        \"share_url\": \"string\",\n        \"hits\": [\n          {\n            \"doc\": {},\n            \"match_types\": [\n              \"string\",\n              \"string\"\n            ],\n            \"match_types_details\": {},\n            \"score\": 1134.447249741929,\n            \"is_whitelisted\": true,\n            \"match_status\": \"string\"\n          },\n          {\n            \"doc\": {},\n            \"match_types\": [\n              \"string\",\n              \"string\"\n            ],\n            \"match_types_details\": {},\n            \"score\": 3466.331227965952,\n            \"is_whitelisted\": false,\n            \"match_status\": \"string\"\n          }\n        ]\n      },\n      {\n        \"id\": 7706,\n        \"ref\": \"string\",\n        \"search_term\": \"string\",\n        \"match_status\": \"string\",\n        \"risk_level\": \"string\",\n        \"total_hits\": 1242,\n        \"total_matches\": 9884,\n        \"created_at\": \"string\",\n        \"updated_at\": \"string\",\n        \"share_url\": \"string\",\n        \"hits\": [\n          {\n            \"doc\": {},\n            \"match_types\": [\n              \"string\",\n              \"string\"\n            ],\n            \"match_types_details\": {},\n            \"score\": 3208.0665653274064,\n            \"is_whitelisted\": true,\n            \"match_status\": \"string\"\n          },\n          {\n            \"doc\": {},\n            \"match_types\": [\n              \"string\",\n              \"string\"\n            ],\n            \"match_types_details\": {},\n            \"score\": 6912.625680762252,\n            \"is_whitelisted\": false,\n            \"match_status\": \"string\"\n          }\n        ]\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "85b03477-7bad-40a5-b2d9-0e61d89ce0fd",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "search_term",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "client_ref",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "monitored",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "page",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "<integer>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "b202c26f-e07e-4375-9710-387b738d1272",
+          "name": "Retrieve a search",
+          "request": {
+            "name": "Retrieve a search",
+            "description": {
+              "content": "Retrieves the overview of a single search by ID or ref.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "searches",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) The search ID or ref."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "6fabe06b-5276-4277-b2ed-fb8ebec1226a",
+              "name": "The search overview.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The search ID or ref."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"string\",\n  \"content\": {\n    \"data\": {\n      \"id\": 8672,\n      \"ref\": \"string\",\n      \"search_term\": \"string\",\n      \"match_status\": \"string\",\n      \"risk_level\": \"string\",\n      \"total_hits\": 1893,\n      \"total_matches\": 8190,\n      \"created_at\": \"string\",\n      \"updated_at\": \"string\",\n      \"share_url\": \"string\",\n      \"hits\": [\n        {\n          \"doc\": {},\n          \"match_types\": [\n            \"string\",\n            \"string\"\n          ],\n          \"match_types_details\": {},\n          \"score\": 4112.757560876157,\n          \"is_whitelisted\": false,\n          \"match_status\": \"string\"\n        },\n        {\n          \"doc\": {},\n          \"match_types\": [\n            \"string\",\n            \"string\"\n          ],\n          \"match_types_details\": {},\n          \"score\": 7205.547115095035,\n          \"is_whitelisted\": false,\n          \"match_status\": \"string\"\n        }\n      ]\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "678a7ce8-f67d-4fbb-8083-00eb55fb85c3",
+              "name": "The search or resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The search ID or ref."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "b5c5a8ac-2bb3-40a2-9b29-89e6d53ce555",
+          "name": "Update search details",
+          "request": {
+            "name": "Update search details",
+            "description": {
+              "content": "Updates case-management details of a search - the assigned user, match status (no_match, false_positive, potential_match, true_positive, true_positive_approve, true_positive_reject), and risk level (low, medium, high, unknown).",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "searches",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) The search ID or ref."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"match_status\": \"<string>\",\n  \"risk_level\": \"<string>\",\n  \"assignee_id\": \"<integer>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "3fd1cca6-2e45-437b-b781-36aeab7557e1",
+              "name": "The updated search.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The search ID or ref."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"match_status\": \"<string>\",\n  \"risk_level\": \"<string>\",\n  \"assignee_id\": \"<integer>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"string\",\n  \"content\": {\n    \"data\": {\n      \"id\": 8672,\n      \"ref\": \"string\",\n      \"search_term\": \"string\",\n      \"match_status\": \"string\",\n      \"risk_level\": \"string\",\n      \"total_hits\": 1893,\n      \"total_matches\": 8190,\n      \"created_at\": \"string\",\n      \"updated_at\": \"string\",\n      \"share_url\": \"string\",\n      \"hits\": [\n        {\n          \"doc\": {},\n          \"match_types\": [\n            \"string\",\n            \"string\"\n          ],\n          \"match_types_details\": {},\n          \"score\": 4112.757560876157,\n          \"is_whitelisted\": false,\n          \"match_status\": \"string\"\n        },\n        {\n          \"doc\": {},\n          \"match_types\": [\n            \"string\",\n            \"string\"\n          ],\n          \"match_types_details\": {},\n          \"score\": 7205.547115095035,\n          \"is_whitelisted\": false,\n          \"match_status\": \"string\"\n        }\n      ]\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "207cd4d7-af4b-400b-81cc-48086a92bb41",
+              "name": "The search or resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The search ID or ref."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"match_status\": \"<string>\",\n  \"risk_level\": \"<string>\",\n  \"assignee_id\": \"<integer>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "a90cebc5-b2c1-4c53-b7d8-9b15978d9695",
+          "name": "Delete a search",
+          "request": {
+            "name": "Delete a search",
+            "description": {
+              "content": "Deletes a search from your account.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "searches",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) The search ID or ref."
+                }
+              ]
+            },
+            "method": "DELETE",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "8698b4b4-34ee-4cbe-b354-812c2f63dcdc",
+              "name": "Deletion confirmation.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The search ID or ref."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "6fd6f393-8af1-4182-a73b-365226394be6",
+              "name": "The search or resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The search ID or ref."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "e576671c-21bb-42e3-b37f-c4528ef032ab",
+          "name": "Retrieve full search results",
+          "request": {
+            "name": "Retrieve full search results",
+            "description": {
+              "content": "Retrieves the full detail of a search including all hits, each with the matched entity document (name, aka, associates, sources, types, fields, media), match types, score, whitelisting, and match status.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "searches",
+                ":id",
+                "details"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) The search ID or ref."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "85d5af6e-1bad-4d48-8873-34345dc9f481",
+              "name": "Full search details with hits.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches",
+                    ":id",
+                    "details"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The search ID or ref."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"string\",\n  \"content\": {\n    \"data\": {\n      \"id\": 8672,\n      \"ref\": \"string\",\n      \"search_term\": \"string\",\n      \"match_status\": \"string\",\n      \"risk_level\": \"string\",\n      \"total_hits\": 1893,\n      \"total_matches\": 8190,\n      \"created_at\": \"string\",\n      \"updated_at\": \"string\",\n      \"share_url\": \"string\",\n      \"hits\": [\n        {\n          \"doc\": {},\n          \"match_types\": [\n            \"string\",\n            \"string\"\n          ],\n          \"match_types_details\": {},\n          \"score\": 4112.757560876157,\n          \"is_whitelisted\": false,\n          \"match_status\": \"string\"\n        },\n        {\n          \"doc\": {},\n          \"match_types\": [\n            \"string\",\n            \"string\"\n          ],\n          \"match_types_details\": {},\n          \"score\": 7205.547115095035,\n          \"is_whitelisted\": false,\n          \"match_status\": \"string\"\n        }\n      ]\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f78bf5d2-2bb8-4e79-aaa4-6fbdb6832e95",
+              "name": "The search or resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches",
+                    ":id",
+                    "details"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The search ID or ref."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "d09615ae-7f33-4ddc-bd7c-63dfa5294d64",
+          "name": "Retrieve paginated search entities",
+          "request": {
+            "name": "Retrieve paginated search entities",
+            "description": {
+              "content": "Retrieves the matching entities of a search in paginated form.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "searches",
+                ":ref",
+                "entities",
+                ":entity_provider"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "ref",
+                  "description": "(Required) The search ref."
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "entity_provider",
+                  "description": "(Required) The entity data provider."
+                }
+              ]
+            },
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "151bef08-902b-47a8-ba37-d4edf82c343e",
+              "name": "Paginated entities for the search.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches",
+                    ":ref",
+                    "entities",
+                    ":entity_provider"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "ref",
+                      "description": "(Required) The search ref."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "entity_provider",
+                      "description": "(Required) The entity data provider."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "39861363-908d-41c6-aba6-3547894730ed",
+              "name": "The search or resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches",
+                    ":ref",
+                    "entities",
+                    ":entity_provider"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "ref",
+                      "description": "(Required) The search ref."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "entity_provider",
+                      "description": "(Required) The entity data provider."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "2c7d12f9-373f-4061-b716-67f2b30cbf6b",
+          "name": "Download search certificate",
+          "request": {
+            "name": "Download search certificate",
+            "description": {
+              "content": "Downloads a PDF certificate of the search for audit and recordkeeping purposes.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "searches",
+                ":id",
+                "certificate"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) The search ID or ref."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/pdf"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "498e3d47-0315-48b7-947a-3f52fe9d90cc",
+              "name": "The search certificate PDF.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches",
+                    ":id",
+                    "certificate"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The search ID or ref."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/pdf"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/pdf"
+                }
+              ],
+              "body": "string",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "67de1887-5d73-4b06-8bbb-57819fc3088e",
+              "name": "The search or resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches",
+                    ":id",
+                    "certificate"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The search ID or ref."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "b658e36d-40e3-4ea1-8e01-f15e9dd44a89",
+          "name": "Update entity details on a search",
+          "request": {
+            "name": "Update entity details on a search",
+            "description": {
+              "content": "Updates details of matched entities within a search - whitelist status (suppress recurring false positives), risk level, and per-entity match status.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "searches",
+                ":id",
+                "entities"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) The search ID or ref."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entities\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"is_whitelisted\": \"<boolean>\",\n  \"match_status\": \"<string>\",\n  \"risk_level\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "ef87b704-d4c4-4450-97be-4495f8253430",
+              "name": "The updated entities.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches",
+                    ":id",
+                    "entities"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The search ID or ref."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"entities\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"is_whitelisted\": \"<boolean>\",\n  \"match_status\": \"<string>\",\n  \"risk_level\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "fc6939d8-f97f-4627-8b09-a6ad2caed747",
+              "name": "The search or resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches",
+                    ":id",
+                    "entities"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The search ID or ref."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"entities\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"is_whitelisted\": \"<boolean>\",\n  \"match_status\": \"<string>\",\n  \"risk_level\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "153091ce-f87c-4a05-be41-9f6db3e32129",
+          "name": "Create search references",
+          "request": {
+            "name": "Create search references",
+            "description": {
+              "content": "Creates search references for tracking searches by your own identifiers.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "searches",
+                "references"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "<object>",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "100022a4-83e3-4465-af52-6345cb7d64df",
+              "name": "The created references.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches",
+                    "references"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "<object>",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "99379976-ab75-4dbf-996b-037fe14f1aac",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "searches",
+                    "references"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "<object>",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.complyadvantage.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "Authorization"
+      },
+      {
+        "key": "value",
+        "value": "{{apiKey}}"
+      },
+      {
+        "key": "in",
+        "value": "header"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "618a736a-9a17-42aa-b2da-4233026873c1",
+    "name": "ComplyAdvantage Case Management Searches API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The ComplyAdvantage REST API screens people and companies against sanctions and watchlists, warnings and fitness-probity lists, politically exposed persons (PEPs and RCAs), and adverse media, and keeps them under ongoing monitoring. It covers searches (create, list, retrieve, update, delete, certificates, entities), monitored searches (start/stop monitoring, differences, acknowledge), case management (assignment, match status, risk level, comments, tags), and account users. Authentication is an api key sent as \"Authorization: Token YOUR_API_KEY\"; keys are generated inside the ComplyAdvantage web platform, so an account is required. Standard contracts allow 600 API calls per minute (sandbox 300), with 429 responses requiring exponential backoff (start at 2 seconds, cap at 60). Webhook events match_status_updated, search_status_updated, and monitored_search_updated push changes to your systems. This document was modeled from the public API reference at docs.complyadvantage.com; the endpoint paths are documented publicly, while request/response schemas are summarized rather than exhaustive.\n\nContact Support:\n Name: ComplyAdvantage",
+      "type": "text/plain"
+    }
+  }
+}

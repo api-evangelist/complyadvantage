@@ -1,0 +1,129 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "ComplyAdvantage Case Management Monitored Searches API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "apikey",
+      "key": "Authorization",
+      "value": "{{Authorization}}",
+      "placement": "header"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Monitored Searches",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get monitored search details",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.complyadvantage.com/searches/:id/monitors",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The search ID or ref."
+              }
+            ]
+          },
+          "docs": "Retrieves the monitoring configuration and state of a search."
+        },
+        {
+          "info": {
+            "name": "Update monitored search details",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.complyadvantage.com/searches/:id/monitors",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The search ID or ref."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Starts or stops ongoing monitoring for a search."
+        },
+        {
+          "info": {
+            "name": "Update the associated search profile",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.complyadvantage.com/searches/:id/search-profile",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The search ID or ref."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates which search profile a monitored search uses."
+        },
+        {
+          "info": {
+            "name": "Retrieve monitored search changes",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.complyadvantage.com/searches/:id/monitor/differences",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The search ID or ref."
+              }
+            ]
+          },
+          "docs": "Retrieves what changed on a monitored search - new, updated, and removed matching entities since the last acknowledgement."
+        },
+        {
+          "info": {
+            "name": "Acknowledge monitored search changes",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.complyadvantage.com/searches/:id/monitor/acknowledge",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The search ID or ref."
+              }
+            ]
+          },
+          "docs": "Acknowledges the pending changes on a monitored search."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

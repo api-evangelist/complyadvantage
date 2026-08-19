@@ -1,0 +1,37 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "ComplyAdvantage Case Management Users API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "apikey",
+      "key": "Authorization",
+      "value": "{{Authorization}}",
+      "placement": "header"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Users",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List account users",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.complyadvantage.com/users"
+          },
+          "docs": "Lists the users on your ComplyAdvantage account for search and case assignment."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

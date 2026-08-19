@@ -1,0 +1,166 @@
+{
+  "item": [
+    {
+      "id": "05325a97-717a-46bf-aeaf-1267b0b01076",
+      "name": "Users",
+      "description": {
+        "content": "Users on your ComplyAdvantage account.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "a973298b-0a9f-4b42-810e-c04686d3da29",
+          "name": "List account users",
+          "request": {
+            "name": "List account users",
+            "description": {
+              "content": "Lists the users on your ComplyAdvantage account for search and case assignment.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "users"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "ef4cd6fa-88d2-4a5a-a1d9-fd479748dffa",
+              "name": "The users on the account.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"string\",\n  \"content\": {}\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e2569338-7351-4ac1-8f5e-4a856a8660aa",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.complyadvantage.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "Authorization"
+      },
+      {
+        "key": "value",
+        "value": "{{apiKey}}"
+      },
+      {
+        "key": "in",
+        "value": "header"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "9710c5a2-0175-4065-bfa8-0ddaa3b729ec",
+    "name": "ComplyAdvantage Case Management Users API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The ComplyAdvantage REST API screens people and companies against sanctions and watchlists, warnings and fitness-probity lists, politically exposed persons (PEPs and RCAs), and adverse media, and keeps them under ongoing monitoring. It covers searches (create, list, retrieve, update, delete, certificates, entities), monitored searches (start/stop monitoring, differences, acknowledge), case management (assignment, match status, risk level, comments, tags), and account users. Authentication is an api key sent as \"Authorization: Token YOUR_API_KEY\"; keys are generated inside the ComplyAdvantage web platform, so an account is required. Standard contracts allow 600 API calls per minute (sandbox 300), with 429 responses requiring exponential backoff (start at 2 seconds, cap at 60). Webhook events match_status_updated, search_status_updated, and monitored_search_updated push changes to your systems. This document was modeled from the public API reference at docs.complyadvantage.com; the endpoint paths are documented publicly, while request/response schemas are summarized rather than exhaustive.\n\nContact Support:\n Name: ComplyAdvantage",
+      "type": "text/plain"
+    }
+  }
+}

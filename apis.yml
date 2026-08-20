@@ -37,6 +37,19 @@ tags:
 - PEP Screening
 - Adverse Media
 - KYC
+- Watchlist
+- Transaction Monitoring
+- Financial Crime
+- RegTech
+tags_raw:
+- Anti-Money Laundering
+- AML
+- Fraud Detection
+- Sanctions Screening
+- Compliance
+- PEP Screening
+- Adverse Media
+- KYC
 - Watchlists
 - Transaction Monitoring
 - Financial Crime
@@ -114,6 +127,8 @@ apis:
   humanURL: https://docs.complyadvantage.com/api-docs/
   baseURL: https://api.complyadvantage.com
   tags:
+  - User
+  tags_raw:
   - Users
   properties:
   - type: OpenAPI

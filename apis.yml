@@ -55,7 +55,7 @@ tags_raw:
 - Financial Crime
 - RegTech
 created: '2026-07-11'
-modified: '2026-07-11'
+modified: '2026-08-27'
 specificationVersion: '0.23'
 apis:
 - aid: complyadvantage:complyadvantage-mesh-platform-api
@@ -69,8 +69,26 @@ apis:
   humanURL: https://docs.mesh.complyadvantage.com/
   baseURL: https://api.mesh.complyadvantage.com
   properties:
-  - url: https://docs.mesh.complyadvantage.com/
-    type: Documentation
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: OpenAPI
+    url: openapi/complyadvantage-mesh-api-openapi.json
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: MCPServer
+    url: mcp/complyadvantage-mcp.yml
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+  - type: Overlay
+    url: overlays/complyadvantage-mesh-api-overlay.yaml
   description: >-
     ComplyAdvantage's newer Mesh platform API, authenticated with OAuth2 bearer tokens (24-hour validity).
     Covers the full customer lifecycle - customer creation and screening (sync or async), risk scoring,
@@ -162,6 +180,67 @@ common:
   url: finops/complyadvantage-finops.yml
 - type: Blog
   url: https://complyadvantage.com/insights/
+- type: OpenAPI
+  url: openapi/complyadvantage-mesh-api-openapi.json
+- type: Packages
+  url: packages/complyadvantage-packages.yml
+- type: SDKs
+  url: packages/complyadvantage-packages.yml
+- type: WellKnown
+  url: well-known/complyadvantage-well-known.yml
+- type: APICatalog
+  url: well-known/complyadvantage-api-catalog.json
+- type: MCPServer
+  url: mcp/complyadvantage-mcp.yml
+- type: ToolCrosswalk
+  url: mcp/complyadvantage-tool-crosswalk.yml
+- type: LLMsTxt
+  url: llms/complyadvantage-llms.txt
+- type: Overlay
+  url: overlays/complyadvantage-mesh-api-overlay.yaml
+- type: Conformance
+  url: conformance/complyadvantage-conformance.yml
+- type: ErrorCatalog
+  url: errors/complyadvantage-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/complyadvantage-lifecycle.yml
+- type: Deprecation
+  url: lifecycle/complyadvantage-lifecycle.yml
+- type: OAuthScopes
+  url: scopes/complyadvantage-scopes.yml
+- type: Conventions
+  url: conventions/complyadvantage-conventions.yml
+- type: Idempotency
+  url: conventions/complyadvantage-conventions.yml
+- type: DataModel
+  url: data-model/complyadvantage-data-model.yml
+- type: Webhooks
+  url: asyncapi/complyadvantage-webhooks.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Postman
+  url: https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+- type: DeveloperPortal
+  url: https://docs.mesh.complyadvantage.com/
+- type: APIReference
+  url: https://docs.mesh.complyadvantage.com/reference/
+- type: GettingStarted
+  url: https://docs.mesh.complyadvantage.com/docs/getting-started
+- type: Support
+  url: https://support.complyadvantage.com/
+- type: TermsOfService
+  url: https://complyadvantage.com/terms-and-conditions/
+- type: PrivacyPolicy
+  url: https://complyadvantage.com/privacy-notice/
+- type: SignUp
+  url: https://complyadvantage.com/starter-plan/
+- type: Login
+  url: https://mesh.complyadvantage.com/
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
+x-enrichment:
+  date: '2026-08-27'
+  status: enriched
+  artifacts_added: 26
+  pass: local-v1

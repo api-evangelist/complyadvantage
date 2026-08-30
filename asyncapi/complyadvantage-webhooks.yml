@@ -1,0 +1,142 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  https://docs.mesh.complyadvantage.com/docs/webhooks.md,
+  https://docs.mesh.complyadvantage.com/reference/notificationcreatewebhookconfiguration.md,
+  ns_WebhookConfigurationPayload in openapi/complyadvantage-mesh-api-openapi.json,
+  https://docs.complyadvantage.com/api-docs
+provider: ComplyAdvantage
+providerId: complyadvantage
+asyncapi_published: false
+description: >-
+  ComplyAdvantage publishes no AsyncAPI document, but it does publish a genuinely
+  substantial webhook contract - ten event types on Mesh with full payload examples, source
+  IP allowlists per region, an at-least-once delivery guarantee with a stated retry
+  schedule, and Standard Webhooks v1 HMAC-SHA256 signing documented down to the canonical
+  string and the base64 alphabet. Three further events exist on the legacy REST API. This
+  is the event surface an AsyncAPI would describe; it is captured here as a webhook catalog
+  because authoring an AsyncAPI on the provider's behalf would misrepresent what they ship.
+transport: HTTP POST to a subscriber-configured URL
+management:
+  configure: POST /v2/notifications/configurations/webhook (notificationCreateWebhookConfiguration)
+  list: GET /v2/notifications/configurations/webhook (notificationGetWebhookConfigurations)
+  update: PATCH /v2/notifications/configurations/webhook/{identifier} (notificationPatchWebhookConfiguration)
+  test: POST /v2/notifications/configurations/webhook/test (notificationTestWebhookConfiguration)
+  permission: Create and update webhooks
+  note: >-
+    One event type per configuration - the `type` field on the configuration payload takes
+    a single enum value, so subscribing to all ten events means ten configurations.
+    is_active toggles delivery without deleting the configuration. There is no delete
+    operation for a webhook configuration in the contract (email configurations do have one).
+delivery:
+  guarantee: at-least-once
+  duplicates: expected; the docs instruct receivers to be idempotent
+  retries: 3
+  retry_schedule:
+  - after: 1s
+  - after: 5s
+  - after: 10s
+  response_timeout_seconds: 5
+  timeout_note: An attempt not completed within 5 seconds is recorded as failed and retried, so a slow endpoint sees duplicates just like an unavailable one.
+  idempotency_key: webhook-id header, stable across all attempts of the same message
+security:
+  signing:
+    standard: Standard Webhooks v1
+    standard_url: https://www.standardwebhooks.com/
+    enabled_by_default: false
+    enablement: opt-in per account, via support; ComplyAdvantage generates a 256-bit secret
+    algorithm: HMAC-SHA256
+    canonical_string: '{webhook-id}.{webhook-timestamp}.{body}'
+    encoding: base64 of the HMAC, prefixed "v1,"
+    secret_format: standard-alphabet base64 (not URL-safe), decodes to 32 raw bytes, no whsec_ prefix
+    rotation: zero-downtime - both secrets active, every message signed with both, header carries space-separated signatures, accept if any matches
+    replay_protection: reject when webhook-timestamp is outside a +/-5 minute window
+    headers:
+    - webhook-id
+    - webhook-timestamp
+    - webhook-signature
+  source_ips:
+  - server: https://api.eu.mesh.complyadvantage.com/
+    addresses: [99.81.100.211, 99.81.116.122, 99.81.123.126]
+  - server: https://api.eu3.mesh.complyadvantage.com/
+    addresses: [34.159.166.146, 34.159.147.62, 34.89.250.171]
+  - server: https://api.us.mesh.complyadvantage.com/
+    addresses: [34.67.184.6, 35.225.126.158, 34.70.66.162]
+  - server: https://api.us2.mesh.complyadvantage.com/
+    addresses: [3.129.172.188, 3.134.73.120, 52.14.135.67]
+  - server: https://api.ca.mesh.complyadvantage.com/
+    addresses: [34.47.8.155, 34.47.17.48, 34.95.18.164]
+  - server: https://api.au.mesh.complyadvantage.com/
+    addresses: [34.151.112.133, 35.201.15.175, 35.201.23.82]
+events:
+- name: CASE_CREATED
+  api: Mesh
+  payload_versions: [v1, v2]
+  recommended_version: v2
+  description: A new case is created.
+  key_fields: [api_version, webhook_type, case_identifier, case_stage, case_type, customer.identifier, customer.external_identifier, subjects]
+- name: CASE_TRANSITIONED
+  api: Mesh
+  payload_versions: [v1, v2]
+  recommended_version: v2
+  description: A case changes stage, e.g. from "Not Started" to "In Progress".
+  replaces: CASE_STATE_UPDATED
+  key_fields: [case_identifier, case_stage, note.contents, subjects]
+- name: CASE_STATE_UPDATED
+  api: Mesh
+  deprecated: true
+  replaced_by: CASE_TRANSITIONED
+  description: Legacy case-state change event. Existing subscriptions continue to function; no cutoff date published.
+- name: CASE_ALERT_LIST_UPDATED
+  api: Mesh
+  payload_versions: [v2]
+  description: The alert list associated with a case is updated, such as when new alerts are added.
+- name: WORKFLOW_COMPLETED
+  api: Mesh
+  description: >-
+    An asynchronous create-and-screen workflow finishes. The primary completion signal for
+    createCustomerAndScreenAsync - the alternative is polling GET /v2/workflows/{id}.
+  key_fields: [workflow_instance_identifier, status, steps, step_details, workflow_type]
+  screening_result_vocabulary: [SANCTION, WARNING, PEP_CLASS_1, PEP_CLASS_2, ADVERSE_MEDIA, ADVERSE_MEDIA_V2_CYBERCRIME]
+- name: TRANSACTION_REVIEWED
+  api: Mesh
+  payload_versions: [v3]
+  description: A transaction has been reviewed and either released or rejected.
+  key_fields: [transaction_identifier, transaction_external_identifier, evaluation_outcome, review_decision]
+- name: TRANSACTION_MONITORING_ASYNC_COMPLETED
+  api: Mesh
+  payload_versions: [v2]
+  description: An asynchronous transaction-monitoring evaluation has completed.
+  key_fields: [transaction_external_id, transaction_version, monitoring_outcome, scenario_evaluations]
+- name: CUSTOMER_RISK_SCORE_CHANGED
+  api: Mesh
+  payload_versions: [v3]
+  description: A customer's risk score value changes.
+  key_fields: [customer_external_identifier, risk_score, previous_risk_score]
+- name: CUSTOMER_RISK_LEVEL_INCREASED
+  api: Mesh
+  payload_versions: [v3]
+  description: A customer's risk level increases, e.g. MEDIUM to HIGH.
+- name: CUSTOMER_RISK_LEVEL_DECREASED
+  api: Mesh
+  payload_versions: [v3]
+  description: A customer's risk level decreases, e.g. HIGH to MEDIUM.
+- name: match_status_updated
+  api: legacy REST
+  description: The match status of an entity in a search changes.
+  docs: https://docs.complyadvantage.com/api-docs
+- name: search_status_updated
+  api: legacy REST
+  description: The status of a search changes.
+- name: monitored_search_updated
+  api: legacy REST
+  description: A monitored search picks up a change against the underlying data.
+legacy_api_note: >-
+  Legacy webhook URLs are configured in the web application's account settings rather than
+  through an API, and every configured URL receives every event - the docs tell you to
+  differentiate in your own handler.
+gaps:
+- No AsyncAPI or CloudEvents description of this surface.
+- Payload schemas are published as JSON examples in prose, not as components in the OpenAPI - a receiver cannot generate types from the contract.
+- Signing is off unless the account asks for it.
+- No delete operation for a webhook configuration; is_active=false is the only off switch.

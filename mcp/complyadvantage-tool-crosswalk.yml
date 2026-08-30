@@ -1,0 +1,135 @@
+generated: '2026-08-27'
+method: derived
+source: >-
+  mcp/complyadvantage-mcp-tools.json (live tools/list, probed 2026-08-27) bound against
+  openapi/complyadvantage-mesh-api-openapi.json (163 operations) and the four refined
+  legacy specs in openapi/ (19 operations)
+provider: ComplyAdvantage
+providerId: complyadvantage
+description: >-
+  ComplyAdvantage's MCP surface does not project business capabilities as named tools. It
+  projects the OpenAPI document itself: three introspection tools plus one generic
+  executor. That means the tool-to-operation binding is not one-to-one but one-to-all -
+  execute-request can invoke any of the 163 Mesh operations, and the other three tools
+  read the spec rather than the API. The practical consequence for an agent is that it
+  gets the whole Mesh API through a single tool with no per-operation affordances,
+  descriptions, or guardrails: consequence, reversibility and required permissions are
+  invisible at the tool layer and have to be recovered from the spec via get-endpoint.
+surfaces:
+  openapi:
+  - file: openapi/complyadvantage-mesh-api-openapi.json
+    servers:
+    - https://api.mesh.complyadvantage.com
+    operations: 163
+    gated: false
+    note: Published anonymously at https://docs.mesh.complyadvantage.com/openapi/mesh-api.json
+  - files:
+    - openapi/complyadvantage-searches-api-openapi.yml
+    - openapi/complyadvantage-monitored-searches-api-openapi.yml
+    - openapi/complyadvantage-case-management-api-openapi.yml
+    - openapi/complyadvantage-users-api-openapi.yml
+    servers:
+    - https://api.complyadvantage.com
+    - https://api.us.complyadvantage.com
+    - https://api.ap.complyadvantage.com
+    operations: 19
+    gated: false
+    note: >-
+      Legacy REST API. Modeled by API Evangelist from the public Slate reference at
+      docs.complyadvantage.com/api-docs; ComplyAdvantage publishes no machine-readable
+      spec for it. Not reachable through the MCP server.
+  graphql: null
+  mcp:
+    url: https://docs.mesh.complyadvantage.com/mcp
+    gated: false
+    tools: 4
+crosswalk:
+- tool: execute-request
+  category: execution
+  rest:
+  - '*'
+  binding: passthrough
+  confidence: high
+  note: >-
+    Takes a HAR request object and forwards it, so its effective REST binding is every
+    operation in openapi/complyadvantage-mesh-api-openapi.json - all 163, spanning
+    Authentication, Onboarding, Customers, Cases, Alerts & Risks, Webhooks, Exports,
+    Email Configurations, Lookup Lists, Audit, Transactions, Custom Lists, Screening
+    Configurations, Regulatory Reports, IAM and Batch Processing. Its inputSchema is a
+    single harRequest object, so it inherits NO per-operation parameters or requestBody -
+    the agent must construct the request itself from get-endpoint output. It carries the
+    write surface: createCustomerAndScreenSync, customerTransitionCustomerStatus,
+    riskScoringManagerServiceAPIUpdateRiskScore,
+    activityStorePostTransactionReviewDecision and every DELETE in the spec are all
+    reachable through this one tool.
+- tool: get-endpoint
+  category: introspection
+  rest: []
+  binding: spec-read
+  confidence: high
+  note: >-
+    Reads one path+method out of the OpenAPI, including security schemes and servers. It
+    calls no API operation; it is the spec-side substitute for the per-operation
+    inputSchema that execute-request does not carry.
+- tool: list-endpoints
+  category: introspection
+  rest: []
+  binding: spec-read
+  confidence: high
+  note: Enumerates all 163 paths and methods with summaries. No API call.
+- tool: search-endpoints
+  category: introspection
+  rest: []
+  binding: spec-read
+  confidence: high
+  note: Full-text search across paths, operations and parameters. No API call.
+mcp_only:
+- tool: list-endpoints
+  reason: >-
+    Spec introspection - there is no REST operation that returns the API's own operation
+    index. The nearest published equivalent is the /.well-known/api-catalog linkset on the
+    docs host, which points at the spec rather than enumerating it.
+- tool: get-endpoint
+  reason: Spec introspection - no REST operation describes another operation.
+- tool: search-endpoints
+  reason: Spec introspection - no REST search-over-the-contract operation exists.
+rest_only:
+  count: 19
+  note: >-
+    Every operation of the legacy REST API (api.complyadvantage.com) is REST-only. The MCP
+    server is bound to the Mesh spec exclusively, so createSearch, listSearches, getSearch,
+    getSearchDetails, getSearchCertificate, getSearchEntities, updateSearch,
+    updateSearchEntities, deleteSearch, createSearchReferences, getMonitoredSearch,
+    updateMonitoredSearch, updateSearchProfile, getMonitoredSearchDifferences,
+    acknowledgeMonitoredSearchChanges, createSearchComment, listSearchComments,
+    detachSearchTag and listUsers have no tool binding at all.
+  operations:
+  - createSearch
+  - listSearches
+  - getSearch
+  - getSearchDetails
+  - getSearchCertificate
+  - getSearchEntities
+  - updateSearch
+  - updateSearchEntities
+  - deleteSearch
+  - createSearchReferences
+  - getMonitoredSearch
+  - updateMonitoredSearch
+  - updateSearchProfile
+  - getMonitoredSearchDifferences
+  - acknowledgeMonitoredSearchChanges
+  - createSearchComment
+  - listSearchComments
+  - detachSearchTag
+  - listUsers
+coverage:
+  mcp_tools: 4
+  tools_bound_to_rest: 1
+  tools_spec_only: 3
+  mesh_operations: 163
+  mesh_operations_reachable_via_mcp: 163
+  mesh_operations_with_a_dedicated_tool: 0
+  legacy_operations: 19
+  legacy_operations_reachable_via_mcp: 0
+  named_capability_tools: 0

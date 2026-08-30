@@ -1,0 +1,158 @@
+generated: '2026-08-27'
+method: searched
+source: https://docs.mesh.complyadvantage.com/llms.txt
+docs: https://docs.mesh.complyadvantage.com/reference/identity_v2_iam_permissions_listpermissions
+provider: ComplyAdvantage
+providerId: complyadvantage
+model: account-permissions
+oauth_scopes_published: false
+description: >-
+  Mesh authenticates with an OAuth2 client-credentials token but does NOT use OAuth scopes.
+  Authorization is carried by named account permissions attached to the role behind the API
+  credential, and by coarser account-level entitlements that gate whole product areas. The
+  Mesh API reference states the required permission on each endpoint in prose ("You need the
+  'View customers' permission to use this endpoint"), which makes the model fully documented
+  but entirely invisible to a machine reading the OpenAPI - components.securitySchemes
+  declares only an opaque http bearer scheme with no scope list, and no operation carries a
+  per-operation security requirement. A caller cannot compute least privilege from the
+  contract; it has to be read out of the docs, which is what this artifact does.
+  Permissions are enumerable at runtime via GET /v3/iam/permissions.
+authorization_layers:
+- layer: account entitlement
+  description: >-
+    Product access sold at the account level. Gates whole capability families regardless of
+    the credential's permissions; a 403 here cannot be fixed by an administrator, only by a
+    contract change.
+  values:
+  - Access to base customer screening functionality
+  - Access to base customer monitoring functionality
+  - Access to base transaction monitoring functionality
+  - Access to base payment screening functionality
+  - Access to custom lists for customer screening
+  - Account has access to monitor on demand functionality
+  - Account has access to FinCEN CTR reports
+  - Account has access to FinCEN SAR reports
+- layer: role permission
+  description: >-
+    Granted on a role in Settings > Access Management and inherited by the API credential.
+    This is the layer an administrator controls.
+enumeration:
+  operation: GET /v3/iam/permissions
+  deprecated_operation: GET /v2/iam/permissions
+  note: >-
+    The live permission list is retrievable from the API itself. The list below is what the
+    published reference names on at least one endpoint - it is the documented subset, not
+    necessarily the complete registry.
+permissions:
+- name: View customers
+  grants: Read customers, acquisition sources, notes, products, monitoring configuration, risk scores, screening certificates.
+  operations_documented: 12
+- name: Update customers
+  grants: Create customer notes, override risk score level, transition customer status.
+  operations_documented: 5
+- name: Create and screen customers
+  grants: The create-and-screen onboarding workflow, sync and async.
+  operations_documented: 4
+  requires_entitlement: Access to base customer screening functionality
+- name: Manage customer custom fields
+  grants: Create and update customer custom-field definitions.
+  operations_documented: 2
+- name: Create and update labels
+  grants: Read and set customer labels.
+  operations_documented: 2
+- name: View customer monitoring status
+  grants: Read a customer's monitoring configuration.
+  operations_documented: 1
+- name: Monitor and unmonitor customers
+  grants: Set a customer's monitoring configuration.
+  operations_documented: 1
+  requires_entitlement: Access to base customer monitoring functionality
+- name: Create and update customer screening configurations
+  grants: Create and update entity-screening configurations.
+  operations_documented: 2
+- name: View cases (customer onboarding)
+  grants: Read cases raised by onboarding screening.
+- name: View cases (customer monitoring)
+  grants: Read cases raised by ongoing monitoring.
+- name: View cases (payment screening)
+  grants: Read cases raised by payment screening.
+- name: View cases (transaction monitoring)
+  grants: Read cases raised by transaction monitoring.
+  operations_documented: 7
+  note: >-
+    Case read access is partitioned by the product that raised the case, so a
+    least-privilege agent reading only onboarding cases needs exactly one of the four.
+- name: Update cases
+  grants: Assign cases, transition case stage, leave notes - individually and in bulk (up to 100).
+  operations_documented: 5
+- name: Update case workflows
+  grants: Update case workflow definitions.
+  operations_documented: 1
+- name: View alerts
+  grants: Read alerts and alert notes.
+  operations_documented: 4
+- name: Update alerts
+  grants: Transition alert state.
+  operations_documented: 2
+- name: Update risks
+  grants: Change the status of a risk on an alert.
+  operations_documented: 1
+- name: Create and delete mutes
+  grants: Create and delete alert mutes (v2 and v3).
+  operations_documented: 4
+- name: View transactions
+  grants: Read transactions, versions, and transaction custom fields.
+  operations_documented: 4
+  note: Appears in the reference in two casings, "View transactions" and "View Transactions".
+- name: View lookup lists
+  grants: Read lookup lists, versions and mappings.
+  operations_documented: 8
+- name: Create and update lookup lists
+  grants: Create, update and delete lookup lists, drafts and mappings.
+  operations_documented: 8
+- name: Create and update webhooks
+  grants: Create, update and test webhook notification configurations.
+  operations_documented: 3
+- name: View webhooks
+  grants: Read webhook notification configurations and their logs.
+  operations_documented: 1
+- name: Create and update email notification configurations
+  grants: Create, update, delete and test email notification configurations.
+  operations_documented: 4
+- name: View email notification configurations
+  grants: Read email notification configurations.
+  operations_documented: 1
+- name: View and download insights
+  grants: Data exports.
+  operations_documented: 4
+- name: View users
+  grants: Read users on the account.
+  operations_documented: 3
+- name: Create and update users
+  grants: Create and update users.
+  operations_documented: 2
+- name: View roles in account
+  grants: Read roles.
+  operations_documented: 3
+- name: 'Create, update, and delete roles in account'
+  grants: Manage roles.
+  operations_documented: 3
+- name: Assign roles in account
+  grants: Assign roles to users.
+  operations_documented: 2
+- name: View all accounts
+  grants: Cross-account read for multi-account clients.
+  operations_documented: 2
+- name: Manage settings such as pre-fill data for FinCEN CTR reports
+  grants: Upsert and bulk-delete CTR transaction locations.
+  operations_documented: 2
+  requires_entitlement: Account has access to FinCEN CTR reports
+- name: Manage settings such as pre-fill data for FinCEN SAR reports
+  grants: Upsert and bulk-delete SAR financial institutions.
+  operations_documented: 2
+  requires_entitlement: Account has access to FinCEN SAR reports
+legacy_api:
+  model: none
+  note: >-
+    The legacy REST API (api.complyadvantage.com) has no scope or permission model in its
+    published reference - a single account API key carries whatever the account can do.

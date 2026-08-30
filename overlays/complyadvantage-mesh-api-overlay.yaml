@@ -1,0 +1,91 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enrichment overlay for Mesh API
+  version: 1.0.0
+extends: openapi/complyadvantage-mesh-api-openapi.json
+x-generated: '2026-08-27'
+x-method: generated
+x-source: 'openapi/complyadvantage-mesh-api-openapi.json plus repo artifacts: conventions/, errors/, lifecycle/,
+  scopes/, authentication/, rate-limits/, asyncapi/, mcp/'
+actions:
+- target: $.info
+  description: Attach API Evangelist provenance and the repo artifacts that describe this contract.
+  update:
+    x-apievangelist:
+      provider: ComplyAdvantage
+      providerId: complyadvantage
+      catalog: https://apis.io/provider/complyadvantage/
+      artifacts:
+        conventions: conventions/complyadvantage-conventions.yml
+        errors: errors/complyadvantage-problem-types.yml
+        lifecycle: lifecycle/complyadvantage-lifecycle.yml
+        authentication: authentication/complyadvantage-authentication.yml
+        rate_limits: rate-limits/complyadvantage-rate-limits.yml
+        conformance: conformance/complyadvantage-conformance.yml
+        data_model: data-model/complyadvantage-data-model.yml
+        webhooks: asyncapi/complyadvantage-webhooks.yml
+- target: $.info
+  description: Record that the OAuth2 client-credentials flow is documented in prose but not declared
+    in securitySchemes.
+  update:
+    x-auth-note: components.securitySchemes declares only BearerAuth (http bearer). The token is minted
+      by POST /v3/token using the OAuth2 client-credentials flow with an access key and secret; tokens
+      live 86400s and cannot be refreshed. See scopes/complyadvantage-scopes.yml for the named-permission
+      authorization layer, which the contract does not express.
+- target: $.components.schemas.identity_ProblemDetailErrorResponse
+  description: Mark the error envelope as RFC 9457 and record the documented deviations.
+  update:
+    x-standard: rfc9457
+    x-deviations:
+    - type is always about:blank
+    - 429 does not use this envelope
+    - 401 omits type/identifier/timestamp
+- target: $.paths['/v2/token'].post
+  description: Flag the deprecated token endpoint that the contract does not mark deprecated.
+  update:
+    deprecated: true
+    x-replacement: POST /v3/token (createTokenV3)
+    x-deprecation-source: https://docs.mesh.complyadvantage.com/reference/createtoken
+- target: $.paths['/v2/iam/permissions'].get
+  description: Flag the deprecated permissions listing.
+  update:
+    deprecated: true
+    x-replacement: GET /v3/iam/permissions
+    x-deprecation-source: https://docs.mesh.complyadvantage.com/reference/identity_v2_iam_permissions_listpermissions
+- target: $.paths['/v3/transactions/{identifier}/review'].post
+  description: Mark the transaction review decision as irreversible - no reversal operation is published.
+  update:
+    x-reversibility:
+      reversible: false
+      reversal: null
+      window: null
+      note: Terminal decision on a held transaction. No reversal operation exists in the contract.
+- target: $.paths['/v2/workflows/sync/create-and-screen'].post
+  description: Record documented behavioural idempotency and the absence of a delete path.
+  update:
+    x-idempotency:
+      header: null
+      behavioural: true
+      note: 'Docs state the endpoint is idempotent: the exact same request may be re-sent after a downstream
+        error and the workflow will be retried.'
+    x-reversibility:
+      reversible: false
+      note: No delete-customer operation exists. A customer created in error can only be transitioned
+        to Closed. The screen is billable.
+- target: $
+  description: Record the published event surface, which the contract does not express as OpenAPI webhooks.
+  update:
+    x-webhooks-catalog:
+      artifact: asyncapi/complyadvantage-webhooks.yml
+      event_count: 10
+      signing: Standard Webhooks v1 (opt-in)
+      docs: https://docs.mesh.complyadvantage.com/docs/webhooks
+- target: $
+  description: Record the live remote MCP server bound to this contract.
+  update:
+    x-mcp:
+      endpoint: https://docs.mesh.complyadvantage.com/mcp
+      mode: remote
+      auth: none
+      tools: 4
+      artifact: mcp/complyadvantage-mcp.yml

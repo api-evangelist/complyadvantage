@@ -73,44 +73,6 @@ created: '2026-07-11'
 modified: '2026-08-27'
 specificationVersion: '0.23'
 apis:
-- aid: complyadvantage:complyadvantage-mesh-platform-api
-  name: ComplyAdvantage Mesh Platform API
-  tags:
-  - Customer Screening
-  - Transaction Monitoring
-  - Fraud Detection
-  - Cases
-  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
-  humanURL: https://docs.mesh.complyadvantage.com/
-  baseURL: https://api.mesh.complyadvantage.com
-  properties:
-  - type: Documentation
-    url: https://docs.mesh.complyadvantage.com/
-  - type: OpenAPI
-    url: openapi/complyadvantage-mesh-api-openapi.json
-  - type: APIReference
-    url: https://docs.mesh.complyadvantage.com/reference/
-  - type: GettingStarted
-    url: https://docs.mesh.complyadvantage.com/docs/getting-started
-  - type: Postman
-    url: https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
-  - type: MCPServer
-    url: mcp/complyadvantage-mcp.yml
-  - type: ToolCrosswalk
-    url: mcp/complyadvantage-tool-crosswalk.yml
-  - type: LLMsTxt
-    url: llms/complyadvantage-llms.txt
-  - type: Webhooks
-    url: asyncapi/complyadvantage-webhooks.yml
-  - type: Overlay
-    url: overlays/complyadvantage-mesh-api-overlay.yaml
-  description: >-
-    ComplyAdvantage's newer Mesh platform API, authenticated with OAuth2 bearer tokens (24-hour validity).
-    Covers the full customer lifecycle - customer creation and screening (sync or async), risk scoring,
-    cases and alerts with stage transitions and assignments, transaction screening and monitoring for
-    payments fraud, custom and lookup lists, webhook and email notifications, data exports, user and role
-    administration, and regulatory reporting (CTR/SAR prefill). Documented separately at docs.mesh.complyadvantage.com
-    with its own OpenAPI schema for customers.
 - aid: complyadvantage:complyadvantage-case-management-api
   name: ComplyAdvantage Case Management API
   description: Comments, tags, assignment, and match status workflow on searches.
@@ -170,6 +132,559 @@ apis:
     url: https://docs.complyadvantage.com/
   - type: APIReference
     url: https://docs.complyadvantage.com/api-docs/
+- aid: complyadvantage:complyadvantage-accounts-api
+  name: ComplyAdvantage Accounts API
+  description: The Accounts API from ComplyAdvantage — 2 operation(s) for accounts.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Accounts
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-accounts-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-alerts-risks-api
+  name: ComplyAdvantage Alerts & Risks API
+  description: The Alerts & Risks API from ComplyAdvantage — 8 operation(s) for alerts & risks.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Alerts & Risks
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-alerts-risks-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-audit-api
+  name: ComplyAdvantage Audit API
+  description: The Audit API from ComplyAdvantage — 6 operation(s) for audit.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Audit
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-audit-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-authentication-api
+  name: ComplyAdvantage Authentication API
+  description: The Authentication API from ComplyAdvantage — 2 operation(s) for authentication.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Authentication
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-authentication-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-batch-processing-api
+  name: ComplyAdvantage Batch Processing API
+  description: The Batch Processing API from ComplyAdvantage — 3 operation(s) for batch processing.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Batch Processing
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-batch-processing-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-case-workflows-api
+  name: ComplyAdvantage Case Workflows API
+  description: The Case Workflows API from ComplyAdvantage — 3 operation(s) for case workflows.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Case Workflows
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-case-workflows-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-cases-api
+  name: ComplyAdvantage Cases API
+  description: The Cases API from ComplyAdvantage — 12 operation(s) for cases.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Cases
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-cases-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-clients-api
+  name: ComplyAdvantage Clients API
+  description: The Clients API from ComplyAdvantage — 3 operation(s) for clients.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Clients
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-clients-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-custom-fields-api
+  name: ComplyAdvantage Custom Fields API
+  description: The Custom Fields API from ComplyAdvantage — 2 operation(s) for custom fields.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Custom Fields
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-custom-fields-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-custom-lists-api
+  name: ComplyAdvantage Custom Lists API
+  description: The Custom Lists API from ComplyAdvantage — 6 operation(s) for custom lists.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Custom Lists
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-custom-lists-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-customers-api
+  name: ComplyAdvantage Customers API
+  description: The Customers API from ComplyAdvantage — 13 operation(s) for customers.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Customers
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-customers-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-email-configurations-api
+  name: ComplyAdvantage Email Configurations API
+  description: >-
+    The Email Configurations API from ComplyAdvantage — 3 operation(s) for email configurations.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Email Configurations
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-email-configurations-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-enrichment-api
+  name: ComplyAdvantage Enrichment API
+  description: The Enrichment API from ComplyAdvantage — 10 operation(s) for enrichment.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Enrichment
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-enrichment-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-exports-api
+  name: ComplyAdvantage Exports API
+  description: The Exports API from ComplyAdvantage — 3 operation(s) for exports.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Exports
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-exports-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-iam-api
+  name: ComplyAdvantage IAM API
+  description: The IAM API from ComplyAdvantage — 5 operation(s) for iam.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - IAM
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-iam-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-labels-api
+  name: ComplyAdvantage Labels API
+  description: The Labels API from ComplyAdvantage — 3 operation(s) for labels.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Labels
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-labels-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-onboarding-api
+  name: ComplyAdvantage Onboarding API
+  description: The Onboarding API from ComplyAdvantage — 3 operation(s) for onboarding.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Onboarding
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-onboarding-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-payment-screening-api
+  name: ComplyAdvantage Payment Screening API
+  description: The Payment Screening API from ComplyAdvantage — 7 operation(s) for payment screening.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Payment Screening
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-payment-screening-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-regulatory-reporting-api
+  name: ComplyAdvantage Regulatory Reporting API
+  description: >-
+    The Regulatory Reporting API from ComplyAdvantage — 4 operation(s) for regulatory reporting.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Regulatory Reporting
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-regulatory-reporting-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-screening-configurations-api
+  name: ComplyAdvantage Screening Configurations API
+  description: >-
+    The Screening Configurations API from ComplyAdvantage — 4 operation(s) for screening configurations.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Screening Configurations
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-screening-configurations-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-transactions-api
+  name: ComplyAdvantage Transactions API
+  description: The Transactions API from ComplyAdvantage — 10 operation(s) for transactions.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Transactions
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-transactions-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
+- aid: complyadvantage:complyadvantage-webhooks-api
+  name: ComplyAdvantage Webhooks API
+  description: The Webhooks API from ComplyAdvantage — 3 operation(s) for webhooks.
+  humanURL: https://docs.mesh.complyadvantage.com/
+  baseURL: https://api.mesh.complyadvantage.com
+  tags:
+  - Webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/complyadvantage-webhooks-api-openapi.yml
+  - type: Documentation
+    url: https://docs.mesh.complyadvantage.com/
+  - type: APIReference
+    url: https://docs.mesh.complyadvantage.com/reference/
+  - type: GettingStarted
+    url: https://docs.mesh.complyadvantage.com/docs/getting-started
+  - type: Postman
+    url: >-
+      https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  - type: ToolCrosswalk
+    url: mcp/complyadvantage-tool-crosswalk.yml
+  - type: LLMsTxt
+    url: llms/complyadvantage-llms.txt
+  - type: Webhooks
+    url: asyncapi/complyadvantage-webhooks.yml
 common:
 - type: AgenticAccess
   url: agentic-access/complyadvantage-agentic-access.yml

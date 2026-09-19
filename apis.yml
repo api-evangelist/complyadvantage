@@ -138,6 +138,8 @@ apis:
   humanURL: https://docs.mesh.complyadvantage.com/
   baseURL: https://api.mesh.complyadvantage.com
   tags:
+  - Account
+  tags_raw:
   - Accounts
   properties:
   - type: OpenAPI
@@ -464,6 +466,8 @@ apis:
   humanURL: https://docs.mesh.complyadvantage.com/
   baseURL: https://api.mesh.complyadvantage.com
   tags:
+  - Export
+  tags_raw:
   - Exports
   properties:
   - type: OpenAPI
@@ -489,6 +493,8 @@ apis:
   humanURL: https://docs.mesh.complyadvantage.com/
   baseURL: https://api.mesh.complyadvantage.com
   tags:
+  - Identity and Access Management
+  tags_raw:
   - IAM
   properties:
   - type: OpenAPI
@@ -641,6 +647,8 @@ apis:
   humanURL: https://docs.mesh.complyadvantage.com/
   baseURL: https://api.mesh.complyadvantage.com
   tags:
+  - Transaction
+  tags_raw:
   - Transactions
   properties:
   - type: OpenAPI
@@ -666,6 +674,8 @@ apis:
   humanURL: https://docs.mesh.complyadvantage.com/
   baseURL: https://api.mesh.complyadvantage.com
   tags:
+  - Webhook
+  tags_raw:
   - Webhooks
   properties:
   - type: OpenAPI

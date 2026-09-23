@@ -1,0 +1,130 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  https://docs.mesh.complyadvantage.com/docs/errors.md (verbatim error reference,
+  updatedAt 2025-12-16) enriched with response codes and the ProblemDetailErrorResponse
+  schemas derived from openapi/complyadvantage-mesh-api-openapi.json; legacy 429 handling
+  from https://docs.complyadvantage.com/api-docs
+provider: ComplyAdvantage
+providerId: complyadvantage
+format: rfc9457
+media_type: application/problem+json
+description: >-
+  The Mesh API returns RFC 9457 problem details. Every error carries type, title, status,
+  detail and instance, and ComplyAdvantage extends the standard envelope with three
+  non-standard members that matter operationally: `identifier` (a UUIDv7 per error
+  occurrence, the value to quote to support), `timestamp` (RFC 3339), and `properties` (a
+  free-form object that carries per-field validation detail, e.g. {"field_name":
+  "duplicated"} on a 409). `type` is populated as `about:blank` rather than a
+  dereferenceable URI, so there is no problem-type registry to resolve - the taxonomy is
+  the HTTP status plus the `properties.identifier` string.
+envelope:
+  members:
+  - name: type
+    required: false
+    note: Always emitted as "about:blank" in the documented examples - no dereferenceable problem-type URIs are published.
+  - name: title
+    required: false
+  - name: status
+    required: false
+  - name: detail
+    required: false
+  - name: instance
+    required: false
+    note: The attempted path.
+  - name: identifier
+    required: true
+    format: uuid
+    note: Per-occurrence error id (UUIDv7). Required by the schema; quote it in support tickets.
+  - name: timestamp
+    required: true
+    format: date-time
+  - name: properties
+    required: false
+    note: Extension object carrying field-level validation detail or a machine identifier such as NOT_FOUND.
+  additional_properties: true
+  schemas:
+  - identity_ProblemDetailErrorResponse
+  - activity_ProblemDetailErrorResponse
+problem_types:
+- status: 400
+  title: Bad Request
+  occurrences: 88
+  meaning: Invalid input - request body or parameters failed validation.
+  remediation: Read `properties` for the offending field; correct and resend.
+- status: 401
+  title: Unauthorized
+  meaning: Authentication token missing, malformed, or expired.
+  detail_example: Invalid authentication for resource.
+  remediation: >-
+    Mint a new token at POST /v3/token (client credentials). Mesh tokens live 24 hours
+    (86,400s) with no refresh mechanism, so a 401 on a long-running job usually means the
+    token aged out.
+  note: The 401 envelope is the thin one - title/status/detail only, no type or identifier.
+- status: 403
+  title: Forbidden
+  occurrences: 28
+  meaning: The caller authenticated but lacks the named permission for the endpoint.
+  detail_example: You do not have the permissions needed to access the resource.
+  remediation: >-
+    Grant the permission on the API credential's role in Settings > Access Management.
+    Each Mesh endpoint names its required permission in the reference (for example "View
+    customers", "Update cases", "Create and update webhooks").
+- status: 404
+  title: Not Found
+  occurrences: 57
+  meaning: >-
+    Two distinct cases share this status - an unrouted URL (thin envelope, no
+    `properties`) and a routed request for a resource that does not exist (full envelope
+    with properties.identifier NOT_FOUND).
+  remediation: Distinguish the two by the presence of `properties`; only the second is retryable after creating the resource.
+- status: 409
+  title: Conflict
+  occurrences: 9
+  meaning: The request conflicts with another request or with existing state.
+  detail_example: Formatted SQL detail message.
+  remediation: >-
+    Read `properties` for the conflicting field (e.g. {"field_name": "duplicated"}). On
+    customer creation this usually means the external identifier is already in use.
+- status: 429
+  title: Too Many Requests
+  meaning: Rate limit exceeded.
+  body_example: '{"message": "API rate limit exceeded"}'
+  remediation: >-
+    Back off using Ratelimit-Reset. Note this response does NOT use the problem+json
+    envelope - it returns a bare {"message": ...} object, which is an envelope
+    inconsistency a client has to handle explicitly.
+  see_also: rate-limits/complyadvantage-rate-limits.yml
+- status: 500
+  title: Generic Error
+  occurrences: 9
+  meaning: Unhandled server error.
+  remediation: Retry with backoff; if it persists, quote `identifier` and `timestamp` to support.
+- status: 503
+  title: Service Unavailable
+  occurrences: 1
+  meaning: Declared on a single operation in the Mesh contract.
+  remediation: Retry with backoff.
+legacy_api:
+  base: https://api.complyadvantage.com
+  docs: https://docs.complyadvantage.com/api-docs
+  note: >-
+    The legacy REST API does not use problem+json. It documents 429 with an EMPTY body and
+    prescribes an explicit exponential backoff - wait 2s, then 4s, then 8s, each plus a
+    random number of milliseconds up to 1000, capped at a maximum_backoff of typically 60
+    seconds. Its 401 returns {"message": "API Key is invalid or was not provided"}.
+  status_codes:
+  - 401
+  - 404
+  - 429
+inconsistencies:
+- >-
+  429 breaks the problem+json envelope on both APIs - Mesh returns {"message": "API rate
+  limit exceeded"}, the legacy API returns an empty body. A client that parses every
+  error as problem+json will fail exactly when it is being throttled.
+- >-
+  401 on Mesh omits `type`, `identifier` and `timestamp`, which the schema marks required
+  for the other statuses.
+- >-
+  `type` is never populated with a real URI, so RFC 9457's central affordance - a stable,
+  dereferenceable problem-type identifier - is not actually available.

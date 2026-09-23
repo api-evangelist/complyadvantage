@@ -1,0 +1,312 @@
+openapi: 3.2.0
+info:
+  title: Mesh Custom Fields API
+  version: v2.0
+servers:
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
+security:
+- BearerAuth: []
+tags:
+- name: Custom Fields
+paths:
+  /v2/customers/custom-fields:
+    get:
+      description: 'This endpoint returns a paginated list of custom fields which can be optionally filtered by customer type.
+
+
+        You need the "View customers" permission to use this endpoint.'
+      operationId: customerGetCustomFields
+      parameters:
+      - example: PERSON
+        in: query
+        name: customer_type
+        required: false
+        schema:
+          enum:
+          - PERSON
+          - COMPANY
+          type: string
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 50
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_PaginatedCustomFieldsResponse'
+          description: Successfully retrieved custom fields.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_ProblemDetailErrorResponse'
+          description: Bad Request
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_ProblemDetailErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_ProblemDetailErrorResponse'
+          description: Not Found
+      summary: Get a list of custom fields
+      tags:
+      - Custom Fields
+    post:
+      description: 'Create a new custom field to be used in the customer schema.
+
+
+        You need the "Manage customer custom fields" permission to use this endpoint.'
+      operationId: customerCreateCustomField
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/customer-manager_CreateCustomFieldRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_CustomField'
+          description: Custom field created successfully.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_ProblemDetailErrorResponse'
+          description: Bad Request.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_ProblemDetailErrorResponse'
+          description: Forbidden.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_ProblemDetailErrorResponse'
+          description: Not Found
+      summary: Create a custom field for customers
+      tags:
+      - Custom Fields
+  /v2/customers/custom-fields/{custom_field_identifier}:
+    patch:
+      description: 'Update the display name for a custom field.
+
+
+        You need the "Manage customer custom fields" permission to use this endpoint.'
+      operationId: customerUpdateCustomerCustomField
+      parameters:
+      - description: The unique identifier we provided when you created the customer custom field.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: custom_field_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/customer-manager_UpdateCustomFieldRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_CustomField'
+          description: Success. The custom field is updated.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_ProblemDetailErrorResponse'
+          description: Incorrect input parameters.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_ProblemDetailErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_ProblemDetailErrorResponse'
+          description: The custom field doesn't exist.
+      summary: Update customer custom fields
+      tags:
+      - Custom Fields
+components:
+  schemas:
+    customer-manager_CustomField:
+      description: List of custom fields.
+      properties:
+        customer_type:
+          enum:
+          - PERSON
+          - COMPANY
+          type: string
+        data_type:
+          $ref: '#/components/schemas/customer-manager_CustomFieldDataType'
+        display_name:
+          type: string
+        identifier:
+          format: uuid
+          type: string
+        key:
+          type: string
+      required:
+      - customer_type
+      - data_type
+      - display_name
+      - identifier
+      - key
+      type: object
+    customer-manager_CustomFieldDataType:
+      description: The type of data stored in a custom field.
+      enum:
+      - TEXT
+      - INTEGER
+      - DECIMAL
+      - DATE
+      - DATETIME
+      type: string
+    customer-manager_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
+    customer-manager_CreateCustomFieldRequest:
+      properties:
+        customer_type:
+          enum:
+          - PERSON
+          - COMPANY
+          - UNDEFINED
+          type: string
+        data_type:
+          $ref: '#/components/schemas/customer-manager_CustomFieldDataType'
+        display_name:
+          maxLength: 50
+          minLength: 0
+          type: string
+        key:
+          maxLength: 50
+          minLength: 0
+          type: string
+      required:
+      - customer_type
+      - data_type
+      - display_name
+      - key
+      type: object
+    customer-manager_UpdateCustomFieldRequest:
+      properties:
+        display_name:
+          maxLength: 50
+          minLength: 0
+          type: string
+      required:
+      - display_name
+      type: object
+    customer-manager_PaginatedCustomFieldsResponse:
+      properties:
+        custom_fields:
+          description: List of custom fields.
+          items:
+            $ref: '#/components/schemas/customer-manager_CustomField'
+          type: array
+        first:
+          description: The URL path to the first page.
+          example: /v2/customers/custom-fields?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v2/customers/custom-fields?page_number=2
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v2/customers/custom-fields?page_number=1
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v2/customers/custom-fields?page_number=1
+          type: string
+        total_count:
+          description: Total number of custom fields.
+          example: 5
+          format: int64
+          type: integer
+      required:
+      - custom_fields
+      - first
+      - self
+      - total_count
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http

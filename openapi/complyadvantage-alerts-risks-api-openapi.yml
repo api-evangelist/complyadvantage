@@ -1,0 +1,1865 @@
+openapi: 3.2.0
+info:
+  title: Mesh Alerts & Risks API
+  version: v2.0
+servers:
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
+security:
+- BearerAuth: []
+tags:
+- name: Alerts & Risks
+paths:
+  /v2/alerts/mutes:
+    get:
+      deprecated: true
+      description: 'Get list of alert mutes for account or customer
+
+
+        You need the "View alerts" permission to use this endpoint.'
+      operationId: alertServiceGetAlertMutes
+      parameters:
+      - description: Optional UUID identifier of the customer if you want to get alert mutes for a single customer
+        example: 9c8b2759-607a-4c90-85bc-b0f3967c7b31
+        in: query
+        name: customer_identifier
+        required: false
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_GetAlertMutesResponse'
+          description: List of found alert mutes for customer or account
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_ProblemDetailErrorResponse'
+          description: Invalid customer identifier
+      summary: Get list of alert mutes for account or customer
+      tags:
+      - Alerts & Risks
+    post:
+      deprecated: true
+      description: 'Allows muting future alerts about the same risk, currently only support for customer scoped muting is provided
+
+
+        You need the "Create and delete mutes" permission to use this endpoint.'
+      operationId: alertServiceCreateAlertMute
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/am_CreateAlertMuteRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_AlertMuteDTO'
+          description: Alert mute created successfully
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_ProblemDetailErrorResponse'
+          description: Customer identifier is not present
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_ProblemDetailErrorResponse'
+          description: Profile is already muted for this customer
+      summary: Create alert mutes for customer
+      tags:
+      - Alerts & Risks
+  /v2/alerts/mutes/{alert_mute_key}/customer/{customer_identifier}:
+    delete:
+      deprecated: true
+      description: 'Delete a muted alert for a risk, currently only support for customer scoped muting is provided
+
+
+        You need the "Create and delete mutes" permission to use this endpoint.'
+      operationId: alertServiceDeleteAlertMute
+      parameters:
+      - description: The key of the risk item that has been muted, for example the Risk ID of a profile hit
+        example: 3JX8PBHOQAZN3RD
+        in: path
+        name: alert_mute_key
+        required: true
+        schema:
+          type: string
+      - description: UUID Identifier for the Customer
+        example: 4aace766-d4bb-4fe5-a9ad-47ebd7687b80
+        in: path
+        name: customer_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '204':
+          content:
+            application/json: {}
+          description: Alert mute deleted successfully
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_ProblemDetailErrorResponse'
+          description: Invalid customer identifier
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_ProblemDetailErrorResponse'
+          description: No alert mute found to delete
+      summary: Delete alert mute
+      tags:
+      - Alerts & Risks
+  /v2/alerts/{alert_identifier}/risks:
+    get:
+      description: 'This endpoint will list all risks for a given alert.
+
+
+        You need the "View alerts" permission to use this endpoint.'
+      operationId: alertServiceGetRisks
+      parameters:
+      - description: UUID identifier of the alert from which to get the risks
+        example: 95913b76-050c-40f3-9075-25f0737ac7d3
+        in: path
+        name: alert_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 25
+          minimum: 1
+          type: integer
+      - description: 'Sorting criteria in the format of: `[-]property` (`-` descending modifier).
+
+
+          * Default sort order is ascending (without `-`).
+
+
+          * Multiple sort criteria are supported.'
+        example:
+        - -timestamp
+        in: query
+        name: sort
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                Screening Response:
+                  description: Risks response from screening app
+                  value:
+                    first: /v2/resource?page_number=1&size=25
+                    next: /v2/resource?page_number=4&size=25
+                    prev: /v2/resource?page_number=2&size=25
+                    risks:
+                    - created_at: '2024-07-18T10:29:45.453Z'
+                      decision: NOT_REVIEWED
+                      detail:
+                        change_type: ADDED
+                        configuration_identifier: 018bf164-3e72-7489-b36b-c1edbf15cb1e
+                        profile:
+                          company:
+                            names:
+                            - name: Company legal name
+                              type: AKA
+                          identifier: F9MA22Q9NY521Z1
+                          match_types:
+                          - name_exact
+                          matching_name: Paul John Smith
+                          person:
+                            associates:
+                            - name: John Paul Smith
+                              type: father
+                            - name: John Paul Smith
+                              type: related-to
+                            dates_of_birth:
+                            - source: uk-company-house-disqualified-directors-register
+                              value: '1960-01-01T00:00:00.000Z'
+                            dates_of_death: []
+                            images:
+                            - source: string
+                              value: string
+                            names:
+                            - name: Paul John Smith
+                              type: AKA
+                            places_of_birth: []
+                          risk_indicators:
+                            aml_types:
+                            - adverse-media
+                            - adverse-media-v2-general-aml-cft
+                            - adverse-media-v2-other-minor
+                            - adverse-media-v2-property
+                            - adverse-media-v2-regulatory
+                            - sanction
+                            lists:
+                            - aml_types:
+                              - adverse-media-v2-regulatory
+                              country_codes:
+                              - GB
+                              fields:
+                              - name: Nationality
+                                tag: nationality
+                                value: United Kingdom
+                              - name: Date of Birth
+                                tag: date_of_birth
+                                value: '1960-01-01T00:00:00.000Z'
+                              - name: Related URL
+                                tag: related_url
+                                value: https://beta.companieshouse.gov.uk/register-of-disqualifications/A
+                              identifier: S:ABC123
+                              listing_ended_utc: '2016-02-18T00:00:00.000Z'
+                              listing_started_utc: '2016-01-29T00:00:00.000Z'
+                              name: United Kingdom Company House Disqualified Directors Register
+                              related_urls:
+                              - https://beta.companieshouse.gov.uk/register-of-disqualifications/A
+                              url: https://beta.companieshouse.gov.uk/register-of-disqualifications/A
+                            media:
+                            - identifier: null
+                              publishing_date: string
+                              snippet: string
+                              title: string
+                              url: string
+                            peps:
+                            - active_end_dates:
+                              - string
+                              active_start_dates:
+                              - string
+                              aml_types:
+                              - pep
+                              - pep-class-2
+                              country_codes:
+                              - GB
+                              fields:
+                              - name: Original Country Text
+                                tag: null
+                                value: EN
+                              - name: Date of Death
+                                tag: date_of_death
+                                value: '2014-03-22T00:00:00.000Z'
+                              identifier: S:ABC123
+                              listing_ended_utc: '2016-02-18T00:00:00.000Z'
+                              listing_started_utc: '2016-01-29T00:00:00.000Z'
+                              name: ComplyAdvantage PEP Data
+                              political_parties: []
+                              political_positions:
+                              - Leading figure of the military
+                              political_regions: []
+                              related_urls:
+                              - https://beta.companieshouse.gov.uk/register-of-disqualifications/A
+                              url: https://beta.companieshouse.gov.uk/register-of-disqualifications/A
+                            sanctions:
+                            - aml_types:
+                              - sanction
+                              country_codes:
+                              - GB
+                              fields:
+                              - name: Nationality
+                                tag: null
+                                value: United Kingdom
+                              - name: Place of Birth
+                                tag: null
+                                value: United Kingdom
+                              identifier: S:ABC123
+                              listing_ended_utc: null
+                              listing_started_utc: '2016-01-29T00:00:00.000Z'
+                              name: OFAC SDN List
+                              related_urls: []
+                              url: https://beta.companieshouse.gov.uk/register-of-disqualifications/A
+                      identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                      type: ENTITY_SCREENING
+                      updated_at: '2024-07-18T10:29:45.453Z'
+                      updated_by: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                    self: /v2/resource?page_number=3&size=25
+                    total_count: 60
+                Transaction monitoring response:
+                  description: Risks response from transaction monitoring
+                  value:
+                    first: /v2/resource?page_number=1&size=25
+                    next: /v2/resource?page_number=4&size=25
+                    prev: /v2/resource?page_number=2&size=25
+                    risks:
+                    - created_at: '2025-05-13T06:52:58.075Z'
+                      detail:
+                        scenario:
+                          description: string
+                          identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                          name: string
+                          version: 0
+                        transaction:
+                          external_identifier: string
+                          identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                          type: BANK_PAYMENT
+                        triggered_segment:
+                          identifiers:
+                          - 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                          name: string
+                          outcome: ALLOW
+                          priority: 9
+                      identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                      type: TRANSACTION_MONITORING
+                    self: /v2/resource?page_number=3&size=25
+                    total_count: 60
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/sra_ListRiskV1Response'
+                - $ref: '#/components/schemas/am_TransactionMonitoringRisksResponse'
+          description: OK
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_ProblemDetailErrorResponse'
+          description: Not found
+      summary: Get risks within an alert
+      tags:
+      - Alerts & Risks
+  /v2/alerts/{alert_identifier}/risks/{risk_identifier}/decision:
+    post:
+      description: 'Given an alert identifier, risk identifier, and new risk state, updates the state of the given risk signal.
+
+
+        **Note**: A risk signal from a `TRANSACTION_MONITORING` alert cannot be updated and will result in a 400 response code
+
+
+        You need the "Update risks" permission to use this endpoint.'
+      operationId: alertServiceChangeRiskStatus
+      parameters:
+      - example: f24f3832-4f1e-40fa-98d0-3d5a324de11b
+        in: path
+        name: alert_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - example: b4fd0eae-a440-49a3-af6a-56189848949b
+        in: path
+        name: risk_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/am_RiskStatusUpdatePayload'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_RiskStatusUpdatePayload'
+          description: Decision state updated
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_ProblemDetailErrorResponse'
+          description: Bad Request
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_ProblemDetailErrorResponse'
+          description: Not found
+      summary: Update the status of a risk
+      tags:
+      - Alerts & Risks
+  /v2/alerts/{alert_identifier}/transition:
+    post:
+      description: 'This endpoint transitions an alert to a new state.
+
+
+        You need the "Update alerts" permission to use this endpoint.'
+      operationId: alertServiceTransitionAlertState
+      parameters:
+      - description: UUID identifier of the alert
+        example: 95915b77-050c-40f3-9075-25f0737ac7d3
+        in: path
+        name: alert_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/am_TransitionStatePayload'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_TransitionStatePayload'
+          description: State of the alert transitioned to
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_ProblemDetailErrorResponse'
+          description: Invalid alert state
+      summary: Transition an alert to a state
+      tags:
+      - Alerts & Risks
+  /v2/entity-screening/risks/{risk_identifier}/notes:
+    get:
+      operationId: entityScreeningGetRiskNotes
+      parameters:
+      - description: The unique risk identifier
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: risk_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: If true, retrieves all notes attached to the profile associated with the requested risk
+        example: true
+        in: query
+        name: related_notes
+        required: false
+        schema:
+          default: false
+          type: boolean
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 50
+          minimum: 1
+          type: integer
+      - description: Sort notes by created_at. Prefix with '-' for descending order (e.g. -created_at), or omit the prefix for ascending order (e.g. created_at).
+        example: -created_at
+        in: query
+        name: sort
+        required: false
+        schema:
+          default: []
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sra_GetNotesResponse'
+          description: OK
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/sra_ProblemDetailErrorResponse'
+          description: Risk not found.
+      summary: Get the notes for a screening risk
+      tags:
+      - Alerts & Risks
+    post:
+      operationId: entityScreeningCreateNote
+      parameters:
+      - description: The unique risk identifier
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: risk_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/sra_PostNoteRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sra_ScreeningNoteResponse'
+          description: Success.
+        '400':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/sra_ProblemDetailErrorResponse'
+          description: Bad request.
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/sra_ProblemDetailErrorResponse'
+          description: Risk not found.
+      summary: Create a new note on a screening risk
+      tags:
+      - Alerts & Risks
+  /v3/alerts/mutes:
+    get:
+      description: 'Get list of alert mutes for the current client account, or filtered by a specific entity (customer, counterparty or agent). entity_identifier and entity_type must be provided together or both omitted. Results are paginated; use page and size parameters to navigate pages.
+
+
+        You need the "View alerts" permission to use this endpoint.'
+      operationId: alertServiceGetAlertMutesV3
+      parameters:
+      - description: Optional identifier/profile id of the entity to filter alert mutes
+        example: 89013cff-8b3a-4301-bb59-c20f1d381c20
+        in: query
+        name: entity_identifier
+        required: false
+        schema:
+          type: string
+      - description: 'Entity type, required when entity_identifier is specified, and must not be provided without it. One of: CUSTOMER, COUNTERPARTY'
+        example: CUSTOMER
+        in: query
+        name: entity_type
+        required: false
+        schema:
+          enum:
+          - CUSTOMER
+          - COUNTERPARTY
+          type: string
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 50
+          minimum: 1
+          type: integer
+      - description: 'Sorting criteria in the format of: `[-]property` (`-` descending modifier).
+
+
+          * Default sort order is ascending (without `-`).
+
+
+          * Multiple sort criteria are supported.'
+        example:
+        - -timestamp
+        in: query
+        name: sort
+        required: false
+        schema:
+          default: []
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_PaginatedResponseAlertMuteV3Response'
+          description: List of found alert mutes for account or entity
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_ProblemDetailErrorResponse'
+          description: Invalid entity filter parameters
+      summary: Get list of alert mutes for account or entity
+      tags:
+      - Alerts & Risks
+    post:
+      description: 'Creates an alert mute for the current client account. CUSTOMER entity identifiers must be valid UUIDs; COUNTERPARTY identifiers are accepted as strings.
+
+
+        You need the "Create and delete mutes" permission to use this endpoint.'
+      operationId: alertServiceCreateAlertMuteV3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/am_CreateAlertMuteV3Request'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_AlertMuteV3Response'
+          description: Alert mute successfully created
+        '400':
+          content:
+            application/json:
+              examples:
+                customerIdentifierMissing:
+                  description: customerIdentifierMissing
+                  summary: Entity type is CUSTOMER but customer identifier is not a valid UUID
+                  value:
+                    identifier: 019cd83e-c008-71ca-b7d8-4b834b516614
+                    status: 400
+                    timestamp: '2026-03-10T14:55:17.835Z'
+                    title: Alert mutes with entity type CUSTOMER are only supported when the entity identifier is a valid UUID.
+              schema:
+                $ref: '#/components/schemas/am_ProblemDetailErrorResponse'
+          description: Bad request
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_ProblemDetailErrorResponse'
+          description: Profile is already muted for this customer
+      summary: Create an alert mute
+      tags:
+      - Alerts & Risks
+  /v3/alerts/mutes/{identifier}:
+    delete:
+      description: 'Delete an alert mute by its identifier for the current client account.
+
+
+        You need the "Create and delete mutes" permission to use this endpoint.'
+      operationId: alertServiceDeleteAlertMuteV3
+      parameters:
+      - description: The identifier of the alert mute to delete
+        example: 1cf055ed-f05d-4814-902f-654668b12910
+        in: path
+        name: identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '204':
+          description: Alert mute successfully deleted
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_ProblemDetailErrorResponse'
+          description: Invalid alert mute identifier
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/am_ProblemDetailErrorResponse'
+          description: Alert mute not found for this identifier, nothing to delete
+      summary: Delete an alert mute
+      tags:
+      - Alerts & Risks
+components:
+  schemas:
+    am_CreateAlertMuteV3Request:
+      properties:
+        entity:
+          $ref: '#/components/schemas/am_AlertMuteEntityRequest'
+        risk_code:
+          description: Risk code/profile identifier to mute for the entity.
+          example: PEP
+          type: string
+        risk_signal_identifier:
+          description: Optional risk signal identifier associated with the alert mute.
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+          format: uuid
+          type:
+          - string
+          - 'null'
+        source_risk_app:
+          description: Risk application that produced the muted risk.
+          enum:
+          - UNSPECIFIED
+          - CUSTOMER_SCREENING
+          - PAYMENT_SCREENING
+          example: PAYMENT_SCREENING
+          type: string
+      required:
+      - entity
+      - risk_code
+      - source_risk_app
+      type: object
+    am_GetAlertMutesResponse:
+      properties:
+        alert_mutes:
+          items:
+            $ref: '#/components/schemas/am_AlertMuteDTO'
+          type: array
+        first:
+          type: string
+        next:
+          type:
+          - string
+          - 'null'
+        prev:
+          type:
+          - string
+          - 'null'
+        self:
+          type: string
+        total_count:
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - alert_mutes
+      - first
+      - self
+      type: object
+    sra_Name:
+      description: Name
+      properties:
+        name:
+          description: Name
+          type:
+          - string
+          - 'null'
+        type:
+          description: Name type
+          enum:
+          - AKA
+          example: AKA
+          type:
+          - string
+          - 'null'
+      type: object
+    am_TransactionMonitoringRiskDetail:
+      properties:
+        scenario:
+          $ref: '#/components/schemas/am_Scenario'
+        transaction:
+          $ref: '#/components/schemas/am_Transaction'
+        triggered_segment:
+          $ref: '#/components/schemas/am_Segment'
+      required:
+      - scenario
+      - transaction
+      - triggered_segment
+      type: object
+    am_TransactionMonitoringRisk:
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        detail:
+          $ref: '#/components/schemas/am_TransactionMonitoringRiskDetail'
+        identifier:
+          format: uuid
+          type: string
+        type:
+          enum:
+          - TRANSACTION_MONITORING
+          type: string
+      required:
+      - created_at
+      - detail
+      - identifier
+      - type
+      type: object
+    am_Segment:
+      properties:
+        identifiers:
+          items:
+            format: uuid
+            type: string
+          type: array
+        name:
+          type: string
+        outcome:
+          enum:
+          - ALLOW
+          - HOLD
+          type: string
+        priority:
+          description: Priority 1 is the highest while 9 is the lowest
+          format: int32
+          maximum: 9
+          minimum: 1
+          type: integer
+      required:
+      - identifiers
+      - name
+      - outcome
+      - priority
+      type: object
+    sra_RiskIndicators:
+      description: Risks associated with the profile.
+      properties:
+        aml_types:
+          description: List of aml types associated with the profile
+          items:
+            description: List of aml types associated with the profile
+            type: string
+          type:
+          - array
+          - 'null'
+        lists:
+          description: List of risks identified from lists
+          items:
+            $ref: '#/components/schemas/sra_Source'
+          type:
+          - array
+          - 'null'
+        media:
+          description: List of risks identified in media
+          items:
+            $ref: '#/components/schemas/sra_Media'
+          type:
+          - array
+          - 'null'
+        peps:
+          description: List of risks identified from PEP lists
+          items:
+            $ref: '#/components/schemas/sra_PepSource'
+          type:
+          - array
+          - 'null'
+        sanctions:
+          description: List of risks identified from sanction lists
+          items:
+            $ref: '#/components/schemas/sra_Source'
+          type:
+          - array
+          - 'null'
+      type: object
+    am_AlertMuteV3Response:
+      properties:
+        created_at:
+          description: Timestamp when the alert mute was created.
+          example: '2026-03-10T14:55:17.835Z'
+          format: date-time
+          type: string
+        created_by:
+          description: Identifier of the user that created the alert mute.
+          example: 019cd83e-c008-71ca-b7d8-4b834b516614
+          type:
+          - string
+          - 'null'
+        entity:
+          $ref: '#/components/schemas/am_AlertMuteEntityResponse'
+        identifier:
+          description: Unique identifier of the alert mute.
+          example: 1cf055ed-f05d-4814-902f-654668b12910
+          format: uuid
+          type: string
+        risk_code:
+          description: Risk code/profile identifier muted for the entity.
+          example: PEP
+          type: string
+        risk_signal_identifier:
+          description: Risk signal identifier associated with the alert mute, when provided.
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+          format: uuid
+          type:
+          - string
+          - 'null'
+      required:
+      - created_at
+      - entity
+      - identifier
+      - risk_code
+      type: object
+    am_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
+    am_TransactionMonitoringRisksResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        risks:
+          items:
+            $ref: '#/components/schemas/am_TransactionMonitoringRisk'
+          type: array
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - risks
+      - self
+      type: object
+    sra_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type:
+          - string
+          - 'null'
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      type: object
+    am_AlertMuteDTO:
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        customer_identifier:
+          format: uuid
+          type: string
+        id:
+          format: uuid
+          type: string
+        profile_identifier:
+          type: string
+        risk_identifier:
+          format: uuid
+          type:
+          - string
+          - 'null'
+      required:
+      - created_at
+      - customer_identifier
+      - id
+      - profile_identifier
+      type: object
+    sra_DateOfBirth:
+      description: Date of birth
+      properties:
+        source:
+          description: Source associated with the date of birth
+          type:
+          - string
+          - 'null'
+        value:
+          description: Date of birth
+          type:
+          - string
+          - 'null'
+      type: object
+    sra_Field:
+      description: Information associated with a source.
+      properties:
+        name:
+          description: Name of the field
+          type:
+          - string
+          - 'null'
+        tag:
+          description: Tag relating to the information (if applicable)
+          type:
+          - string
+          - 'null'
+        value:
+          description: Value
+          type:
+          - string
+          - 'null'
+      type: object
+    sra_DateOfDeath:
+      description: Date of death
+      properties:
+        source:
+          description: Source associated with the date of death
+          type:
+          - string
+          - 'null'
+        value:
+          description: Date of death
+          type:
+          - string
+          - 'null'
+      type: object
+    sra_PlaceOfBirth:
+      description: Place of birth
+      properties:
+        source:
+          description: Source associated with the place of birth
+          type:
+          - string
+          - 'null'
+        value:
+          description: Place of birth
+          type:
+          - string
+          - 'null'
+      type: object
+    sra_Company:
+      description: Identity information of the profile.
+      properties:
+        associates:
+          description: List of known associates
+          items:
+            $ref: '#/components/schemas/sra_Associate'
+          type:
+          - array
+          - 'null'
+        fields:
+          description: List of relevant information from the profile
+          items:
+            $ref: '#/components/schemas/sra_Field'
+          type:
+          - array
+          - 'null'
+        names:
+          description: List of known names
+          items:
+            $ref: '#/components/schemas/sra_Name'
+          type:
+          - array
+          - 'null'
+      type:
+      - object
+      - 'null'
+    sra_Media:
+      description: Risk identified in media.
+      properties:
+        identifier:
+          description: Unique identifier of the media (if available)
+          type:
+          - string
+          - 'null'
+        publishing_date:
+          description: Publishing date of the media (if available)
+          type:
+          - string
+          - 'null'
+        snippet:
+          description: Snippet of the media (if available)
+          type:
+          - string
+          - 'null'
+        title:
+          description: Title of the media (if available)
+          type:
+          - string
+          - 'null'
+        url:
+          description: Url of the media (if available)
+          type:
+          - string
+          - 'null'
+      type: object
+    am_TransitionStatePayload:
+      properties:
+        state:
+          enum:
+          - NOT_STARTED
+          - IN_PROGRESS
+          - POSITIVE_END_STATE
+          - NEGATIVE_END_STATE
+          type: string
+      required:
+      - state
+      type: object
+    am_RiskStatusUpdatePayload:
+      properties:
+        decision:
+          enum:
+          - NOT_REVIEWED
+          - IN_REVIEW
+          - FALSE_POSITIVE
+          - TRUE_POSITIVE
+          type: string
+      required:
+      - decision
+      type: object
+    sra_ListRiskV1Response:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1&size=25
+          type:
+          - string
+          - 'null'
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4&size=25
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2&size=25
+          type:
+          - string
+          - 'null'
+        risks:
+          description: List of Risks
+          items:
+            $ref: '#/components/schemas/sra_Risk'
+          type:
+          - array
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3&size=25
+          type:
+          - string
+          - 'null'
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      type: object
+    sra_Risk:
+      description: Object containing risk information.
+      properties:
+        created_at:
+          description: Timestamp of when the risk was created
+          format: date-time
+          type:
+          - string
+          - 'null'
+        decision:
+          description: Decision made on the risk.
+          enum:
+          - NOT_REVIEWED
+          - IN_REVIEW
+          - FALSE_POSITIVE
+          - TRUE_POSITIVE
+          type:
+          - string
+          - 'null'
+        detail:
+          $ref: '#/components/schemas/sra_RiskDetail'
+        identifier:
+          description: Unique identifier of the risk
+          format: uuid
+          type:
+          - string
+          - 'null'
+        previous_decision:
+          description: Decision made on the risk.
+          enum:
+          - NOT_REVIEWED
+          - IN_REVIEW
+          - FALSE_POSITIVE
+          - TRUE_POSITIVE
+          type:
+          - string
+          - 'null'
+        type:
+          description: Type of risk
+          enum:
+          - ENTITY_SCREENING
+          type:
+          - string
+          - 'null'
+        updated_at:
+          description: Timestamp of when the risk was updated
+          format: date-time
+          type:
+          - string
+          - 'null'
+        updated_by:
+          description: Unique identifier of the user of last updated the risk
+          format: uuid
+          type:
+          - string
+          - 'null'
+      type: object
+    sra_AddedMentions:
+      description: Added mention for a risk
+      properties:
+        added_aml_types:
+          description: Added AML mentions
+          items:
+            description: Added AML mentions
+            type: string
+          type:
+          - array
+          - 'null'
+        added_listings:
+          description: Added listing mentions
+          items:
+            description: Added listing mentions
+            type: string
+          type:
+          - array
+          - 'null'
+        added_snippets:
+          description: Added snippet mentions
+          items:
+            description: Added snippet mentions
+            type: string
+          type:
+          - array
+          - 'null'
+      type: object
+    am_Transaction:
+      properties:
+        external_identifier:
+          type: string
+        identifier:
+          format: uuid
+          type: string
+        type:
+          enum:
+          - BANK_PAYMENT
+          type: string
+      required:
+      - external_identifier
+      - identifier
+      - type
+      type: object
+    sra_ScreeningNoteResponse:
+      description: Object containing note information
+      properties:
+        contents:
+          description: Text content of note
+          maximum: 1000
+          type:
+          - string
+          - 'null'
+        created_at:
+          description: Timestamp of when note was created
+          format: date-time
+          type:
+          - string
+          - 'null'
+        created_by:
+          description: Unique identifier of the user who created the note
+          format: uuid
+          type:
+          - string
+          - 'null'
+        identifier:
+          description: Unique identifier for this note
+          format: uuid
+          type:
+          - string
+          - 'null'
+        risk_identifier:
+          description: Unique identifier of the risk that this note is associated with
+          format: uuid
+          type:
+          - string
+          - 'null'
+      type: object
+    am_PaginatedResponseAlertMuteV3Response:
+      properties:
+        alert_mutes:
+          items:
+            $ref: '#/components/schemas/am_AlertMuteV3Response'
+          type: array
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - alert_mutes
+      type: object
+    sra_Associate:
+      description: Associate
+      properties:
+        name:
+          description: Name of associate
+          type:
+          - string
+          - 'null'
+        type:
+          description: Association type
+          example: father
+          type:
+          - string
+          - 'null'
+      type: object
+    sra_Vessel:
+      description: Identity information of the profile.
+      properties:
+        associates:
+          description: List of known associates
+          items:
+            $ref: '#/components/schemas/sra_Associate'
+          type:
+          - array
+          - 'null'
+        names:
+          description: List of known names
+          items:
+            $ref: '#/components/schemas/sra_Name'
+          type:
+          - array
+          - 'null'
+      type:
+      - object
+      - 'null'
+    sra_Person:
+      description: Identity information of the profile.
+      properties:
+        associates:
+          description: List of known associates
+          items:
+            $ref: '#/components/schemas/sra_Associate'
+          type:
+          - array
+          - 'null'
+        dates_of_birth:
+          description: List of known dates of birth
+          items:
+            $ref: '#/components/schemas/sra_DateOfBirth'
+          type:
+          - array
+          - 'null'
+        dates_of_death:
+          description: List of known dates of death
+          items:
+            $ref: '#/components/schemas/sra_DateOfDeath'
+          type:
+          - array
+          - 'null'
+        fields:
+          description: List of relevant information from the profile
+          items:
+            $ref: '#/components/schemas/sra_Field'
+          type:
+          - array
+          - 'null'
+        images:
+          description: List of images
+          items:
+            $ref: '#/components/schemas/sra_Image'
+          type:
+          - array
+          - 'null'
+        names:
+          description: List of known names
+          items:
+            $ref: '#/components/schemas/sra_Name'
+          type:
+          - array
+          - 'null'
+        places_of_birth:
+          description: List of known places of birth
+          items:
+            $ref: '#/components/schemas/sra_PlaceOfBirth'
+          type:
+          - array
+          - 'null'
+      type:
+      - object
+      - 'null'
+    sra_Image:
+      description: Image
+      properties:
+        source:
+          description: Source associated with the image
+          type:
+          - string
+          - 'null'
+        url:
+          description: Url of the image
+          type:
+          - string
+          - 'null'
+      type: object
+    am_AlertMuteEntityResponse:
+      description: Entity scope the alert mute applies to.
+      properties:
+        identifier:
+          description: Identifier of the muted entity.
+          example: 89013cff-8b3a-4301-bb59-c20f1d381c20
+          type: string
+        type:
+          description: Type of muted entity.
+          enum:
+          - CUSTOMER
+          - COUNTERPARTY
+          example: CUSTOMER
+          type: string
+      required:
+      - identifier
+      - type
+      type: object
+    am_AlertMuteEntityRequest:
+      description: Entity scope for the mute. CUSTOMER identifiers must be valid UUIDs.
+      properties:
+        identifier:
+          description: Identifier of the entity to mute. Must be a UUID when type is CUSTOMER.
+          example: 89013cff-8b3a-4301-bb59-c20f1d381c20
+          type: string
+        type:
+          description: Type of entity the alert mute applies to.
+          enum:
+          - CUSTOMER
+          - COUNTERPARTY
+          example: CUSTOMER
+          type: string
+      required:
+      - identifier
+      - type
+      type: object
+    sra_RiskDetail:
+      description: Detail of the risk.
+      properties:
+        added_mentions:
+          $ref: '#/components/schemas/sra_AddedMentions'
+        change_type:
+          description: Type of change detected on the profile between two successive screens.
+          enum:
+          - ADDED
+          - REMOVED
+          - UPDATED
+          type:
+          - string
+          - 'null'
+        configuration_identifier:
+          description: Unique identifier of the screening configuration used
+          format: uuid
+          type:
+          - string
+          - 'null'
+        profile:
+          $ref: '#/components/schemas/sra_Profile'
+      type: object
+    sra_Profile:
+      description: A list of entity screening risks associated with the alert.
+      properties:
+        aircraft:
+          $ref: '#/components/schemas/sra_Aircraft'
+        company:
+          $ref: '#/components/schemas/sra_Company'
+        identifier:
+          description: Unique identifier of the profile
+          type:
+          - string
+          - 'null'
+        match_score:
+          description: Match score
+          format: double
+          type:
+          - number
+          - 'null'
+        match_types:
+          description: List of reasons the profile matched the screen criteria
+          example:
+          - name_exact
+          items:
+            description: List of reasons the profile matched the screen criteria
+            example: '["name_exact"]'
+            type: string
+          type:
+          - array
+          - 'null'
+        matching_name:
+          description: Name of the profile that matched the screen criteria
+          type:
+          - string
+          - 'null'
+        person:
+          $ref: '#/components/schemas/sra_Person'
+        risk_indicators:
+          $ref: '#/components/schemas/sra_RiskIndicators'
+        vessel:
+          $ref: '#/components/schemas/sra_Vessel'
+      type: object
+    sra_PostNoteRequest:
+      description: Object containing new note content
+      properties:
+        contents:
+          description: Text content of new note
+          type: string
+      required:
+      - contents
+      type: object
+    sra_Aircraft:
+      description: Identity information of the profile.
+      properties:
+        associates:
+          description: List of known associates
+          items:
+            $ref: '#/components/schemas/sra_Associate'
+          type:
+          - array
+          - 'null'
+        names:
+          description: List of known names
+          items:
+            $ref: '#/components/schemas/sra_Name'
+          type:
+          - array
+          - 'null'
+      type:
+      - object
+      - 'null'
+    am_CreateAlertMuteRequest:
+      properties:
+        customer_identifier:
+          format: uuid
+          type:
+          - string
+          - 'null'
+        profile_identifier:
+          type: string
+        risk_identifier:
+          format: uuid
+          type:
+          - string
+          - 'null'
+      required:
+      - profile_identifier
+      type: object
+    sra_Source:
+      description: Risks identified from sanction or watch lists.
+      properties:
+        aml_types:
+          description: Aml types associated with the source
+          items:
+            description: Aml types associated with the source
+            type: string
+          type:
+          - array
+          - 'null'
+        country_codes:
+          description: Country codes associated with the source
+          items:
+            description: Country codes associated with the source
+            type: string
+          type:
+          - array
+          - 'null'
+        fields:
+          description: List of relevant information from the source
+          items:
+            $ref: '#/components/schemas/sra_Field'
+          type:
+          - array
+          - 'null'
+        identifier:
+          description: Unique identifier of the source
+          type:
+          - string
+          - 'null'
+        listing_ended_utc:
+          description: Date the source was removed
+          type:
+          - string
+          - 'null'
+        listing_started_utc:
+          description: Date the source was first published
+          type:
+          - string
+          - 'null'
+        name:
+          description: Name of the source
+          type:
+          - string
+          - 'null'
+        related_urls:
+          description: List urls related to the source
+          items:
+            description: List urls related to the source
+            type: string
+          type:
+          - array
+          - 'null'
+        url:
+          description: Url of the source
+          type:
+          - string
+          - 'null'
+      type: object
+    sra_PepSource:
+      description: Risks identified from PEP lists.
+      properties:
+        active_end_dates:
+          description: List of dates when the PEP finished in office
+          items:
+            description: List of dates when the PEP finished in office
+            type: string
+          type:
+          - array
+          - 'null'
+        active_start_dates:
+          description: List of dates when the PEP started in office
+          items:
+            description: List of dates when the PEP started in office
+            type: string
+          type:
+          - array
+          - 'null'
+        aml_types:
+          description: Aml types associated with the source
+          items:
+            description: Aml types associated with the source
+            type: string
+          type:
+          - array
+          - 'null'
+        country_codes:
+          description: Country codes associated with the source
+          items:
+            description: Country codes associated with the source
+            type: string
+          type:
+          - array
+          - 'null'
+        fields:
+          description: List of relevant information from the source
+          items:
+            $ref: '#/components/schemas/sra_Field'
+          type:
+          - array
+          - 'null'
+        identifier:
+          description: Unique identifier of the source
+          type:
+          - string
+          - 'null'
+        listing_ended_utc:
+          description: Date the source was removed
+          type:
+          - string
+          - 'null'
+        listing_started_utc:
+          description: Date the source was first published
+          type:
+          - string
+          - 'null'
+        name:
+          description: Name of the source
+          type:
+          - string
+          - 'null'
+        political_parties:
+          description: List of political parties associated with the PEP
+          items:
+            description: List of political parties associated with the PEP
+            type: string
+          type:
+          - array
+          - 'null'
+        political_positions:
+          description: List of political positions held by the PEP
+          items:
+            description: List of political positions held by the PEP
+            type: string
+          type:
+          - array
+          - 'null'
+        political_regions:
+          description: List of political regions associated with the PEP
+          items:
+            description: List of political regions associated with the PEP
+            type: string
+          type:
+          - array
+          - 'null'
+        related_urls:
+          description: List urls related to the source
+          items:
+            description: List urls related to the source
+            type: string
+          type:
+          - array
+          - 'null'
+        url:
+          description: Url of the source
+          type:
+          - string
+          - 'null'
+      type: object
+    am_Scenario:
+      properties:
+        description:
+          type: string
+        identifier:
+          format: uuid
+          type: string
+        name:
+          type: string
+        version:
+          format: int32
+          type: integer
+      required:
+      - description
+      - identifier
+      - name
+      - version
+      type: object
+    sra_GetNotesResponse:
+      description: A paginated collection of notes
+      properties:
+        first:
+          description: URL to fetch the first page of items
+          type:
+          - string
+          - 'null'
+        next:
+          description: URL to fetch the next page of items
+          type:
+          - string
+          - 'null'
+        notes:
+          description: List of notes
+          items:
+            $ref: '#/components/schemas/sra_ScreeningNoteResponse'
+          type:
+          - array
+          - 'null'
+        prev:
+          description: URL to fetch the previous page of items
+          type:
+          - string
+          - 'null'
+        self:
+          description: URL to fetch the current page of items
+          type:
+          - string
+          - 'null'
+        total_count:
+          description: Total number of notes across all pages
+          format: int32
+          type:
+          - integer
+          - 'null'
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http

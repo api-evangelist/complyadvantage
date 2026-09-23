@@ -1,0 +1,170 @@
+openapi: 3.2.0
+info:
+  title: Mesh Authentication API
+  version: v2.0
+servers:
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
+security:
+- BearerAuth: []
+tags:
+- name: Authentication
+paths:
+  /v2/token:
+    post:
+      description: '**If you are setting up a new API integration, use API credentials and the `/v3/token` endpoint instead of this one.**
+
+
+        Mesh is authenticated via OAuth2. An initial request must be made to collect the token. This token can then be used to authenticate all requests for the following 24 hours, after which the token must be refreshed.
+
+
+        The username and password should be one of the users already created in your account. The value `realm` is provided by ComplyAdvantage.
+
+
+        The access token returned by the initial request can then be used within the authorization header.
+
+
+        ```
+
+        "Authorization":"Bearer {access_token}"
+
+        ```
+
+
+        The bearer token has a validity period of 24 hours (86,400 seconds), after which any authentication attempts will fail. To refresh a token, use the same method as that used to generate it.'
+      operationId: createToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenCreateRequestBody'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TokenCreateResponseData'
+          description: OK
+        '400':
+          content:
+            '*/*':
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                type: object
+          description: Bad Request
+      security:
+      - {}
+      summary: Create an access token with username/password (deprecated)
+      tags:
+      - Authentication
+  /v3/token:
+    post:
+      description: 'API access to Mesh uses the OAuth2 client credentials flow. Users can generate a set of credentials (consisting of an access key and secret) in the UI (Settings > Access Management > API Credentials). The lifespan, permissions and optional expiry date of the credentials can all be configured by the user at the time of creation.
+
+
+        These credentials can then be used to generate an access token by calling this endpoint. This token must then be sent in headers when making authenticated API calls.
+
+
+        ```
+
+        "Authorization":"Bearer {access_token}"
+
+        ```
+
+
+        Each token has an expiry of 24 hours (86,400 seconds). This is not configurable. Once a token expires, any requests made using it will fail — there is no refresh mechanism, so a new token must be generated the same way as before. When client credentials expire or are revoked by the user, they can no longer be used to generate access tokens.'
+      operationId: createTokenV3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenCreateRequestBodyV3'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TokenCreateResponseData'
+          description: OK
+        '400':
+          content:
+            '*/*':
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                type: object
+          description: Bad Request
+      security:
+      - {}
+      summary: Create an API access token
+      tags:
+      - Authentication
+components:
+  schemas:
+    TokenCreateRequestBodyV3:
+      properties:
+        access_key:
+          description: The access key identifying your API Credential.
+          example: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+          type: string
+        secret:
+          description: The randomly generated secret associated with your API Credential, used to authenticate the request. Treat this as sensitive, store it securely and do not share it.
+          example: randomsecretstring
+          type: string
+      required:
+      - access_key
+      - secret
+      type: object
+    TokenCreateResponseData:
+      properties:
+        access_token:
+          description: 'The generated token that should be included in the authorization header of each call (`Authorization: Bearer {access_token}`)'
+          example: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+          type: string
+        expires_in:
+          description: The number of seconds until the token expires
+          example: 86400
+          type: integer
+        scope:
+          enum:
+          - read:api write:api
+          type: string
+        token_type:
+          enum:
+          - Bearer
+          type: string
+      type: object
+    TokenCreateRequestBody:
+      properties:
+        password:
+          description: The password of the API user
+          example: password
+          type: string
+        realm:
+          description: This will have been provided by ComplyAdvantage at onboarding.  Note this is case sensitive.
+          example: yourrealm
+          type: string
+        username:
+          description: The username (email address) of the API user
+          example: yourapiuser@yourdomain.com
+          format: email
+          type: string
+      required:
+      - username
+      - password
+      - realm
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http

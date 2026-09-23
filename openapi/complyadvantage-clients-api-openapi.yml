@@ -1,0 +1,390 @@
+openapi: 3.2.0
+info:
+  title: Mesh Clients API
+  version: v2.0
+servers:
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
+security:
+- BearerAuth: []
+tags:
+- name: Clients
+paths:
+  /v2/clients/me:
+    get:
+      description: Returns your client details.
+      operationId: identity_v2_clients_me_getMyClient
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_ClientData'
+          description: OK
+      summary: Get your client details
+      tags:
+      - Clients
+  /v2/clients/me/accounts:
+    get:
+      description: 'Returns a list of accounts within your client.
+
+
+        You need the "View all accounts" permission to use this endpoint.'
+      operationId: identity_v2_clients_me_accounts_getMyClientsAccounts
+      parameters:
+      - description: Filter the resource by name.
+        example: ad
+        in: query
+        name: name_contains
+        required: false
+        schema:
+          type: string
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 10
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_AccountsResponse'
+          description: OK
+      summary: Get list of accounts within your client
+      tags:
+      - Clients
+  /v2/clients/me/users:
+    get:
+      description: 'Retrieve list of users in the client.
+
+
+        You need the "View users" permission to use this endpoint if no value is passed for the `identifier` query param.'
+      operationId: identity_v2_clients_me_users_getClientUsers
+      parameters:
+      - deprecated: true
+        description: Search users by name.
+        example: Doe
+        in: query
+        name: name_contains
+        required: false
+        schema:
+          type: string
+      - description: Search users.
+        example: Doe
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+      - description: Exclude you current account from the listing.
+        example: false
+        in: query
+        name: exclude_my_account
+        required: false
+        schema:
+          default: false
+          type: boolean
+      - description: Do not include support users in the response.
+        example: false
+        in: query
+        name: exclude_support_users
+        required: false
+        schema:
+          default: false
+          type: boolean
+      - description: Identifiers of users requested within the client.
+        example:
+        - 00000000-0000-0000-0000-000000000000
+        in: query
+        name: identifier
+        required: false
+        schema:
+          items:
+            format: uuid
+            type: string
+          maxItems: 40
+          minItems: 0
+          type: array
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 10
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_NoRolesUsersResponse'
+          description: Users list retrieved
+      summary: Retrieve list of users in the client
+      tags:
+      - Clients
+components:
+  schemas:
+    identity_ClientData:
+      properties:
+        active:
+          default: false
+          description: If your client is active or deactivated.
+          type: boolean
+        allow_password_login:
+          default: false
+          description: If password login is enabled or disabled.
+          type: boolean
+        allow_sso_login:
+          default: false
+          description: If SSO login is enabled or disabled.
+          type: boolean
+        can_manage_subscription:
+          default: false
+          description: Indicates whether the client has access to self-serve subscription management
+          type: boolean
+        created_at:
+          description: Date and time the client was created.
+          format: date-time
+          type: string
+        deactivated_at:
+          description: Date and time the client was deactivated.
+          format: date-time
+          type: string
+        identifier:
+          description: The unique identifier of the client.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        idp_identifier:
+          description: The identifier of the identity provider.
+          type: string
+        name:
+          description: The client's name.
+          example: Client
+          type: string
+        updated_at:
+          description: Date and time the client was last updated.
+          format: date-time
+          type: string
+      required:
+      - active
+      - allow_password_login
+      - allow_sso_login
+      - can_manage_subscription
+      - identifier
+      - idp_identifier
+      - name
+      type: object
+    identity_AccountsResponse:
+      properties:
+        accounts:
+          items:
+            $ref: '#/components/schemas/identity_AccountData'
+          type: array
+        first:
+          description: The url with parameters of the first page
+          type: string
+        next:
+          description: The url with parameters of the next page, null if there are no more pages
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The url with parameters of the previous page, null if current page_number is 1
+          type:
+          - string
+          - 'null'
+        self:
+          description: The url with parameters of the current page
+          type:
+          - string
+          - 'null'
+        total_count:
+          description: Total number of accounts.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - accounts
+      - first
+      type: object
+    identity_AccountData:
+      properties:
+        account_type:
+          description: Type of the account
+          enum:
+          - CLIENT_ACCOUNT_TYPE_UNSPECIFIED
+          - CLIENT_ACCOUNT_TYPE_NON_PRODUCTION
+          - CLIENT_ACCOUNT_TYPE_PRODUCTION
+          - UNRECOGNIZED
+          example: CLIENT_ACCOUNT_TYPE_NON_PRODUCTION
+          type: string
+        active:
+          default: false
+          description: If the account is active or deactivated.
+          type: boolean
+        client_identifier:
+          description: The unique identifier of the account's client.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        created_at:
+          description: Date and time the account was created.
+          format: date-time
+          type: string
+        deactivated_at:
+          description: Date and time the account was deactivated.
+          format: date-time
+          type: string
+        identifier:
+          description: The unique identifier of the account.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        name:
+          description: Name of the account
+          example: A Bank PLC Sandbox
+          type: string
+        updated_at:
+          description: Date and time the account was last updated.
+          format: date-time
+          type: string
+      required:
+      - account_type
+      - active
+      - client_identifier
+      - identifier
+      - name
+      type: object
+    identity_NoRolesUserData:
+      description: List of users.
+      properties:
+        active:
+          default: false
+          description: If a user is active or deactivated.
+          example: true
+          type: boolean
+        client_identifier:
+          description: The unique identifier of the client.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        created_at:
+          description: Date and time the user was created.
+          format: date-time
+          type: string
+        created_by:
+          description: The unique identifier of who created the user.
+          format: uuid
+          type: string
+        deactivated_at:
+          description: Date and time the user was deactivated.
+          format: date-time
+          type: string
+        email:
+          description: Email address of the user.
+          example: example@mail.com
+          type: string
+        enforce_mfa_after:
+          description: Date and time of when MFA will be enforced for the user.
+          format: date-time
+          type: string
+        identifier:
+          description: The unique identifier of the user.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        name:
+          description: Full name of the user.
+          example: John Doe
+          type: string
+        updated_at:
+          description: Date and time the user was last updated.
+          format: date-time
+          type: string
+        updated_by:
+          description: The unique identifier of who last updated the user.
+          format: uuid
+          type: string
+        user_type:
+          enum:
+          - AGENT
+          - HUMAN
+          - MACHINE_CREDENTIAL
+          type: string
+      required:
+      - active
+      - client_identifier
+      - email
+      - identifier
+      - name
+      - user_type
+      type: object
+    identity_NoRolesUsersResponse:
+      properties:
+        first:
+          description: The url with parameters of the first page
+          type: string
+        next:
+          description: The url with parameters of the next page, null if there are no more pages
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The url with parameters of the previous page, null if current page_number is 1
+          type:
+          - string
+          - 'null'
+        self:
+          description: The url with parameters of the current page
+          type:
+          - string
+          - 'null'
+        total_count:
+          description: Total number of users.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+        users:
+          description: List of users.
+          items:
+            $ref: '#/components/schemas/identity_NoRolesUserData'
+          type: array
+      required:
+      - first
+      - users
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http

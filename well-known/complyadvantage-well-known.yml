@@ -1,0 +1,176 @@
+generated: '2026-08-27'
+method: probed
+source: live GET probes of /.well-known/* on every apis.yml baseURL host, every OpenAPI servers[] host, and both docs hosts
+provider: ComplyAdvantage
+providerId: complyadvantage
+description: >-
+  One real hit across five hosts: the Mesh documentation host serves an RFC 9727
+  /.well-known/api-catalog as application/linkset+json, pointing at the Mesh OpenAPI
+  (mesh-api.json) as service-desc and the API reference as service-doc. No security.txt
+  anywhere, no OpenID/OAuth discovery document (the login flow runs on AWS Cognito at
+  auth.complyadvantage.com, which answers 404 for all three discovery paths), no
+  ai-plugin.json, and no A2A agent card on any host.
+notes: >-
+  api.complyadvantage.com answers 401 for every path including /.well-known/* - the
+  gateway authenticates before routing, so absence there is unprovable rather than
+  proven. api.mesh.complyadvantage.com behaves the same way with an
+  application/problem+json 401. docs.complyadvantage.com is an S3-backed Slate site that
+  returns an XML AccessDenied 403 for anything it does not have. complyadvantage.com and
+  docs.mesh.complyadvantage.com return HTML 404 shells - recorded as misses, not
+  documents.
+hosts:
+- host: complyadvantage.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+    file: null
+  - path: /.well-known/openid-configuration
+    status: 404
+    file: null
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+    file: null
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+    file: null
+  - path: /.well-known/api-catalog
+    status: 404
+    file: null
+  - path: /.well-known/ai-plugin.json
+    status: 404
+    file: null
+  - path: /.well-known/agent-card.json
+    status: 404
+    file: null
+  - path: /.well-known/agent.json
+    status: 404
+    file: null
+- host: docs.mesh.complyadvantage.com
+  documents:
+  - path: /.well-known/api-catalog
+    status: 200
+    file: complyadvantage-api-catalog.json
+    content_type: application/linkset+json; charset=utf-8
+    note: >-
+      RFC 9727 linkset. anchor https://docs.mesh.complyadvantage.com/reference#mesh-api.json;
+      service-desc https://docs.mesh.complyadvantage.com/openapi/mesh-api.json
+      (application/vnd.oai.openapi+json); service-doc
+      https://docs.mesh.complyadvantage.com/reference (text/html).
+  - path: /.well-known/security.txt
+    status: 404
+    file: null
+  - path: /.well-known/openid-configuration
+    status: 404
+    file: null
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+    file: null
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+    file: null
+  - path: /.well-known/ai-plugin.json
+    status: 404
+    file: null
+  - path: /.well-known/agent-card.json
+    status: 404
+    file: null
+  - path: /.well-known/agent.json
+    status: 404
+    file: null
+- host: docs.complyadvantage.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 403
+    file: null
+    note: S3 origin returns an XML AccessDenied body for every unmapped path.
+  - path: /.well-known/openid-configuration
+    status: 403
+    file: null
+  - path: /.well-known/oauth-authorization-server
+    status: 403
+    file: null
+  - path: /.well-known/oauth-protected-resource
+    status: 403
+    file: null
+  - path: /.well-known/api-catalog
+    status: 403
+    file: null
+  - path: /.well-known/ai-plugin.json
+    status: 403
+    file: null
+  - path: /.well-known/agent-card.json
+    status: 403
+    file: null
+  - path: /.well-known/agent.json
+    status: 403
+    file: null
+- host: api.complyadvantage.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 401
+    file: null
+    note: 'Gateway authenticates before routing: {"message": "API Key is invalid or was not provided"} on every path.'
+  - path: /.well-known/openid-configuration
+    status: 401
+    file: null
+  - path: /.well-known/oauth-authorization-server
+    status: 401
+    file: null
+  - path: /.well-known/oauth-protected-resource
+    status: 401
+    file: null
+  - path: /.well-known/api-catalog
+    status: 401
+    file: null
+  - path: /.well-known/ai-plugin.json
+    status: 401
+    file: null
+  - path: /.well-known/agent-card.json
+    status: 401
+    file: null
+  - path: /.well-known/agent.json
+    status: 401
+    file: null
+- host: api.mesh.complyadvantage.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 401
+    file: null
+    note: application/problem+json - "Unauthorized (no suitable authorization credentials were provided)".
+  - path: /.well-known/openid-configuration
+    status: 401
+    file: null
+  - path: /.well-known/oauth-authorization-server
+    status: 401
+    file: null
+  - path: /.well-known/oauth-protected-resource
+    status: 401
+    file: null
+  - path: /.well-known/api-catalog
+    status: 401
+    file: null
+  - path: /.well-known/ai-plugin.json
+    status: 401
+    file: null
+  - path: /.well-known/agent-card.json
+    status: 401
+    file: null
+  - path: /.well-known/agent.json
+    status: 401
+    file: null
+- host: auth.complyadvantage.com
+  documents:
+  - path: /.well-known/openid-configuration
+    status: 404
+    file: null
+    note: >-
+      AWS Cognito hosted-UI domain reached via app.complyadvantage.com. Returns
+      {"error":"This URL doesn't exist on the authorization server."} - the Cognito
+      discovery document lives on the cognito-idp regional endpoint, not on this
+      custom domain, so ComplyAdvantage publishes no discoverable OIDC metadata.
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+    file: null
+  - path: /.well-known/jwks.json
+    status: 404
+    file: null

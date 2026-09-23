@@ -1,0 +1,540 @@
+openapi: 3.2.0
+info:
+  title: Mesh Labels API
+  version: v2.0
+servers:
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
+security:
+- BearerAuth: []
+tags:
+- name: Labels
+paths:
+  /v2/customers/{customer_identifier}/labels:
+    get:
+      description: 'Provides the labels that have been set for the specified customer.
+
+
+        You need the "View customers" permission to use this endpoint.'
+      operationId: customerGetLabelsV2
+      parameters:
+      - description: The unique identifier we provided when you created the customer.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: customer_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 50
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                Page 1:
+                  description: Page 1 of the customer labels available for this account.
+                  value:
+                    first: /v2/customers/{customer-identifier}/labels?page_number=1&page_size=1
+                    labels:
+                    - identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                      name: string-1
+                    next: /v2/customers/{customer-identifier}/labels?page_number=2&page_size=1
+                    prev: 'null'
+                    self: /v2/customers/{customer-identifier}/labels?page_number=1&page_size=1
+                    total_count: 3
+                Page 2:
+                  description: Page 2 of the customer labels available for this account.
+                  value:
+                    first: /v2/customers/{customer-identifier}/labels?page_number=1&page_size=1
+                    labels:
+                    - identifier: 3fa85f64-5717-4562-b3fc-2c963f77aba9
+                      name: string-2
+                    next: /v2/customers/{customer-identifier}/labels?page_number=3&page_size=1
+                    prev: /v2/customers/{customer-identifier}/labels?page_number=1&page_size=1
+                    self: /v2/customers/{customer-identifier}/labels?page_number=2&page_size=1
+                    total_count: 3
+              schema:
+                $ref: '#/components/schemas/customer-manager_PaginatedCustomerLabelsV2Response'
+          description: Label list
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_ProblemDetailErrorResponse'
+          description: Bad Request
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_ProblemDetailErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_ProblemDetailErrorResponse'
+          description: Not Found
+      summary: Retrieve the labels for a customer
+      tags:
+      - Labels
+    put:
+      description: 'Sets the labels for a customer. The labels you specify replace what was there before.
+
+
+        The payload you send is a JSON array of the label UUIDs you want to set for this customer.
+
+
+        You need the "Update customers" permission to use this endpoint.'
+      operationId: customerUpdateLabels
+      parameters:
+      - description: The unique identifier we provided when you created the customer.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: customer_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                format: uuid
+                type: string
+              type: array
+        required: true
+      responses:
+        '204':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_Unit'
+          description: Success. The labels have been set for the customer.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_ProblemDetailErrorResponse'
+          description: Incorrect input parameters.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_ProblemDetailErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer-manager_ProblemDetailErrorResponse'
+          description: The customer doesn't exist.
+      summary: Set labels for a customer
+      tags:
+      - Labels
+  /v2/labels:
+    get:
+      description: 'This endpoint allows you to retrieve all the labels in an account. It can also be used to perform a direct search on a label identifier or name, and can be sorted by name or created at of the labels.
+
+
+        You need the "View customers" permission to use this endpoint.'
+      operationId: labelManagerGetLabelsList
+      parameters:
+      - description: The unique name you provided when you created the label.
+        example:
+        - label_one
+        in: query
+        name: name
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+      - description: The unique identifier we provided when you created the label.
+        example:
+        - 00000000-0000-0000-0000-000000000000
+        in: query
+        name: identifier
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+      - in: query
+        name: search
+        required: false
+        schema:
+          type: string
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 50
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/label_GetLabelsPaginatedResponse'
+          description: Get a list of labels
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/label_ProblemDetailErrorResponse'
+          description: Bad Request
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/label_ProblemDetailErrorResponse'
+          description: You do not have the permissions needed to access the resource.
+      summary: Get a list of labels
+      tags:
+      - Labels
+    post:
+      description: 'This endpoint allows you to create labels by submitting an array of label names.
+
+
+        You need the "Create and update labels" permission to use this endpoint.'
+      operationId: labelManagerCreateLabels
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/label_CreateLabelsPayload'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/label_CreateLabelsResponse'
+          description: New labels created
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/label_ProblemDetailErrorResponse'
+          description: Bad Request
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/label_ProblemDetailErrorResponse'
+          description: You do not have the permissions needed to access the resource.
+      summary: Create new labels
+      tags:
+      - Labels
+  /v2/labels/{label_identifier}:
+    patch:
+      description: 'This endpoint allows you to rename a label
+
+
+        You need the "Create and update labels" permission to use this endpoint.'
+      operationId: labelManagerRenameLabel
+      parameters:
+      - description: The unique identifier we provided when you created the label.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: label_identifier
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/label_UpdateLabelRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/label_Label'
+          description: Rename label
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/label_ProblemDetailErrorResponse'
+          description: Bad Request
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/label_ProblemDetailErrorResponse'
+          description: You do not have the permissions needed to access the resource.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/label_ProblemDetailErrorResponse'
+          description: Label Not Found
+      summary: Rename label
+      tags:
+      - Labels
+components:
+  schemas:
+    label_CreateLabelsResponse:
+      properties:
+        labels:
+          description: List of labels
+          items:
+            $ref: '#/components/schemas/label_Label'
+          type: array
+      required:
+      - labels
+      type: object
+    customer-manager_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
+    customer-manager_PaginatedCustomerLabelsV2Response:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v2/resource?page_number=1
+          type: string
+        labels:
+          items:
+            $ref: '#/components/schemas/customer-manager_LabelV2'
+          type: array
+        next:
+          description: The URL path to the next page.
+          example: /v2/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v2/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v2/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - labels
+      - self
+      type: object
+    label_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
+    label_CreateLabelsPayload:
+      properties:
+        labels:
+          description: A list of unique label names to create.
+          items:
+            description: Label name must be between 1 and 280 characters.
+            maxLength: 280
+            minLength: 1
+            type: string
+          maxItems: 100
+          minItems: 0
+          type: array
+          uniqueItems: true
+      required:
+      - labels
+      type: object
+    label_UpdateLabelRequest:
+      properties:
+        name:
+          maxLength: 280
+          minLength: 0
+          type: string
+      required:
+      - name
+      type: object
+    customer-manager_LabelV2:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+        name:
+          type: string
+      required:
+      - identifier
+      - name
+      type: object
+    customer-manager_Unit:
+      type: object
+    label_Label:
+      description: List of labels
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        created_by:
+          type: string
+        identifier:
+          format: uuid
+          type: string
+        name:
+          description: Name of the label.
+          maxLength: 280
+          minLength: 1
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+        updated_by:
+          type: string
+      required:
+      - created_at
+      - created_by
+      - identifier
+      - name
+      - updated_at
+      - updated_by
+      type: object
+    label_GetLabelsPaginatedResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v2/labels?page_number=1
+          type: string
+        labels:
+          description: List of labels
+          items:
+            $ref: '#/components/schemas/label_Label'
+          type: array
+        next:
+          description: The URL path to the next page.
+          example: /v2/labels?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v2/labels?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v2/labels?page_number=3
+          type: string
+        total_count:
+          description: Total number of labels.
+          example: 50
+          format: int64
+          type: integer
+      required:
+      - first
+      - labels
+      - self
+      - total_count
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http

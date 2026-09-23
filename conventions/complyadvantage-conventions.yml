@@ -1,0 +1,247 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  https://docs.mesh.complyadvantage.com/docs/errors.md,
+  https://docs.mesh.complyadvantage.com/docs/versioning.md,
+  https://docs.mesh.complyadvantage.com/docs/rate-limiting.md,
+  https://docs.mesh.complyadvantage.com/docs/webhooks.md,
+  https://docs.mesh.complyadvantage.com/docs/getting-started.md,
+  https://docs.complyadvantage.com/api-docs; derived from
+  openapi/complyadvantage-mesh-api-openapi.json
+provider: ComplyAdvantage
+providerId: complyadvantage
+description: >-
+  Cross-cutting runtime semantics for the two ComplyAdvantage API surfaces. Mesh
+  (api.mesh.complyadvantage.com) is the current platform: OAuth2 client-credentials bearer
+  tokens, page-number pagination with a link envelope, RFC 9457 problem details, RFC 9457
+  -adjacent rate-limit headers, and Standard Webhooks v1 signing. The legacy REST API
+  (api.complyadvantage.com) is a different animal - a static API key in an Authorization
+  header, offset/limit pagination, no problem+json, and no rate-limit headers at all.
+auth:
+  mesh:
+    style: oauth2-client-credentials
+    scheme: BearerAuth (http bearer)
+    token_endpoint: POST /v3/token
+    deprecated_token_endpoint: POST /v2/token
+    token_ttl_seconds: 86400
+    refresh: none
+    note: >-
+      Credentials (access key + secret) are minted in the UI under Settings > Access
+      Management > API Credentials, with configurable lifespan, permissions and optional
+      expiry. Tokens expire after exactly 24 hours and there is no refresh grant - mint a
+      new one the same way. /v2/token (username + password + realm) is deprecated for new
+      integrations.
+  legacy:
+    style: api-key
+    header: 'Authorization: Token YOUR_API_KEY'
+    note: Key generated inside the ComplyAdvantage web platform; an account is required.
+  see_also: authentication/complyadvantage-authentication.yml
+authorization:
+  model: named account permissions
+  note: >-
+    Not OAuth scopes. Each Mesh endpoint states the permission the credential's role must
+    hold, e.g. "View customers", "Update customers", "Update cases", "View alerts",
+    "Create and update webhooks", "Monitor and unmonitor customers". Some also require an
+    account-level entitlement ("Access to base customer screening functionality"). A
+    missing permission returns 403, not 401.
+  see_also: scopes/complyadvantage-scopes.yml
+idempotency:
+  supported: true
+  header: X-ComplyAdvantage-Idempotency-Key
+  required: false
+  max_length: 255
+  recommended_value: a standard UUID, to guarantee global uniqueness
+  scope: >-
+    Declared on POST /v2/customers/{customer_identifier}/workflows/sync/rescreen
+    (orchestrationLayerAPIPostV2RescreenCustomerWorkflowsSync) - one operation out of 163.
+  retention: not published
+  additional:
+  - >-
+    Two workflow endpoints are documented as idempotent by behaviour rather than by
+    header - "This end-point is currently idempotent: in case of downstream error you can
+    re-send the exact same request, and the workflow will be retried" - on
+    createCustomerAndScreenSync (POST /v2/workflows/sync/create-and-screen) and
+    updateCustomer (POST /v2/customers/{customer_identifier}/workflows/sync/update-and-rescore).
+  - >-
+    Inbound webhooks carry a `webhook-id` header that is stable across retries and is
+    explicitly documented as the idempotency key for the receiver.
+  gap: >-
+    The header is opt-in on a single operation. Customer creation and screening - the
+    expensive, billable, duplicate-prone write - has behavioural idempotency described in
+    prose but no idempotency key of its own.
+pagination:
+  mesh:
+    style: page-number
+    request_params:
+    - page_number
+    - page_size
+    sort_param: sort
+    response_fields:
+    - first
+    - prev
+    - self
+    - next
+    - total_count
+    note: >-
+      Link fields are URL paths, not absolute URLs; `next` and `prev` are nullable. Used
+      by 47 operations. getCustomersList caps out at 10,000 customers - beyond that the
+      docs direct you to the exports endpoints.
+  legacy:
+    style: offset-limit
+    request_params:
+    - offset
+    - limit
+    max_page_size: 100
+field_selection:
+  expansion: not supported
+  sparse_fieldsets: not supported
+  filtering: >-
+    Per-resource query filters rather than a general filter language - name_contains,
+    status, type, level, created_at_from / created_at_to, assigned_at_from /
+    assigned_at_to, customer.identifier, created_by, assignee_identifier.
+metadata:
+  custom_fields: >-
+    First-class. Customers and transactions each carry an account-defined custom-field
+    registry (GET/POST /v2/customers/custom-fields, GET/POST /v3/transactions/custom-fields)
+    plus customer labels (GET/PUT /v2/customers/{customer_identifier}/labels).
+  external_identifiers: >-
+    Every customer and transaction carries a caller-supplied external identifier, and both
+    are addressable by it (GET /v2/customers/external/{external_identifier} - which
+    answers 308 Permanent Redirect to the canonical identifier - and
+    GET /v3/transactions/external/{identifier}).
+request_tracing:
+  request_id_header: not published
+  error_correlation: >-
+    Every problem+json body carries `identifier` (UUIDv7) and `timestamp`. That is the
+    correlation handle - there is no documented request-id request or response header.
+versioning:
+  style: path-prefix
+  current: v2 and v3 coexist in one contract (info.version "v2.0")
+  policy_url: https://docs.mesh.complyadvantage.com/docs/versioning
+  rule: >-
+    A new version of an endpoint is released whenever a backwards-INCOMPATIBLE change
+    ships. Documented backwards-compatible (non-versioning) changes: new endpoints, adding
+    a response body where none existed, adding optional or read-only fields, rearranging
+    JSON fields, new HTTP headers, new enum values, and new HTTP methods on existing
+    resources.
+  agent_note: >-
+    "Adding new values to an enum" is explicitly non-breaking, so a client must treat every
+    Mesh enum as open - case stages, risk levels, workflow statuses and webhook types can
+    all gain members without a version bump.
+  see_also: lifecycle/complyadvantage-lifecycle.yml
+errors:
+  envelope: rfc9457 problem+json with identifier/timestamp/properties extensions
+  see_also: errors/complyadvantage-problem-types.yml
+rate_limit_signaling:
+  mesh:
+    headers:
+    - Ratelimit-Limit
+    - Ratelimit-Remaining
+    - Ratelimit-Reset
+    status: 429
+    body: '{"message": "API rate limit exceeded"}'
+    published_numbers: >-
+      None. The docs say to contact your account manager to confirm the limits on your
+      account - the runtime headers are the only source of truth.
+  legacy:
+    headers: none published
+    status: 429
+    body: empty
+    published_numbers: 600 requests/minute standard contract, 300 requests/minute sandbox accounts
+  see_also: rate-limits/complyadvantage-rate-limits.yml
+webhooks:
+  signing: Standard Webhooks v1 (HMAC-SHA256), opt-in per account
+  headers:
+  - webhook-id
+  - webhook-timestamp
+  - webhook-signature
+  delivery: at-least-once, 3 retries at 1s / 5s / 10s, 5s response timeout
+  see_also: asyncapi/complyadvantage-webhooks.yml
+dry_run_mode:
+  supported: partial
+  note: >-
+    No dry-run on the write path. Two test affordances exist and both are notification-only:
+    POST /v2/notifications/configurations/webhook/test and
+    POST /v2/notifications/configurations/email/test send a sample payload to a URL or
+    address you nominate. There is no way to rehearse a customer screen, a case
+    transition, or a transaction decision.
+reversibility:
+  grade: documented
+  summary: >-
+    Mesh has real reversal paths on most write surfaces - alert mutes can be deleted,
+    cases and alerts and customers are transitioned by state machine rather than
+    destroyed, custom-list entities are archived rather than removed, and a manual risk
+    score override can be changed again. What is missing everywhere is the WINDOW: the
+    documentation does not state a time bound on any of these reversals, so an agent can
+    know that an action is undoable but not for how long. That is why this grades
+    `documented` and not `verified`.
+  surfaces:
+  - write_operation: alertServiceCreateAlertMute
+    path: POST /v2/alerts/mutes
+    reversal: alertServiceDeleteAlertMute
+    reversal_path: DELETE /v2/alerts/mutes/{alert_mute_key}/customer/{customer_identifier}
+    window: not stated
+    docs: https://docs.mesh.complyadvantage.com/reference/alertservicedeletealertmute
+  - write_operation: alertServiceCreateAlertMuteV3
+    path: POST /v3/alerts/mutes
+    reversal: alertServiceDeleteAlertMuteV3
+    reversal_path: DELETE /v3/alerts/mutes/{identifier}
+    window: not stated
+  - write_operation: riskScoringManagerServiceAPIUpdateRiskScore
+    path: PATCH /v2/customers/{customer_identifier}/scores
+    reversal: >-
+      The same operation. The docs state the manual override "persists until explicitly
+      changed again through this endpoint or removed" - so it is reversible with no
+      deadline, but also note that once overridden the score type becomes MANUAL and stops
+      being recalculated automatically. Reverting the value does not by itself restore
+      automatic scoring.
+    window: unbounded (explicitly persists until changed)
+    docs: https://docs.mesh.complyadvantage.com/reference/riskscoringmanagerserviceapiupdateriskscore
+  - write_operation: customerTransitionCustomerStatus
+    path: POST /v2/customers/{customer_identifier}/transition
+    reversal: >-
+      The same operation, subject to the allowed transitions of the status machine
+      (Processing / Active / Closed). Not a general undo - whether Closed can go back to
+      Active is a configuration question the docs do not answer.
+    window: not stated
+  - write_operation: casesService/v2/cases/case_identifier/transition.post
+    path: POST /v2/cases/{case_identifier}/transition
+    reversal: >-
+      The same operation, plus GET /v2/cases/states which enumerates every state a case
+      can be transitioned to. Case stages are account-configurable, so reversibility is
+      whatever the account's case workflow permits.
+    window: not stated
+    docs: https://docs.mesh.complyadvantage.com/reference/casesservicev2casesstatesget
+  - write_operation: customListAPINewEntityAddedToList
+    path: POST /v2/custom-lists/{custom_list_id}/entity
+    reversal: customListAPIEntityArchivedFromList
+    reversal_path: DELETE /v2/custom-lists/{custom_list_id}/entity/{id}
+    window: not stated
+    note: The summary says "Archive an entity from a list", so the delete is a soft delete - but no restore operation is published.
+  - write_operation: activityStorePostTransactionReviewDecision
+    path: POST /v3/transactions/{identifier}/review
+    reversal: none published
+    window: not applicable
+    note: >-
+      A decision on a held transaction (RELEASE / reject) has no documented reversal. This
+      is the highest-consequence irreversible write in the contract and an agent should
+      treat it as terminal.
+  - write_operation: createCustomerAndScreenSync / createCustomerAndScreenAsync
+    path: POST /v2/workflows/sync/create-and-screen
+    reversal: none published
+    window: not applicable
+    note: >-
+      There is no delete-customer operation in the contract. A customer created in error
+      can be transitioned to Closed but not removed, and the screen is billable - rescreen
+      events are documented as counting towards onboarding search volumes.
+  irreversible:
+  - activityStorePostTransactionReviewDecision
+  - createCustomerAndScreenSync
+  - createCustomerAndScreenAsync
+  - customListAPIDeleteCustomListById
+  - bulkUploaderDeleteV2BatchProcessing
+  - meshEnrichmentServiceDeleteLookupListVersion
+  legacy_api:
+    reversal: deleteSearch (DELETE /searches/{id}) reverses createSearch (POST /searches).
+    window: not stated
+    note: A deleted search cannot be restored; no restore operation is documented.

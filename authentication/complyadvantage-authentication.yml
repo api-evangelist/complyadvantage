@@ -1,17 +1,113 @@
-generated: '2026-07-11'
-method: derived
-source: openapi/complyadvantage-openapi.yml
+generated: '2026-08-27'
+method: searched
+source: >-
+  https://docs.mesh.complyadvantage.com/reference/createtokenv3,
+  https://docs.mesh.complyadvantage.com/reference/createtoken,
+  https://docs.mesh.complyadvantage.com/docs/getting-started,
+  https://docs.complyadvantage.com/api-docs; derived from
+  openapi/complyadvantage-mesh-api-openapi.json and the four refined legacy specs in openapi/
+docs: https://docs.mesh.complyadvantage.com/reference/createtokenv3
+provider: ComplyAdvantage
+providerId: complyadvantage
+description: >-
+  Two APIs, two unrelated authentication models. The Mesh platform uses an OAuth2
+  client-credentials exchange - an access key and secret minted in the UI are traded at
+  POST /v3/token for a bearer token that lives 24 hours and cannot be refreshed. The legacy
+  REST API uses a static account API key sent as `Authorization: Token <key>`. Neither model
+  is fully expressed in a machine-readable contract: the Mesh OpenAPI declares only an
+  opaque `http bearer` scheme with no OAuth flow object and no scopes, and there is no
+  published spec for the legacy API at all.
 summary:
   types:
+  - oauth2-client-credentials
+  - http-bearer
   - apiKey
   api_key_in:
   - header
+  mtls: false
+  oidc: false
+  discovery_document: none published
 schemes:
+- name: BearerAuth
+  api: ComplyAdvantage Mesh Platform API
+  type: http
+  scheme: bearer
+  in: header
+  parameter: Authorization
+  format: 'Authorization: Bearer {access_token}'
+  description: >-
+    The token issued by the client-credentials exchange. Declared globally -
+    security is [{BearerAuth: []}] and no operation overrides it, so every one of the 163
+    Mesh operations requires it.
+  token_endpoint: POST /v3/token
+  token_operation_id: createTokenV3
+  credential_source: 'Mesh UI: Settings > Access Management > API Credentials'
+  credential_shape: access key + secret, with configurable lifespan, permissions and optional expiry date
+  token_ttl_seconds: 86400
+  token_refresh: none - there is no refresh grant; mint a new token the same way
+  revocation: >-
+    When client credentials expire or are revoked by the user they can no longer generate
+    access tokens. Already-issued tokens are not documented as being revoked.
+  sources:
+  - openapi/complyadvantage-mesh-api-openapi.json
+  - https://docs.mesh.complyadvantage.com/reference/createtokenv3
+- name: LegacyTokenExchange
+  api: ComplyAdvantage Mesh Platform API
+  type: oauth2-password
+  deprecated: true
+  description: >-
+    POST /v2/token (createToken) exchanges username + password + realm for the same 24-hour
+    bearer token. Deprecated - "If you are setting up a new API integration, use API
+    credentials and the /v3/token endpoint instead of this one." `realm` is the organization
+    name supplied by ComplyAdvantage at onboarding and is case-sensitive. The provider
+    recommends a dedicated API-user email address, one per account.
+  replacement: POST /v3/token
+  sunset: not published
+  sources:
+  - https://docs.mesh.complyadvantage.com/reference/createtoken
+  - https://docs.mesh.complyadvantage.com/docs/getting-started
 - name: apiKeyAuth
+  api: ComplyAdvantage legacy REST API
   type: apiKey
   in: header
   parameter: Authorization
-  description: 'API key sent as: Authorization: Token YOUR_API_KEY. Keys are generated in the
-    ComplyAdvantage web platform.'
+  format: 'Authorization: Token YOUR_API_KEY'
+  description: >-
+    Static per-account API key generated inside the ComplyAdvantage web platform; an account
+    is required, so there is no anonymous or self-serve key issuance. No rotation policy,
+    expiry, or scoping is published. Applies to all three regional bases -
+    api.complyadvantage.com (EU), api.us.complyadvantage.com (US),
+    api.ap.complyadvantage.com (APAC).
   sources:
-  - openapi/complyadvantage-openapi.yml
+  - openapi/complyadvantage-case-management-api-openapi.yml
+  - openapi/complyadvantage-monitored-searches-api-openapi.yml
+  - openapi/complyadvantage-searches-api-openapi.yml
+  - openapi/complyadvantage-users-api-openapi.yml
+  - https://docs.complyadvantage.com/api-docs
+authorization:
+  model: named account permissions plus account-level entitlements
+  note: >-
+    Not OAuth scopes. A 401 means the token is bad; a 403 means the credential's role lacks
+    the permission the endpoint names, or the account lacks the product entitlement.
+  artifact: scopes/complyadvantage-scopes.yml
+end_user_auth:
+  provider: AWS Cognito
+  evidence: >-
+    app.complyadvantage.com redirects to
+    auth.complyadvantage.com/login?client_id=...&response_type=code&scope=aws.cognito.signin.user.admin
+    openid email profile - an authorization-code flow on a Cognito hosted UI.
+  note: >-
+    This is the human web-app login, not an API surface. No OIDC discovery document is
+    published on auth.complyadvantage.com (/.well-known/openid-configuration returns 404),
+    so third parties cannot federate against it.
+transport:
+  https_required: true
+  note: >-
+    "All API requests must be made over HTTPS; calls made over plain HTTP will fail." Both
+    API hosts answer 401 for every unauthenticated path, including /.well-known/*, so the
+    gateway authenticates before it routes.
+gaps:
+- The Mesh OpenAPI declares no oauth2 securityScheme, so the client-credentials flow and the token endpoint are invisible to code generators.
+- No scopes are published; least privilege has to be assembled by reading the prose permission line on each of 163 endpoints.
+- No OIDC discovery, no JWKS endpoint, no mTLS, no DPoP.
+- No documented key/credential rotation policy for the legacy API key.

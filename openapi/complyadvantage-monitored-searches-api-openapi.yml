@@ -1,7 +1,7 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: ComplyAdvantage Case Management Monitored Searches API
-  description: 'The ComplyAdvantage REST API screens people and companies against sanctions and watchlists, warnings and fitness-probity lists, politically exposed persons (PEPs and RCAs), and adverse media, and keeps them under ongoing monitoring. It covers searches (create, list, retrieve, update, delete, certificates, entities), monitored searches (start/stop monitoring, differences, acknowledge), case management (assignment, match status, risk level, comments, tags), and account users. Authentication is an api key sent as "Authorization: Token YOUR_API_KEY"; keys are generated inside the ComplyAdvantage web platform, so an account is required. Standard contracts allow 600 API calls per minute (sandbox 300), with 429 responses requiring exponential backoff (start at 2 seconds, cap at 60). Webhook events match_status_updated, search_status_updated, and monitored_search_updated push changes to your systems. This document was modeled from the public API reference at docs.complyadvantage.com; the endpoint paths are documented publicly, while request/response schemas are summarized rather than exhaustive.'
+  title: ComplyAdvantage Monitored Searches API
+  description: The ComplyAdvantage REST API screens people and companies against sanctions and watchlists, warnings and fitness-probity lists, politically exposed persons (PEPs and RCAs), and adverse media, and keeps them under ongoing monitoring.
   version: '1.0'
   contact:
     name: ComplyAdvantage
@@ -123,6 +123,9 @@ components:
       schema:
         type: string
       description: The search ID or ref.
+  responses:
+    NotFound:
+      description: The search or resource was not found.
   schemas:
     MonitorEnvelope:
       type: object
@@ -134,9 +137,6 @@ components:
           properties:
             is_monitored:
               type: boolean
-  responses:
-    NotFound:
-      description: The search or resource was not found.
   securitySchemes:
     apiKeyAuth:
       type: apiKey

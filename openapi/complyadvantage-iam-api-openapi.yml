@@ -1,0 +1,976 @@
+openapi: 3.2.0
+info:
+  title: Mesh IAM API
+  version: v2.0
+servers:
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
+security:
+- BearerAuth: []
+tags:
+- name: IAM
+paths:
+  /v2/iam/permissions:
+    get:
+      deprecated: true
+      description: 'List permissions. DEPRECATED: Please use GET /v3/iam/permissions instead.'
+      operationId: identity_v2_iam_permissions_listPermissions
+      parameters:
+      - description: Permission level.
+        example: ACCOUNT
+        in: query
+        name: level
+        required: false
+        schema:
+          enum:
+          - USER
+          - ACCOUNT
+          type: string
+      - description: Include only permissions that are valid given the requesting user's account permissions.
+        example: true
+        in: query
+        name: valid_for_account
+        required: false
+        schema:
+          default: false
+          type: boolean
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 10
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_PaginatedResponsePermissionWithDepsResponse'
+          description: OK
+      summary: List permissions
+      tags:
+      - IAM
+  /v2/iam/permissions/groups:
+    get:
+      description: List permission groups
+      operationId: identity_v2_iam_permissions_groups_listPermissionGroups
+      parameters:
+      - description: Permission level.
+        example: ACCOUNT
+        in: query
+        name: level
+        required: false
+        schema:
+          enum:
+          - USER
+          - ACCOUNT
+          type: string
+      - description: Include only permissions that are valid given the requesting user's account permissions.
+        example: true
+        in: query
+        name: valid_for_account
+        required: false
+        schema:
+          default: false
+          type: boolean
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 25
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_PaginatedResponseGroupWithPermissionsHttpResponse'
+          description: OK
+      summary: List permission groups with permissions
+      tags:
+      - IAM
+  /v2/iam/roles:
+    get:
+      description: 'Returns a list of roles. You need the View roles in organization permission to use the account_identifier parameter.
+
+
+        You need the "View roles in account" permission to use this endpoint.'
+      operationId: identity_v2_iam_roles_getRoles
+      parameters:
+      - description: Filter roles by name.
+        example: Admin
+        in: query
+        name: name_contains
+        required: false
+        schema:
+          type: string
+      - description: Filter only roles that have all of at least one set of permissions.
+        example:
+        - '1'
+        - '2'
+        in: query
+        name: permissions
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+      - description: The identifier of the account whose roles you'd like to retrieve.
+        example: 00000000-0000-0000-0000-000000000000
+        in: query
+        name: account_identifier
+        required: false
+        schema:
+          format: uuid
+          type: string
+      - description: When true, returns active and archived roles. Defaults to false (active only).
+        example: false
+        in: query
+        name: include_archived
+        required: false
+        schema:
+          default: false
+          type: boolean
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 50
+          minimum: 1
+          type: integer
+      - description: 'Sorting criteria in the format of: `[-]property` (`-` descending modifier).
+
+
+          * Default sort order is ascending (without `-`).
+
+
+          * Multiple sort criteria are supported.'
+        example:
+        - name
+        in: query
+        name: sort
+        required: false
+        schema:
+          default:
+          - name
+          items:
+            enum:
+            - name
+            - created_at
+            - updated_at
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_PaginatedResponseRoleResponse'
+          description: OK
+      summary: Get list of roles
+      tags:
+      - IAM
+    post:
+      description: You need the "Create, update, and delete roles in account" permission to use this endpoint.
+      operationId: identity_v2_iam_roles_createRole
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/identity_RoleRequestBody'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/identity_CustomRoleWithPermissionsResponse'
+                - $ref: '#/components/schemas/identity_DefaultRoleWithPermissionsResponse'
+          description: CREATED
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_ProblemDetailErrorResponse'
+          description: Invalid input
+      summary: Create a new role
+      tags:
+      - IAM
+  /v2/iam/roles/{role_identifier}:
+    delete:
+      description: You need the "Create, update, and delete roles in account" permission to use this endpoint.
+      operationId: identity_v2_iam_roles_role_identifier_deleteSpecificRole
+      parameters:
+      - description: The identifier of the Role that you want to archive.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: role_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '204':
+          description: Role archived
+      summary: Archive a role
+      tags:
+      - IAM
+    get:
+      description: 'Returns details for a given role.
+
+
+        You need the "View roles in account" permission to use this endpoint.'
+      operationId: identity_v2_iam_roles_role_identifier_getSpecificRole
+      parameters:
+      - description: The identifier of the role that you want to retrieve.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: role_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/identity_CustomRoleWithPermissionsResponse'
+                - $ref: '#/components/schemas/identity_DefaultRoleWithPermissionsResponse'
+          description: OK
+      summary: Get details about a role
+      tags:
+      - IAM
+    patch:
+      description: You need the "Create, update, and delete roles in account" permission to use this endpoint.
+      operationId: identity_v2_iam_roles_role_identifier_updateAccountRole
+      parameters:
+      - description: The identifier of the role that you want to update.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: role_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/identity_PartialUpdateRoleRequestBody'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/identity_CustomRoleWithPermissionsResponse'
+                - $ref: '#/components/schemas/identity_DefaultRoleWithPermissionsResponse'
+          description: UPDATED
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_ProblemDetailErrorResponse'
+          description: Invalid input
+      summary: Partial update an existing role
+      tags:
+      - IAM
+  /v3/iam/permissions:
+    get:
+      operationId: identity_v3_iam_permissions_listPermission
+      parameters:
+      - description: Permission level.
+        example: ACCOUNT
+        in: query
+        name: level
+        required: false
+        schema:
+          enum:
+          - USER
+          - ACCOUNT
+          type: string
+      - description: Include only permissions that are valid given the requesting user's account permissions.
+        example: true
+        in: query
+        name: valid_for_account
+        required: false
+        schema:
+          default: false
+          type: boolean
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 10
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_PaginatedResponseListPermissionsResponseItem'
+          description: OK
+      summary: List permissions
+      tags:
+      - IAM
+components:
+  schemas:
+    identity_PartialUpdateRoleRequestBody:
+      properties:
+        description:
+          description: Description of the role.
+          example: View Cases
+          maxLength: 300
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        name:
+          description: Name of the role.
+          example: Role name
+          maxLength: 100
+          minLength: 1
+          type:
+          - string
+          - 'null'
+        permissions:
+          default: null
+          description: An array of permissions as integers.
+          example:
+          - 1
+          - 2
+          items:
+            description: An array of permissions as integers.
+            format: int32
+            type: integer
+          type:
+          - array
+          - 'null'
+          uniqueItems: true
+      type: object
+    identity_PaginatedResponseListPermissionsResponseItem:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        permissions:
+          items:
+            $ref: '#/components/schemas/identity_ListPermissionsResponseItem'
+          type: array
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - permissions
+      - self
+      type: object
+    identity_BuiltInRoleResponse:
+      allOf:
+      - $ref: '#/components/schemas/identity_RoleResponse'
+      - properties:
+          description:
+            description: Description of the role.
+            example: View Cases
+            type: string
+          identifier:
+            description: The unique identifier of the role.
+            example: 00000000-0000-0000-0000-000000000000
+            format: uuid
+            type: string
+          name:
+            description: Name of the role.
+            example: Supervisor
+            type: string
+          users_assigned_count:
+            description: Number of users assigned.
+            example: 1
+            format: int32
+            type: integer
+        type: object
+      required:
+      - description
+      - identifier
+      - name
+      - users_assigned_count
+      type: object
+    identity_IdPermissionDependencyNode:
+      description: A leaf node referencing a permission by its identifier.
+      properties:
+        type:
+          description: Defines the type of a permission dependency node.
+          enum:
+          - ID
+          example: ID
+          type: string
+        value:
+          description: The permission identifier.
+          example: 13
+          format: int32
+          type: integer
+      required:
+      - type
+      - value
+      type: object
+    identity_OrPermissionDependencyNode:
+      description: An OR compound node — at least one child must be satisfied.
+      properties:
+        type:
+          description: Defines the type of a permission dependency node.
+          enum:
+          - OR
+          example: OR
+          type: string
+        values:
+          description: Child nodes, at least one of which must be satisfied.
+          items:
+            $ref: '#/components/schemas/identity_PermissionDependencyNode'
+          type: array
+      required:
+      - type
+      - values
+      type: object
+    identity_GroupWithPermissionsHttpResponse:
+      properties:
+        name:
+          description: Name
+          example: permissions.groups.00000000-0000-0000-0000-000000000000.name
+          type: string
+        permissions:
+          description: Permissions
+          example:
+          - 1
+          - 2
+          - 3
+          items:
+            description: Permissions
+            format: int32
+            type: integer
+          type: array
+          uniqueItems: true
+      required:
+      - name
+      - permissions
+      type: object
+    identity_CustomRoleWithPermissionsResponse:
+      allOf:
+      - $ref: '#/components/schemas/identity_RoleWithPermissionResponse'
+      - properties:
+          account_identifier:
+            description: The account identifier of the role.
+            example: 00000000-0000-0000-0000-000000000000
+            format: uuid
+            type: string
+          archived_at:
+            description: Date and time the role was archived, or null if active.
+            example: '2023-01-01T10:10:10.000Z'
+            format: date-time
+            type:
+            - string
+            - 'null'
+          created_at:
+            description: Date and time the role was last created.
+            example: '2023-01-01T10:10:10.000Z'
+            format: date-time
+            type: string
+          created_by:
+            default: 00000000-0000-0000-0000-000000000000
+            description: Created by identifier
+            format: uuid
+            type: string
+          updated_at:
+            description: Date and time the role was last updated.
+            example: '2023-01-01T10:10:10.000Z'
+            format: date-time
+            type: string
+          updated_by:
+            default: 00000000-0000-0000-0000-000000000000
+            description: Updated by identifier
+            format: uuid
+            type: string
+        type: object
+      required:
+      - account_identifier
+      - created_at
+      - created_by
+      - description
+      - identifier
+      - name
+      - permissions
+      - updated_at
+      - updated_by
+      - users_assigned_count
+      type: object
+    identity_RoleWithPermissionResponse:
+      properties:
+        description:
+          description: Description of the role.
+          example: View Cases
+          type: string
+        identifier:
+          description: The unique identifier of the role.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        name:
+          description: Name of the role.
+          example: Supervisor
+          type: string
+        permissions:
+          description: Role permission identifiers
+          example:
+          - 1
+          items:
+            description: Role permission identifiers
+            format: int32
+            type: integer
+          type: array
+          uniqueItems: true
+        users_assigned_count:
+          description: Number of users assigned.
+          example: 1
+          format: int32
+          type: integer
+      required:
+      - description
+      - identifier
+      - name
+      - permissions
+      - users_assigned_count
+      type: object
+    identity_RoleRequestBody:
+      properties:
+        description:
+          description: Description of the role.
+          example: View Cases
+          maxLength: 300
+          minLength: 0
+          type: string
+        name:
+          description: Name of the role.
+          example: Role name
+          maxLength: 100
+          minLength: 1
+          type: string
+        permissions:
+          description: List of user permission identifiers
+          example:
+          - 1
+          - 2
+          items:
+            description: List of user permission identifiers
+            format: int32
+            type: integer
+          type: array
+          uniqueItems: true
+      required:
+      - description
+      - name
+      - permissions
+      type: object
+    identity_PaginatedResponsePermissionWithDepsResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        permissions:
+          items:
+            $ref: '#/components/schemas/identity_PermissionWithDepsResponse'
+          type: array
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - permissions
+      - self
+      type: object
+    identity_RoleResponse:
+      type: object
+    identity_PaginatedResponseRoleResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        roles:
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/identity_BuiltInRoleResponse'
+            - $ref: '#/components/schemas/identity_CustomRoleResponse'
+          type: array
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - roles
+      - self
+      type: object
+    identity_DefaultRoleWithPermissionsResponse:
+      allOf:
+      - $ref: '#/components/schemas/identity_RoleWithPermissionResponse'
+      required:
+      - description
+      - identifier
+      - name
+      - permissions
+      - users_assigned_count
+      type: object
+    identity_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type: string
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type: string
+        status:
+          format: int32
+          type: integer
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type: string
+        type:
+          format: uri
+          type: string
+      required:
+      - identifier
+      - timestamp
+      type: object
+    identity_AndPermissionDependencyNode:
+      description: An AND compound node — all children must be satisfied.
+      properties:
+        type:
+          description: Defines the type of a permission dependency node.
+          enum:
+          - AND
+          example: AND
+          type: string
+        values:
+          description: Child nodes, all of which must be satisfied.
+          items:
+            $ref: '#/components/schemas/identity_PermissionDependencyNode'
+          type: array
+      required:
+      - type
+      - values
+      type: object
+    identity_PermissionDependencyNode:
+      description: A node in the permission dependency tree.
+      discriminator:
+        mapping:
+          AND: '#/components/schemas/identity_AndPermissionDependencyNode'
+          ID: '#/components/schemas/identity_IdPermissionDependencyNode'
+          OR: '#/components/schemas/identity_OrPermissionDependencyNode'
+        propertyName: type
+      oneOf:
+      - $ref: '#/components/schemas/identity_AndPermissionDependencyNode'
+      - $ref: '#/components/schemas/identity_OrPermissionDependencyNode'
+      - $ref: '#/components/schemas/identity_IdPermissionDependencyNode'
+      properties:
+        type:
+          description: Defines the type of a permission dependency node.
+          enum:
+          - AND
+          - OR
+          - ID
+          type: string
+      required:
+      - type
+      type: object
+    identity_CustomRoleResponse:
+      allOf:
+      - $ref: '#/components/schemas/identity_RoleResponse'
+      - properties:
+          account_identifier:
+            description: The account identifier of the role.
+            example: 00000000-0000-0000-0000-000000000000
+            format: uuid
+            type: string
+          archived_at:
+            description: Date and time the role was archived, or null if active.
+            example: '2023-01-01T10:10:10.000Z'
+            format: date-time
+            type:
+            - string
+            - 'null'
+          created_at:
+            description: Date and time the role was last created.
+            example: '2023-01-01T10:10:10.000Z'
+            format: date-time
+            type: string
+          created_by:
+            default: 00000000-0000-0000-0000-000000000000
+            description: Created by identifier
+            format: uuid
+            type: string
+          description:
+            description: Description of the role.
+            example: View Cases
+            type: string
+          identifier:
+            description: The unique identifier of the role.
+            example: 00000000-0000-0000-0000-000000000000
+            format: uuid
+            type: string
+          name:
+            description: Name of the role.
+            example: Supervisor
+            type: string
+          updated_at:
+            description: Date and time the role was last updated.
+            example: '2023-01-01T10:10:10.000Z'
+            format: date-time
+            type: string
+          updated_by:
+            default: 00000000-0000-0000-0000-000000000000
+            description: Updated by identifier
+            format: uuid
+            type: string
+          users_assigned_count:
+            description: Number of users assigned.
+            example: 1
+            format: int32
+            type: integer
+        type: object
+      required:
+      - account_identifier
+      - created_at
+      - created_by
+      - description
+      - identifier
+      - name
+      - updated_at
+      - updated_by
+      - users_assigned_count
+      type: object
+    identity_PaginatedResponseGroupWithPermissionsHttpResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        groups:
+          items:
+            $ref: '#/components/schemas/identity_GroupWithPermissionsHttpResponse'
+          type: array
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - groups
+      - self
+      type: object
+    identity_PermissionWithDepsResponse:
+      properties:
+        description:
+          description: Description of the permission.
+          example: Accessing API, user and account management
+          type: string
+        identifier:
+          description: The unique identifier of the permission.
+          example: 1
+          format: int32
+          type: integer
+        level:
+          description: Permission level type
+          enum:
+          - USER
+          - ACCOUNT
+          example: USER
+          type: string
+        name:
+          description: Name of the permission.
+          example: insights
+          type: string
+        required_user_permissions:
+          description: User-level permissions required for this permission to be given to a role
+          items:
+            description: Permission identifier
+            format: int32
+            type: integer
+          type: array
+          uniqueItems: true
+      required:
+      - description
+      - identifier
+      - level
+      - name
+      - required_user_permissions
+      type: object
+    identity_ListPermissionsResponseItem:
+      properties:
+        description:
+          description: Description of the permission.
+          example: Accessing API, user and account management
+          type: string
+        identifier:
+          description: The unique identifier of the permission.
+          example: 1
+          format: int32
+          type: integer
+        level:
+          description: Permission level type
+          enum:
+          - USER
+          - ACCOUNT
+          example: USER
+          type: string
+        name:
+          description: Name of the permission.
+          example: insights
+          type: string
+        required_user_permissions:
+          $ref: '#/components/schemas/identity_PermissionDependencyNode'
+      required:
+      - description
+      - identifier
+      - level
+      - name
+      - required_user_permissions
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http

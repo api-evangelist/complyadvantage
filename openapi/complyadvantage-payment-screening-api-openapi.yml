@@ -1,0 +1,1476 @@
+openapi: 3.2.0
+info:
+  title: Mesh Payment Screening API
+  version: v2.0
+servers:
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
+security:
+- BearerAuth: []
+tags:
+- name: Payment Screening
+paths:
+  /v2/payment-screening/configurations:
+    get:
+      description: 'This endpoint returns a list of all payment screening configurations with their metadata
+
+
+        Payment screening configurations define which lists a transaction will be screened against and the fuzziness that should be applied to the search. You can create multiple configurations in your account. Each payment screening configuration can have multiple versions.
+
+
+        You need "Access to base payment screening functionality" enabled to use this endpoint.'
+      operationId: paymentScreeningFetchConfigurationSummaries
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ps_ConfigurationSummariesResponse'
+          description: OK
+      summary: Get payment screening configurations
+      tags:
+      - Payment Screening
+    post:
+      description: 'This endpoint allows you to create a new payment screening configuration.
+
+
+        Payment screening configurations define which lists a transaction will be screened against and the settings to apply to the search. You can create multiple configurations in your account and each configuration can have multiple versions.
+
+
+        Within the configuration are one or more source collections. A source collection contains:
+
+
+        * The sanctions lists you wish to screen against
+
+        * A global fuzziness score (a spectrum with 0 as exact search, 100 as very broad search)
+
+        * Name search options:
+
+        * Name fuzziness score that, if present, overrides the global fuzziness
+
+        * Search options
+
+        * Reference text search options:
+
+        * Reference text fuzziness score that, if present, overrides the global fuzziness
+
+        * Search options
+
+        * BIC search strictness
+
+
+        In addition, you can choose to omit your customer from the screening.
+
+
+        You need "Access to base payment screening functionality" enabled to use this endpoint.'
+      operationId: paymentScreeningCreateConfiguration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ps_CreateConfigurationRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ps_CreateConfigurationResponse'
+          description: Created
+      summary: Create payment screening configuration
+      tags:
+      - Payment Screening
+  /v2/payment-screening/configurations/{configuration_identifier}:
+    get:
+      description: 'This endpoint provides full details of the latest version of the payment screening configuration specified by the configuration ID.
+
+
+        Payment screening configurations define which lists a transaction will be screened against, and the fuzziness that should be applied to the search. You can create multiple of these in your account. Each payment screening configuration can have multiple versions.
+
+
+        You need "Access to base payment screening functionality" enabled to use this endpoint.'
+      operationId: paymentScreeningFetchLatestConfiguration
+      parameters:
+      - description: configuration ID
+        example: 91b47e18-7b4b-46e7-8e9b-7311bedc1115
+        in: path
+        name: configuration_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ps_ConfigurationDetail'
+          description: OK
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ps_ProblemDetailErrorResponse'
+          description: Not found
+      summary: Retrieve latest payment screening configuration by id
+      tags:
+      - Payment Screening
+    put:
+      description: 'This endpoint creates a new version of a payment screening configuration.
+
+
+        Specify the details of the new version, as you would when creating a new configuration. The new version will be created with an incremented version number.
+
+
+        Payment screening configurations define which lists a transaction will be screened against and the settings to apply to the search. You can create multiple configurations in your account and each configuration can have multiple versions.
+
+
+        Within the configuration are one or more source collections. A source collection contains:
+
+
+        * The sanctions lists you wish to screen against
+
+        * A global fuzziness score (a spectrum with 0 as exact search, 100 as very broad search)
+
+        * Name search options:
+
+        * Name fuzziness score that, if present, overrides the global fuzziness
+
+        * Search options
+
+        * Reference text search options:
+
+        * Reference text fuzziness score that, if present, overrides the global fuzziness
+
+        * Search options
+
+        * BIC search strictness
+
+
+        In addition, you can choose to omit your customer from the screening.
+
+
+        You need "Access to base payment screening functionality" enabled to use this endpoint.'
+      operationId: paymentScreeningUpdateConfiguration
+      parameters:
+      - description: configuration ID
+        example: 91b47e18-7b4b-46e7-8e9b-7311bedc1115
+        in: path
+        name: configuration_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ps_UpdateConfigurationRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ps_UpdateConfigurationResponse'
+          description: Created
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ps_ProblemDetailErrorResponse'
+          description: Not found
+      summary: Create a new version of a configuration
+      tags:
+      - Payment Screening
+  /v2/payment-screening/configurations/{configuration_identifier}/versions:
+    get:
+      description: 'This endpoint returns all versions of a screening configuration.
+
+
+        Payment screening configurations define which lists a transaction will be screened against, and the fuzziness that should be applied to the search. You can create multiple of these in your account. Each payment screening configuration can have multiple versions.
+
+
+        You need "Access to base payment screening functionality" enabled to use this endpoint.'
+      operationId: paymentScreeningFetchConfigurationVersions
+      parameters:
+      - description: configuration ID
+        example: 91b47e18-7b4b-46e7-8e9b-7311bedc1115
+        in: path
+        name: configuration_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ps_ConfigurationVersions'
+          description: OK
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ps_ProblemDetailErrorResponse'
+          description: Not found
+      summary: Get payment screening configuration versions
+      tags:
+      - Payment Screening
+  /v2/payment-screening/configurations/{configuration_identifier}/versions/{version_identifier}:
+    get:
+      description: 'This endpoint returns a version of a payment screening configuration with its metadata.
+
+
+        Payment screening configurations define which lists a transaction will be screened against, and the fuzziness that should be applied to the search. You can create multiple of these in your account. Each payment screening configuration can have multiple versions.
+
+
+        You need "Access to base payment screening functionality" enabled to use this endpoint.'
+      operationId: paymentScreeningFetchConfigurationByVersion
+      parameters:
+      - description: configuration ID
+        example: 91b47e18-7b4b-46e7-8e9b-7311bedc1115
+        in: path
+        name: configuration_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: configuration version
+        example: 4
+        in: path
+        name: version_identifier
+        required: true
+        schema:
+          format: int32
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ps_ConfigurationDetail'
+          description: OK
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ps_ProblemDetailErrorResponse'
+          description: Not found
+      summary: Get a payment screening configuration version
+      tags:
+      - Payment Screening
+  /v2/payment-screening/risks:
+    get:
+      description: 'Retrieve all payment-screening risks attached to a single transaction. The transaction is addressed by exactly one of two mutually exclusive query parameters: `transaction_identifier` (the internal ComplyAdvantage payment identifier, a UUID) or `transaction_external_identifier` (the client''s own external payment reference, an arbitrary string). Supplying both, or neither, is a 400. Returns a 200 with an empty `risks` array when the transaction exists but produced no risks. Results are ordered by `created_at` ascending; ties are broken by risk `identifier`.
+
+
+        You need "Access to base payment screening functionality" enabled to use this endpoint.'
+      operationId: paymentScreeningGetRisksByTransaction
+      parameters:
+      - description: Internal ComplyAdvantage payment identifier (UUID). Mutually exclusive with transaction_external_identifier.
+        example: 9f2a7c10-3e44-4b21-bc55-1d0a9e6f2b88
+        in: query
+        name: transaction_identifier
+        required: false
+        schema:
+          format: uuid
+          type: string
+      - description: Client's own external payment reference. Mutually exclusive with transaction_identifier.
+        example: client-txn-9f2a
+        in: query
+        name: transaction_external_identifier
+        required: false
+        schema:
+          type: string
+      - description: 1-based page index
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          format: int32
+          minimum: 1
+          type: integer
+      - description: Page size (max 100)
+        example: 25
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 25
+          format: int32
+          maximum: 100
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ps_RiskResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ps_ProblemDetailErrorResponse'
+          description: Conflicting or missing identifier, or invalid pagination parameters
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ps_ProblemDetailErrorResponse'
+          description: Not found
+      summary: Retrieve risks for a transaction
+      tags:
+      - Payment Screening
+  /v2/payment-screening/risks/bulk:
+    patch:
+      description: 'Update the status of multiple risks in one request, by risk identifier. Outcomes are reported per-item (partial success): well-formed identifiers that do not resolve within the account scope are reported as success=false / NOT_FOUND rather than failing the whole request. Returns 207 Multi-Status for every well-formed, processed batch.
+
+
+        You need "Access to base payment screening functionality" enabled to use this endpoint.'
+      operationId: paymentScreeningBulkUpdateRiskStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ps_BulkRiskStatusUpdateRequest'
+        required: true
+      responses:
+        '207':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ps_BulkRiskStatusUpdateResponse'
+          description: Multi-Status
+      summary: Bulk risk status update
+      tags:
+      - Payment Screening
+  /v2/payment-screening/risks/{risk_identifier}:
+    patch:
+      description: 'Update the status of a single risk using its identifier
+
+
+        You need "Access to base payment screening functionality" enabled to use this endpoint.'
+      operationId: paymentScreeningUpdateRiskStatus
+      parameters:
+      - description: Risk ID
+        example: 91b47e18-7b4b-46e7-8e9b-7311bedc1115
+        in: path
+        name: risk_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ps_SingleStatusUpdateRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ps_SingleStatusUpdateResponse'
+          description: OK
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ps_ProblemDetailErrorResponse'
+          description: Not found
+      summary: Update a single risk status
+      tags:
+      - Payment Screening
+components:
+  schemas:
+    ps_BulkRiskStatusUpdateResponse:
+      properties:
+        results:
+          description: One entry per distinct requested identifier, in request order
+          items:
+            $ref: '#/components/schemas/ps_RiskStatusUpdateResult'
+          type: array
+      required:
+      - results
+      type: object
+    ps_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
+    ps_SourceCollection:
+      properties:
+        bic_settings:
+          $ref: '#/components/schemas/ps_BicSettings'
+        name:
+          type: string
+        name_settings:
+          $ref: '#/components/schemas/ps_NameSettings'
+        reference_text_settings:
+          $ref: '#/components/schemas/ps_ReferenceTextSettings'
+        source_identifiers:
+          description: Provide the source identifiers for the lists you want to screen against.
+          items:
+            description: Provide the source identifiers for the lists you want to screen against.
+            type: string
+          maxItems: 1000
+          minItems: 1
+          type: array
+        source_type:
+          default: SANCTION
+          description: The type of sources in this collection. CUSTOM_LIST collections may only be used with name_screening_settings.
+          enum:
+          - SANCTION
+          - CUSTOM_LIST
+          - RISK_WORD_LIST
+          example: SANCTION
+          type: string
+      required:
+      - name
+      - source_identifiers
+      - source_type
+      type: object
+    ps_ConfigurationVersion:
+      properties:
+        change_reason:
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+        updated_by:
+          format: uuid
+          type: string
+        version:
+          format: int32
+          type: integer
+      required:
+      - change_reason
+      - updated_at
+      - updated_by
+      - version
+      type: object
+    ps_ReferenceTextSettings:
+      properties:
+        options:
+          description: Choose one or more of these options to use them in reference text searches.
+          items:
+            description: Choose one or more of these options to use them in reference text searches.
+            enum:
+            - EXCLUDE_VESSELS
+            - REMOVE_DECEASED
+            - REMOVE_DELISTED_ENTITIES_SANCTION_ONLY
+            - REMOVE_EQUIVALENT_NAMES
+            - REMOVE_HOMOPHONES
+            - REMOVE_ONE_WORD_PERSON_ALIAS
+            - REMOVE_WEAK_ALIAS
+            type: string
+          type:
+          - array
+          - 'null'
+        reference_text_fuzziness:
+          description: A search fuzziness score between 0 and 1 by 0.1 increments, where 0 is a narrow search and 1 is a broad search.
+          example: 0.8
+          format: float
+          maximum: 1
+          minimum: 0
+          type:
+          - number
+          - 'null'
+      type: object
+    ps_ScreeningContext:
+      description: Context surrounding the screening operation that produced the risk.
+      properties:
+        customer_identifier:
+          description: Customer identifier associated with the screening operation.
+          format: uuid
+          type: string
+        number_of_results:
+          description: Number of results returned by the provider for the search.
+          format: int32
+          type: integer
+        search_term:
+          description: Search term submitted to the screening provider.
+          type: string
+        source_list_type:
+          description: Type of source list set that was screened.
+          enum:
+          - SANCTION
+          - CUSTOM_LIST
+          - RISK_WORD_LIST
+          - INTERNAL
+          type: string
+      required:
+      - customer_identifier
+      - number_of_results
+      - search_term
+      - source_list_type
+      type: object
+    ps_SourceNote:
+      description: Per-source note attached to the matched profile.
+      properties:
+        aml_types:
+          description: AML types associated with the source note.
+          items:
+            description: AML type assigned by the screening provider.
+            enum:
+            - SANCTION
+            - WARNING
+            - FITNESS_PROBITY
+            - PEP
+            - PEP_CLASS_1
+            - PEP_CLASS_2
+            - PEP_CLASS_3
+            - PEP_CLASS_4
+            - ADVERSE_MEDIA
+            - ADVERSE_MEDIA_FINANCIAL_CRIME
+            - ADVERSE_MEDIA_VIOLENT_CRIME
+            - ADVERSE_MEDIA_SEXUAL_CRIME
+            - ADVERSE_MEDIA_TERRORISM
+            - ADVERSE_MEDIA_FRAUD
+            - ADVERSE_MEDIA_NARCOTICS
+            - ADVERSE_MEDIA_GENERAL
+            - UNKNOWN
+            type: string
+          type: array
+        country_codes:
+          description: Country codes associated with the source note.
+          items:
+            description: Country codes associated with the source note.
+            type: string
+          type: array
+        listing_ended_at:
+          description: UTC timestamp when the listing ended, when available.
+          example: '2024-07-18T10:29:45.453Z'
+          format: date-time
+          type:
+          - string
+          - 'null'
+        listing_started_at:
+          description: UTC timestamp when the listing started, when available.
+          example: '2024-07-18T10:29:45.453Z'
+          format: date-time
+          type:
+          - string
+          - 'null'
+        name:
+          description: Display name of the source note.
+          type: string
+        source_identifier:
+          description: Provider source identifier associated with the note, when available.
+          type:
+          - string
+          - 'null'
+        source_key:
+          description: Key of the source note entry.
+          type: string
+        url:
+          description: Source URL associated with the note, when available.
+          type:
+          - string
+          - 'null'
+      required:
+      - aml_types
+      - country_codes
+      - name
+      - source_key
+      type: object
+    ps_Match:
+      description: Transparency information about the provider match.
+      properties:
+        details:
+          description: Structured match details returned for name and BIC matches.
+          items:
+            $ref: '#/components/schemas/ps_MatchDetail'
+          type:
+          - array
+          - 'null'
+        match_types:
+          description: Name-based match types returned by the provider.
+          items:
+            description: Name-based match types returned by the provider.
+            type: string
+          type:
+          - array
+          - 'null'
+        score:
+          description: Provider score for the match, when available.
+          format: double
+          type:
+          - number
+          - 'null'
+        text_match_terms:
+          description: Normalised text match terms returned for text screening risks.
+          items:
+            $ref: '#/components/schemas/ps_TextMatchTerm'
+          type:
+          - array
+          - 'null'
+      type: object
+    ps_ItemError:
+      description: Describes a single reason why a risk status update failed.
+      properties:
+        code:
+          description: Machine-readable reason. Currently only NOT_FOUND.
+          example: NOT_FOUND
+          type: string
+        message:
+          description: Human-readable explanation
+          type: string
+      required:
+      - code
+      - message
+      type: object
+    ps_ConfigurationDetail:
+      properties:
+        change_reason:
+          type: string
+        configuration:
+          $ref: '#/components/schemas/ps_Configuration'
+        configuration_identifier:
+          format: uuid
+          type: string
+        is_archived:
+          type: boolean
+        updated_at:
+          format: date-time
+          type: string
+        updated_by:
+          format: uuid
+          type: string
+        version:
+          format: int32
+          type: integer
+      required:
+      - change_reason
+      - configuration
+      - configuration_identifier
+      - is_archived
+      - updated_at
+      - updated_by
+      - version
+      type: object
+    ps_TextMatchTerm:
+      description: Matched text fragment for text screening results.
+      properties:
+        matching_reason:
+          description: Reason reported by the provider for the text match.
+          type: string
+        name_type:
+          description: Name type of the matched term (e.g. aka, homophone).
+          type: string
+        source_name:
+          description: Name of the source that produced the text match.
+          type: string
+        substring_matched:
+          description: Inclusive start and end offsets of the substring match, when available.
+          items:
+            description: Inclusive start and end offsets of the substring match, when available.
+            format: int32
+            type: integer
+          type:
+          - array
+          - 'null'
+        term:
+          description: Query term that matched, as keyed in the provider's text match payload.
+          type: string
+      required:
+      - matching_reason
+      - name_type
+      - source_name
+      - term
+      type: object
+    ps_RiskDetail:
+      description: Provider-agnostic detail for a payment screening risk.
+      properties:
+        configuration_identifier:
+          description: Configuration identifier that produced the screening result, when available.
+          format: uuid
+          type:
+          - string
+          - 'null'
+        provider_detail:
+          $ref: '#/components/schemas/ps_ProviderDetail'
+        relevance:
+          description: Relevance classification for the screening hit.
+          enum:
+          - EXACT_NAME
+          - EXACT_AKA
+          - SIMILAR_NAME
+          - SIMILAR_AKA
+          - BIC_MATCH
+          - EXACT_EQUIVALENT
+          - SIMILAR_EQUIVALENT
+          - UNKNOWN
+          type: string
+        screened_entity_info:
+          $ref: '#/components/schemas/ps_ScreenedEntityInfo'
+        screening_context:
+          $ref: '#/components/schemas/ps_ScreeningContext'
+        source_type:
+          description: Source category that matched the screened entity.
+          enum:
+          - SANCTION
+          - CUSTOM_LIST
+          - RISK_WORD_LIST
+          type: string
+      required:
+      - provider_detail
+      - relevance
+      - screened_entity_info
+      - screening_context
+      - source_type
+      type: object
+    ps_ProfileAttributes:
+      description: Structured attributes derived from provider profile fields.
+      properties:
+        addresses:
+          description: Address values derived from provider fields.
+          items:
+            $ref: '#/components/schemas/ps_AttributeValue'
+          type: array
+        dates_of_birth:
+          description: Date-of-birth values derived from provider fields.
+          items:
+            $ref: '#/components/schemas/ps_AttributeValue'
+          type: array
+        genders:
+          description: Gender values derived from provider fields.
+          items:
+            $ref: '#/components/schemas/ps_AttributeValue'
+          type: array
+        nationalities:
+          description: Nationality values derived from provider fields.
+          items:
+            $ref: '#/components/schemas/ps_AttributeValue'
+          type: array
+        places_of_birth:
+          description: Place-of-birth values derived from provider fields.
+          items:
+            $ref: '#/components/schemas/ps_AttributeValue'
+          type: array
+      required:
+      - addresses
+      - dates_of_birth
+      - genders
+      - nationalities
+      - places_of_birth
+      type: object
+    ps_RiskStatusUpdateResult:
+      description: One entry per distinct requested identifier, in request order
+      properties:
+        errors:
+          description: List of failure reasons; null when all risk updates are successful.
+          items:
+            $ref: '#/components/schemas/ps_ItemError'
+          type:
+          - array
+          - 'null'
+        identifier:
+          description: The risk identifier this outcome refers to
+          example: 019e1c18-90d0-709e-8561-23ea3ab2cb0d
+          format: uuid
+          type: string
+        success:
+          description: true if the risk was updated (status set, audit written, event published)
+          type: boolean
+      required:
+      - identifier
+      - success
+      type: object
+    ps_BulkRiskStatusUpdateRequest:
+      properties:
+        risk_identifiers:
+          description: The identifiers of the risks to update. Must be non-empty; each element must be a UUID. Duplicates are de-duplicated (first occurrence wins for result ordering).
+          example:
+          - 019e1c18-90d0-709e-8561-23ea3ab2cb0d
+          - 019e1b9d-346c-7686-9b89-178f18ad40b6
+          items:
+            description: The identifiers of the risks to update. Must be non-empty; each element must be a UUID. Duplicates are de-duplicated (first occurrence wins for result ordering).
+            format: uuid
+            type: string
+          maxItems: 1000
+          minItems: 1
+          type: array
+        status:
+          description: The new status applied to every supplied risk
+          enum:
+          - NOT_REVIEWED
+          - IN_REVIEW
+          - FALSE_POSITIVE
+          - TRUE_POSITIVE
+          type: string
+      required:
+      - risk_identifiers
+      - status
+      type: object
+    ps_MatcherDetail:
+      description: Matcher-specific detail payload for a risk.
+      properties:
+        match:
+          $ref: '#/components/schemas/ps_Match'
+        profile:
+          $ref: '#/components/schemas/ps_Profile'
+      required:
+      - match
+      - profile
+      title: Matcher
+      type: object
+    ps_ConfigurationSummariesResponse:
+      properties:
+        configurations:
+          items:
+            $ref: '#/components/schemas/ps_ConfigurationSummary'
+          type: array
+      required:
+      - configurations
+      type: object
+    ps_UpdateConfigurationRequest:
+      properties:
+        change_reason:
+          type: string
+        configuration:
+          $ref: '#/components/schemas/ps_Configuration'
+        is_archived:
+          type: boolean
+      required:
+      - change_reason
+      - configuration
+      - is_archived
+      type: object
+    ps_Configuration:
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+        name:
+          type: string
+        source_collections:
+          items:
+            $ref: '#/components/schemas/ps_SourceCollection'
+          maxItems: 4
+          minItems: 1
+          type: array
+      required:
+      - name
+      - source_collections
+      type: object
+    ps_Profile:
+      description: Matched profile returned by the screening provider.
+      properties:
+        aka:
+          description: Alternative names associated with the matched profile.
+          items:
+            description: Alternative names associated with the matched profile.
+            type: string
+          type: array
+        aml_types:
+          description: AML types assigned to the matched profile.
+          items:
+            description: AML type assigned by the screening provider.
+            enum:
+            - SANCTION
+            - WARNING
+            - FITNESS_PROBITY
+            - PEP
+            - PEP_CLASS_1
+            - PEP_CLASS_2
+            - PEP_CLASS_3
+            - PEP_CLASS_4
+            - ADVERSE_MEDIA
+            - ADVERSE_MEDIA_FINANCIAL_CRIME
+            - ADVERSE_MEDIA_VIOLENT_CRIME
+            - ADVERSE_MEDIA_SEXUAL_CRIME
+            - ADVERSE_MEDIA_TERRORISM
+            - ADVERSE_MEDIA_FRAUD
+            - ADVERSE_MEDIA_NARCOTICS
+            - ADVERSE_MEDIA_GENERAL
+            - UNKNOWN
+            type: string
+          type: array
+        associates:
+          description: Associated parties linked to the matched profile.
+          items:
+            $ref: '#/components/schemas/ps_Associate'
+          type: array
+        attributes:
+          $ref: '#/components/schemas/ps_ProfileAttributes'
+        fields:
+          description: Raw provider fields retained for transparency.
+          items:
+            $ref: '#/components/schemas/ps_ProfileField'
+          type: array
+        identifier:
+          description: Provider identifier of the matched profile.
+          type: string
+        last_updated_at:
+          description: UTC timestamp when the provider last updated the profile, when available.
+          example: '2024-07-18T10:29:45.453Z'
+          format: date-time
+          type:
+          - string
+          - 'null'
+        name:
+          description: Primary name of the matched profile.
+          type: string
+        source_notes:
+          description: Per-source notes for the matched profile.
+          items:
+            $ref: '#/components/schemas/ps_SourceNote'
+          type: array
+        sources:
+          description: Source slugs associated with the matched profile.
+          items:
+            description: Source slugs associated with the matched profile.
+            type: string
+          type: array
+        type:
+          description: Profile category returned by the provider.
+          enum:
+          - PERSON
+          - ORGANISATION
+          - VESSEL
+          - AIRCRAFT
+          - REF_TEXT
+          - UNKNOWN
+          type: string
+      required:
+      - aka
+      - aml_types
+      - associates
+      - attributes
+      - fields
+      - identifier
+      - name
+      - source_notes
+      - sources
+      - type
+      type: object
+    ps_CreateConfigurationResponse:
+      properties:
+        configuration:
+          $ref: '#/components/schemas/ps_Configuration'
+        configuration_identifier:
+          format: uuid
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        created_by:
+          format: uuid
+          type: string
+        version:
+          format: int32
+          type: integer
+      required:
+      - configuration
+      - configuration_identifier
+      - created_at
+      - created_by
+      - version
+      type: object
+    ps_CreateConfigurationRequest:
+      properties:
+        configuration:
+          $ref: '#/components/schemas/ps_Configuration'
+      required:
+      - configuration
+      type: object
+    ps_AttributeValue:
+      description: Single structured attribute value derived from a provider field.
+      properties:
+        source:
+          description: Source associated with the attribute value, when available.
+          type:
+          - string
+          - 'null'
+        value:
+          description: Raw attribute value returned by the provider.
+          type: string
+      required:
+      - value
+      type: object
+    ps_ConfigurationSummary:
+      properties:
+        configuration_identifier:
+          format: uuid
+          type: string
+        is_archived:
+          type: boolean
+        name:
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+        updated_by:
+          format: uuid
+          type: string
+        version:
+          format: int32
+          type: integer
+      required:
+      - configuration_identifier
+      - is_archived
+      - name
+      - updated_at
+      - updated_by
+      - version
+      type: object
+    ps_BicMatch:
+      description: Detailed BIC match information returned by the provider.
+      properties:
+        characters_matched:
+          description: Number of characters matched within the BIC.
+          format: int32
+          type: integer
+        match_type:
+          description: Type of BIC match reported by the provider.
+          type: string
+        matching_bic:
+          description: BIC value that matched the screened input.
+          type: string
+      required:
+      - characters_matched
+      - match_type
+      - matching_bic
+      type: object
+    ps_RiskResponse:
+      description: Paginated response envelope for transaction risk results.
+      properties:
+        first:
+          description: Canonical URL for the first page, when available.
+          type:
+          - string
+          - 'null'
+        next:
+          description: Canonical URL for the next page, when available.
+          type:
+          - string
+          - 'null'
+        prev:
+          description: Canonical URL for the previous page, when available.
+          type:
+          - string
+          - 'null'
+        risks:
+          description: Risk records returned for the current page.
+          items:
+            $ref: '#/components/schemas/ps_Risk'
+          type: array
+        self:
+          description: Canonical URL for the current page.
+          type: string
+        total_count:
+          description: Total number of risks available across all pages.
+          format: int32
+          type: integer
+      required:
+      - risks
+      - self
+      - total_count
+      type: object
+    ps_MatchDetail:
+      description: Detailed match explanation for a single provider hit.
+      properties:
+        aml_types:
+          description: AML types associated with the match detail, when available.
+          items:
+            description: AML type assigned by the screening provider.
+            enum:
+            - SANCTION
+            - WARNING
+            - FITNESS_PROBITY
+            - PEP
+            - PEP_CLASS_1
+            - PEP_CLASS_2
+            - PEP_CLASS_3
+            - PEP_CLASS_4
+            - ADVERSE_MEDIA
+            - ADVERSE_MEDIA_FINANCIAL_CRIME
+            - ADVERSE_MEDIA_VIOLENT_CRIME
+            - ADVERSE_MEDIA_SEXUAL_CRIME
+            - ADVERSE_MEDIA_TERRORISM
+            - ADVERSE_MEDIA_FRAUD
+            - ADVERSE_MEDIA_NARCOTICS
+            - ADVERSE_MEDIA_GENERAL
+            - UNKNOWN
+            type: string
+          type:
+          - array
+          - 'null'
+        bic_matches:
+          description: BIC match explanations, when available.
+          items:
+            $ref: '#/components/schemas/ps_BicMatch'
+          type:
+          - array
+          - 'null'
+        matching_name:
+          description: Matching name returned for name screening hits, when available.
+          type:
+          - string
+          - 'null'
+        name_matches:
+          description: Primary name match terms, when available.
+          items:
+            $ref: '#/components/schemas/ps_MatchTerm'
+          type:
+          - array
+          - 'null'
+        secondary_matches:
+          description: Secondary name match terms, when available.
+          items:
+            $ref: '#/components/schemas/ps_MatchTerm'
+          type:
+          - array
+          - 'null'
+        source_identifiers:
+          description: ComplyAdvantage source identifiers associated with the BIC match, when available.
+          items:
+            description: ComplyAdvantage source identifiers associated with the BIC match, when available.
+            type: string
+          type:
+          - array
+          - 'null'
+        sources:
+          description: Display names of the sources that contributed to the match, when available.
+          items:
+            description: Display names of the sources that contributed to the match, when available.
+            type: string
+          type:
+          - array
+          - 'null'
+      type: object
+    ps_Risk:
+      description: Single payment screening risk entry.
+      properties:
+        created_at:
+          description: UTC timestamp when the risk was created.
+          example: '2024-07-18T10:29:45.453Z'
+          format: date-time
+          type: string
+        detail:
+          $ref: '#/components/schemas/ps_RiskDetail'
+        identifier:
+          description: Unique identifier of the risk.
+          format: uuid
+          type: string
+        status:
+          description: Current review status of the risk.
+          enum:
+          - NOT_REVIEWED
+          - IN_REVIEW
+          - FALSE_POSITIVE
+          - TRUE_POSITIVE
+          type: string
+        type:
+          description: External risk type exposed by the payment screening API.
+          enum:
+          - NAME
+          - BIC
+          - TEXT
+          type:
+          - string
+          - 'null'
+        updated_at:
+          description: UTC timestamp when the risk was last updated.
+          example: '2024-07-18T10:29:45.453Z'
+          format: date-time
+          type: string
+        updated_by:
+          description: Identifier of the user who last updated the risk.
+          format: uuid
+          type: string
+      required:
+      - created_at
+      - detail
+      - identifier
+      - status
+      - updated_at
+      - updated_by
+      type: object
+    ps_BicSettings:
+      properties:
+        options:
+          items:
+            enum:
+            - REMOVE_DELISTED_ENTITIES_SANCTION_ONLY
+            type: string
+          type:
+          - array
+          - 'null'
+        strictness:
+          description: Choose how strict you want the BIC search to be. BANK is the least strict, returning a match for any BIC matching the first 4 digits, COUNTRY returns a match on the first 6 digits, LOCATION returns a match on the first 8 digits, and BRANCH requires a match on 11 digits. If not supplied, the default is full match on the BIC, whether length is 8 or 11 digits.
+          enum:
+          - BANK
+          - COUNTRY
+          - LOCATION
+          - BRANCH
+          type:
+          - string
+          - 'null'
+      type: object
+    ps_Associate:
+      description: Associated party linked to the matched profile.
+      properties:
+        association:
+          description: Relationship of the associated party to the profile.
+          type: string
+        name:
+          description: Name of the associated party.
+          type: string
+      required:
+      - association
+      - name
+      type: object
+    ps_ProviderDetail:
+      description: Provider-specific detail payload for a risk.
+      oneOf:
+      - $ref: '#/components/schemas/ps_MatcherDetail'
+      type: object
+    ps_ScreenedEntityInfo:
+      description: Information about the screened entity that produced the risk.
+      properties:
+        index:
+          description: Index of the screened entity within the original request, when applicable.
+          format: int32
+          type:
+          - integer
+          - 'null'
+        type:
+          description: Type of entity field that was screened.
+          enum:
+          - DEBTOR_NAME
+          - ULTIMATE_DEBTOR_NAME
+          - CREDITOR_NAME
+          - ULTIMATE_CREDITOR_NAME
+          - AGENT_BANK_NAME
+          - AGENT_MONEY_TRANSFER_OPERATOR_NAME
+          - AGENT_ONLINE_REMITTANCE_PLATFORM_NAME
+          - AGENT_BANK_BIC
+          - AGENT_MONEY_TRANSFER_OPERATOR_BIC
+          - AGENT_ONLINE_REMITTANCE_PLATFORM_BIC
+          - AGENT_VIRTUAL_ASSET_SERVICE_PROVIDER_NAME
+          - FINANCIAL_DETAILS_REFERENCE
+          - AGENT_REFERENCE
+          - CARD_HOLDER_NAME
+          - MERCHANT_NAME
+          - SUB_MERCHANT_NAME
+          - ISSUER_NAME
+          - ACQUIRER_NAME
+          - WALLET_MANAGING_EXCHANGE_NAME
+          type: string
+      required:
+      - type
+      type: object
+    ps_MatchTerm:
+      description: Matched term returned for name screening transparency.
+      properties:
+        match_text:
+          description: Text that matched the screened entity.
+          type: string
+        match_type:
+          description: Type of the match term reported by the provider.
+          type: string
+      required:
+      - match_text
+      - match_type
+      type: object
+    ps_SingleStatusUpdateResponse:
+      properties:
+        last_updated_at:
+          description: The UTC timestamp when the risk status update was recorded
+          example: '2024-07-18T10:29:45.453Z'
+          format: date-time
+          type: string
+        new_status:
+          description: The new status applied to the risk
+          enum:
+          - NOT_REVIEWED
+          - IN_REVIEW
+          - FALSE_POSITIVE
+          - TRUE_POSITIVE
+          type: string
+        risk_identifier:
+          description: The identifier of the risk that was updated
+          example: 91b47e18-7b4b-46e7-8e9b-7311bedc1115
+          format: uuid
+          type: string
+      required:
+      - last_updated_at
+      - new_status
+      - risk_identifier
+      type: object
+    ps_UpdateConfigurationResponse:
+      properties:
+        change_reason:
+          type: string
+        configuration:
+          $ref: '#/components/schemas/ps_Configuration'
+        configuration_identifier:
+          format: uuid
+          type: string
+        is_archived:
+          type: boolean
+        updated_at:
+          format: date-time
+          type: string
+        updated_by:
+          format: uuid
+          type: string
+        version:
+          format: int32
+          type: integer
+      required:
+      - change_reason
+      - configuration
+      - configuration_identifier
+      - is_archived
+      - updated_at
+      - updated_by
+      - version
+      type: object
+    ps_ConfigurationVersions:
+      properties:
+        configuration_identifier:
+          format: uuid
+          type: string
+        is_archived:
+          type: boolean
+        versions:
+          items:
+            $ref: '#/components/schemas/ps_ConfigurationVersion'
+          type: array
+      required:
+      - configuration_identifier
+      - is_archived
+      - versions
+      type: object
+    ps_NameSettings:
+      properties:
+        ignored_parties:
+          description: Supply CUSTOMER and your customer will not be screened.
+          items:
+            description: Supply CUSTOMER and your customer will not be screened.
+            enum:
+            - CUSTOMER
+            type: string
+          type:
+          - array
+          - 'null'
+          uniqueItems: true
+        name_fuzziness:
+          description: A search fuzziness score between 0 and 1 by 0.1 increments, where 0 is a narrow search and 1 is a broad search.
+          example: 0.8
+          format: float
+          maximum: 1
+          minimum: 0
+          type:
+          - number
+          - 'null'
+        options:
+          description: Choose one or more of these options to use them in name searches.
+          items:
+            description: Choose one or more of these options to use them in name searches.
+            enum:
+            - ALL_WORDS_MANDATORY
+            - ALLOW_NON_PHONETIC_FUZZY_MATCHES_SANCTION
+            - ALLOW_ONE_NON_PHONETIC
+            - ALLOW_ONE_NON_PHONETIC_FITNESS
+            - ALLOW_ONE_NON_PHONETIC_SANCTION
+            - ALLOW_ONE_NON_PHONETIC_WARNING
+            - FIRST_WORD_OPTIONAL
+            - LAST_WORD_OPTIONAL
+            - MORE_ARABIC_TRANSLITERATIONS_SANCTION
+            - REMOVE_DECEASED
+            - REMOVE_DELISTED_ENTITIES_SANCTION_ONLY
+            - REMOVE_EQUIVALENT_NAMES
+            - REMOVE_HOMOPHONES
+            - REMOVE_WEAK_ALIAS
+            - SPANISH_ADDED_MATERNAL
+            - WARNING_FITNESS_ENTITY_TYPE_FILTER
+            type: string
+          type:
+          - array
+          - 'null'
+      type: object
+    ps_SingleStatusUpdateRequest:
+      properties:
+        status:
+          description: The new status to apply to the risk
+          enum:
+          - NOT_REVIEWED
+          - IN_REVIEW
+          - FALSE_POSITIVE
+          - TRUE_POSITIVE
+          type: string
+      required:
+      - status
+      type: object
+    ps_ProfileField:
+      description: Raw provider field preserved for transparency.
+      properties:
+        name:
+          description: Provider field name, when supplied.
+          type:
+          - string
+          - 'null'
+        source:
+          description: Provider field source, when supplied.
+          type:
+          - string
+          - 'null'
+        tag:
+          description: Provider field tag, when supplied.
+          type:
+          - string
+          - 'null'
+        value:
+          description: Provider field value.
+          type: string
+      required:
+      - value
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http

@@ -1,11 +1,8 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: ComplyAdvantage Case Management Users API
-  description: 'The ComplyAdvantage REST API screens people and companies against sanctions and watchlists, warnings and fitness-probity lists, politically exposed persons (PEPs and RCAs), and adverse media, and keeps them under ongoing monitoring. It covers searches (create, list, retrieve, update, delete, certificates, entities), monitored searches (start/stop monitoring, differences, acknowledge), case management (assignment, match status, risk level, comments, tags), and account users. Authentication is an api key sent as "Authorization: Token YOUR_API_KEY"; keys are generated inside the ComplyAdvantage web platform, so an account is required. Standard contracts allow 600 API calls per minute (sandbox 300), with 429 responses requiring exponential backoff (start at 2 seconds, cap at 60). Webhook events match_status_updated, search_status_updated, and monitored_search_updated push changes to your systems. This document was modeled from the public API reference at docs.complyadvantage.com; the endpoint paths are documented publicly, while request/response schemas are summarized rather than exhaustive.'
+  title: Complyadvantage Users API
   version: '1.0'
-  contact:
-    name: ComplyAdvantage
-    url: https://complyadvantage.com
+  description: 'Operations tagged Users across 2 of this provider''s published API definitions: complyadvantage-openapi.yml, complyadvantage-users-api-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.complyadvantage.com
   description: EU (default)
@@ -13,8 +10,8 @@ servers:
   description: US
 - url: https://api.ap.complyadvantage.com
   description: APAC
-security:
-- apiKeyAuth: []
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
 tags:
 - name: Users
   description: Users on your ComplyAdvantage account.
@@ -40,13 +37,1001 @@ paths:
                     type: object
         '401':
           $ref: '#/components/responses/Unauthorized'
+      security:
+      - apiKeyAuth: []
+    servers:
+    - url: https://api.complyadvantage.com
+      description: EU (default)
+    - url: https://api.us.complyadvantage.com
+      description: US
+    - url: https://api.ap.complyadvantage.com
+      description: APAC
+  /v2/users:
+    servers:
+    - description: ComplyAdvantage Mesh API
+      url: https://api.mesh.complyadvantage.com
+    post:
+      description: 'Creates a new user.
+
+
+        To enable the user to access an account, they must be assigned at least one role. A user will not be sent an email invite until assigned at least one role.
+
+
+        Follow these steps to create and configure a user:
+
+
+        1. **Create user:** Create the user by calling `POST /users`.
+
+
+        2. **Get role(s):** Use `GET /roles` to fetch the role_identifier(s) you wish to assign to the user.
+
+
+        3. **(Optional) Get account**: If you need to assign roles for an account you''re not currently logged into but within the same organization, retrieve the relevant `account_identifier` using `GET clients/me/accounts`.
+
+
+        4. **Assign user role**: Use `POST /users/{user_identifier}/roles` to assign the user to an account with a list of `role_identifier(s)` and optionally the `account_identifier` if applicable.
+
+
+        You need the "Create and update users" permission to use this endpoint.'
+      operationId: identity_v2_users_createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/identity_UserRequestBody'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_AnyUserResponse'
+          description: CREATED
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_ProblemDetailErrorResponse'
+          description: Invalid input
+      summary: Create a new user
+      tags:
+      - Users
+      security:
+      - BearerAuth: []
+  /v2/users/me:
+    servers:
+    - description: ComplyAdvantage Mesh API
+      url: https://api.mesh.complyadvantage.com
+    get:
+      description: Returns details about your user.
+      operationId: identity_v2_users_me_getMyUser
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_OwnUserResponse'
+          description: OK
+      summary: Get details about your user
+      tags:
+      - Users
+      security:
+      - BearerAuth: []
+    patch:
+      description: 'Update details for your user.
+
+
+        This endpoint cannot be used with API credentials.'
+      operationId: identity_v2_users_me_patchMyUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/identity_UsersMePartialUpdateRequestBody'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_OwnUserResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_ProblemDetailErrorResponse'
+          description: Invalid input
+      summary: Update your user
+      tags:
+      - Users
+      security:
+      - BearerAuth: []
+  /v2/users/me/accounts:
+    servers:
+    - description: ComplyAdvantage Mesh API
+      url: https://api.mesh.complyadvantage.com
+    get:
+      description: 'Returns a list of accounts for your user.
+
+
+        This endpoint cannot be used with API credentials.'
+      operationId: identity_v2_users_me_accounts_getMyAccounts
+      parameters:
+      - description: Filter accounts by name.
+        example: Doe
+        in: query
+        name: name_contains
+        required: false
+        schema:
+          type: string
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 10
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_UserAccountRolesResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_ProblemDetailErrorResponse'
+          description: Invalid input
+      summary: Get accounts for your user
+      tags:
+      - Users
+      security:
+      - BearerAuth: []
+  /v2/users/me/permissions:
+    servers:
+    - description: ComplyAdvantage Mesh API
+      url: https://api.mesh.complyadvantage.com
+    get:
+      description: Returns your permissions.
+      operationId: identity_v2_users_me_permissions_getMyPermissions
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_PermissionListResponse'
+          description: OK
+      summary: Get permissions for your user
+      tags:
+      - Users
+      security:
+      - BearerAuth: []
+  /v2/users/roles/bulk:
+    servers:
+    - description: ComplyAdvantage Mesh API
+      url: https://api.mesh.complyadvantage.com
+    put:
+      description: 'Set the roles for a list of users in an account.
+
+
+        You need the "Assign roles in account" permission to use this endpoint.'
+      operationId: identity_v2_users_roles_bulk_bulkUpdateUserAccountRoles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/identity_BulkAccountUserRolesRequestBody'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_BulkAccountUserRolesResponse'
+          description: OK
+      summary: Bulk assign user roles
+      tags:
+      - Users
+      security:
+      - BearerAuth: []
+  /v2/users/{user_identifier}:
+    servers:
+    - description: ComplyAdvantage Mesh API
+      url: https://api.mesh.complyadvantage.com
+    get:
+      description: Returns details for a given user.
+      operationId: identity_v2_users_user_identifier_getSpecificUser
+      parameters:
+      - description: The identifier of the user that you want to retrieve.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: user_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_AnyUserResponse'
+          description: OK
+      summary: Get details about a user
+      tags:
+      - Users
+      security:
+      - BearerAuth: []
+    patch:
+      description: 'Updates details for a given user.
+
+
+        You need the "Create and update users" permission to use this endpoint.'
+      operationId: identity_v2_users_user_identifier_partialUpdateUser
+      parameters:
+      - description: The identifier of the user that you want to update.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: user_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/identity_UserPartialUpdateRequestBody'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_AnyUserResponse'
+          description: OK
+      summary: Update an existing user
+      tags:
+      - Users
+      security:
+      - BearerAuth: []
+  /v2/users/{user_identifier}/accounts:
+    servers:
+    - description: ComplyAdvantage Mesh API
+      url: https://api.mesh.complyadvantage.com
+    get:
+      description: 'Returns a list of accounts for a given user.
+
+
+        You need the "View users" permission to use this endpoint.'
+      operationId: identity_v2_users_user_identifier_accounts_getSpecificUsersAccounts
+      parameters:
+      - description: The identifier of the user whose accounts you'd like to retrieve.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: user_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: Filter user by name.
+        example: Doe
+        in: query
+        name: name_contains
+        required: false
+        schema:
+          type: string
+      - description: The identifier of the client whose accounts you'd like to retrieve.
+        example: 00000000-0000-0000-0000-000000000000
+        in: query
+        name: client_identifier
+        required: false
+        schema:
+          format: uuid
+          type: string
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 10
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_ExtendedUserAccountRolesResponse'
+          description: OK
+      summary: Get accounts for a user
+      tags:
+      - Users
+      security:
+      - BearerAuth: []
+  /v2/users/{user_identifier}/roles:
+    servers:
+    - description: ComplyAdvantage Mesh API
+      url: https://api.mesh.complyadvantage.com
+    put:
+      description: 'Set the roles of a user in an account.
+
+
+        You need the "Assign roles in account" permission to use this endpoint.'
+      operationId: identity_v2_users_user_identifier_roles_updateUserAccountRoles
+      parameters:
+      - description: The identifier of the user who the roles will be assigned to.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: user_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/identity_AccountUserRolesRequestBody'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_AccountUserRolesResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity_ProblemDetailErrorResponse'
+          description: Invalid input
+      summary: Assign user roles
+      tags:
+      - Users
+      security:
+      - BearerAuth: []
 components:
   responses:
     Unauthorized:
       description: Missing or invalid API key.
+  schemas:
+    identity_AnyUserResponse:
+      properties:
+        active:
+          default: false
+          description: If a user is active or deactivated.
+          example: true
+          type: boolean
+        client_identifier:
+          description: The unique identifier of the client.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        created_at:
+          description: Date and time the user was created.
+          format: date-time
+          type: string
+        created_by:
+          description: The unique identifier of who created the user.
+          format: uuid
+          type: string
+        deactivated_at:
+          description: Date and time the user was deactivated.
+          format: date-time
+          type: string
+        email:
+          description: Email address of the user.
+          example: example@mail.com
+          type: string
+        enforce_mfa_after:
+          description: Date and time of when MFA will be enforced for the user.
+          format: date-time
+          type: string
+        identifier:
+          description: The unique identifier of the user.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        name:
+          description: Full name of the user.
+          example: John Doe
+          type: string
+        updated_at:
+          description: Date and time the user was last updated.
+          format: date-time
+          type: string
+        updated_by:
+          description: The unique identifier of who last updated the user.
+          format: uuid
+          type: string
+        user_type:
+          description: Specifies the type of the entity.
+          enum:
+          - AGENT
+          - HUMAN
+          - MACHINE_CREDENTIAL
+          example: HUMAN
+          type: string
+      required:
+      - active
+      - client_identifier
+      - created_at
+      - created_by
+      - email
+      - identifier
+      - name
+      - updated_at
+      - updated_by
+      - user_type
+      type: object
+    identity_UsersMePartialUpdateRequestBody:
+      properties:
+        cookie_consent:
+          default: false
+          description: Whether the user consents to cookies.
+          example: false
+          type: boolean
+        locale:
+          description: User locale.
+          enum:
+          - en-US
+          - en-GB
+          - fr-CA
+          - fr-FR
+          example: en-US
+          type:
+          - string
+          - 'null'
+      type: object
+    identity_UserAccountRolesResponse:
+      properties:
+        accounts:
+          description: List of accounts.
+          items:
+            $ref: '#/components/schemas/identity_UserAccountsRoles'
+          type: array
+        first:
+          description: The url with parameters of the first page
+          type: string
+        next:
+          description: The url with parameters of the next page, null if there are no more pages
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The url with parameters of the previous page, null if current page_number is 1
+          type:
+          - string
+          - 'null'
+        self:
+          description: The url with parameters of the current page
+          type:
+          - string
+          - 'null'
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - accounts
+      - first
+      type: object
+    identity_AccountUserRolesRequestBody:
+      properties:
+        account_identifier:
+          description: The unique identifier of the account.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        role_identifiers:
+          description: List of role identifiers.
+          example:
+          - 00000000-0000-0000-0000-000000000000
+          items:
+            example: 00000000-0000-0000-0000-000000000000
+            format: uuid
+            type: string
+          type: array
+          uniqueItems: true
+      required:
+      - role_identifiers
+      type: object
+    identity_AccountUserRolesResponse:
+      properties:
+        identifier:
+          description: The unique identifier of the user.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        roles:
+          description: List of roles within the account.
+          items:
+            $ref: '#/components/schemas/identity_UserRole'
+          type: array
+      required:
+      - identifier
+      - roles
+      type: object
+    identity_BulkAccountUserRolesRequestBody:
+      properties:
+        account_identifier:
+          description: The unique identifier of the account.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        role_identifiers:
+          description: List of role identifiers.
+          example:
+          - 00000000-0000-0000-0000-000000000000
+          items:
+            example: 00000000-0000-0000-0000-000000000000
+            format: uuid
+            type: string
+          type: array
+          uniqueItems: true
+        user_identifiers:
+          description: List of user identifiers.
+          example:
+          - 00000000-0000-0000-0000-000000000000
+          items:
+            example: 00000000-0000-0000-0000-000000000000
+            format: uuid
+            type: string
+          type: array
+          uniqueItems: true
+      required:
+      - role_identifiers
+      - user_identifiers
+      type: object
+    identity_BulkAccountUserRolesError:
+      description: Details for in case it wasn't successful.
+      properties:
+        details:
+          description: Detail of the error.
+          example: Failed to connect with database
+          type: string
+        message:
+          description: Error message.
+          example: DATABASE_ERROR
+          type: string
+      required:
+      - details
+      - message
+      type: object
+    identity_PermissionResponse:
+      properties:
+        description:
+          description: Description of the permission.
+          example: Accessing API, user and account management
+          type: string
+        identifier:
+          description: The unique identifier of the permission.
+          example: 1
+          format: int32
+          type: integer
+        level:
+          description: Permission level type
+          enum:
+          - USER
+          - ACCOUNT
+          example: USER
+          type: string
+        name:
+          description: Name of the permission.
+          example: insights
+          type: string
+      required:
+      - description
+      - identifier
+      - level
+      - name
+      type: object
+    identity_PermissionListResponse:
+      properties:
+        bitfield:
+          type: string
+        permissions:
+          description: List of your permissions.
+          items:
+            $ref: '#/components/schemas/identity_PermissionResponse'
+          type: array
+      required:
+      - bitfield
+      - permissions
+      type: object
+    identity_UserRequestBody:
+      properties:
+        email:
+          description: Email address of the user.
+          example: john@example.com
+          format: email
+          maxLength: 100
+          minLength: 1
+          type: string
+        name:
+          description: Full name of the user.
+          example: John Doe
+          maxLength: 50
+          minLength: 1
+          type: string
+      required:
+      - email
+      - name
+      type: object
+    identity_UserRole:
+      description: List of roles within the account.
+      properties:
+        assigned_at:
+          description: Date and time the user was assigned the user role in the account.
+          example: '2023-01-01T10:10:10.000Z'
+          format: date-time
+          type: string
+        name:
+          description: Name of the role
+          example: Admin
+          type: string
+        user_role_identifier:
+          description: The unique identifier of the user role.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+      required:
+      - name
+      type: object
+    identity_BulkAccountUserRolesResponse:
+      properties:
+        results:
+          description: List with the result of the operation on each user identifier.
+          items:
+            $ref: '#/components/schemas/identity_BulkAccountUserRoles'
+          type: array
+      required:
+      - results
+      type: object
+    identity_UserPartialUpdateRequestBody:
+      properties:
+        active:
+          default: false
+          description: If the user is active or deactivated.
+          example: true
+          type:
+          - boolean
+          - 'null'
+        enforce_mfa_after:
+          description: Date and time of when MFA will be enforced for the user.
+          example: '2024-06-01T00:00:00.000Z'
+          format: date-time
+          type: string
+        name:
+          description: Full name of the user.
+          example: John Doe
+          maxLength: 50
+          minLength: 1
+          type:
+          - string
+          - 'null'
+      type: object
+    identity_BulkAccountUserRoles:
+      description: List with the result of the operation on each user identifier.
+      properties:
+        errors:
+          default: null
+          description: Details for in case it wasn't successful.
+          items:
+            $ref: '#/components/schemas/identity_BulkAccountUserRolesError'
+          type:
+          - array
+          - 'null'
+        success:
+          default: false
+          description: The unique identifier of the user.
+          example: true
+          type: boolean
+        user_identifier:
+          description: The unique identifier of the user.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+      required:
+      - success
+      - user_identifier
+      type: object
+    identity_ExtendedUserAccountRolesResponse:
+      properties:
+        accounts:
+          description: List of accounts.
+          items:
+            $ref: '#/components/schemas/identity_ExtendedUserAccountsRoles'
+          type: array
+        first:
+          description: The url with parameters of the first page
+          type: string
+        next:
+          description: The url with parameters of the next page, null if there are no more pages
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The url with parameters of the previous page, null if current page_number is 1
+          type:
+          - string
+          - 'null'
+        self:
+          description: The url with parameters of the current page
+          type:
+          - string
+          - 'null'
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - accounts
+      - first
+      type: object
+    identity_ExtendedUserAccountsRoles:
+      description: List of accounts.
+      properties:
+        account_type:
+          description: Type of the account.
+          enum:
+          - CLIENT_ACCOUNT_TYPE_UNSPECIFIED
+          - CLIENT_ACCOUNT_TYPE_NON_PRODUCTION
+          - CLIENT_ACCOUNT_TYPE_PRODUCTION
+          - UNRECOGNIZED
+          type: string
+        client_identifier:
+          description: The unique identifier of the client.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        identifier:
+          description: The unique identifier of the account.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        name:
+          description: Name of the account.
+          example: A Bank Retail
+          type: string
+        roles:
+          description: List of roles within the account.
+          items:
+            $ref: '#/components/schemas/identity_ExtendedUserRole'
+          type: array
+      required:
+      - account_type
+      - client_identifier
+      - identifier
+      - name
+      - roles
+      type: object
+    identity_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type: string
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type: string
+        status:
+          format: int32
+          type: integer
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type: string
+        type:
+          format: uri
+          type: string
+      required:
+      - identifier
+      - timestamp
+      type: object
+    identity_OwnUserResponse:
+      properties:
+        active:
+          default: false
+          description: If a user is active or deactivated.
+          example: true
+          type: boolean
+        client_identifier:
+          description: The unique identifier of the client.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        cookie_consent:
+          default: false
+          description: Whether the user has consented to cookies.
+          example: false
+          type: boolean
+        created_at:
+          description: Date and time the user was created.
+          format: date-time
+          type: string
+        created_by:
+          description: The unique identifier of who created the user.
+          format: uuid
+          type: string
+        deactivated_at:
+          description: Date and time the user was deactivated.
+          format: date-time
+          type: string
+        email:
+          description: Email address of the user.
+          example: example@mail.com
+          type: string
+        enforce_mfa_after:
+          description: Date and time of when MFA will be enforced for the user.
+          format: date-time
+          type: string
+        identifier:
+          description: The unique identifier of the user.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        is_default_locale:
+          default: false
+          description: Default locale is used.
+          type: boolean
+        locale:
+          description: Locale of the user.
+          enum:
+          - en-US
+          - en-GB
+          - fr-CA
+          - fr-FR
+          type: string
+        name:
+          description: Full name of the user.
+          example: John Doe
+          type: string
+        prompt_user_cookie:
+          default: false
+          description: Whether to prompt the user about cookie consent.
+          example: true
+          type: boolean
+        updated_at:
+          description: Date and time the user was last updated.
+          format: date-time
+          type: string
+        updated_by:
+          description: The unique identifier of who last updated the user.
+          format: uuid
+          type: string
+      required:
+      - active
+      - client_identifier
+      - cookie_consent
+      - created_at
+      - created_by
+      - email
+      - identifier
+      - is_default_locale
+      - locale
+      - name
+      - prompt_user_cookie
+      - updated_at
+      - updated_by
+      type: object
+    identity_UserAccountsRoles:
+      description: List of accounts.
+      properties:
+        account_type:
+          description: Type of the account.
+          enum:
+          - CLIENT_ACCOUNT_TYPE_UNSPECIFIED
+          - CLIENT_ACCOUNT_TYPE_NON_PRODUCTION
+          - CLIENT_ACCOUNT_TYPE_PRODUCTION
+          - UNRECOGNIZED
+          type: string
+        client_identifier:
+          description: The unique identifier of the client.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        identifier:
+          description: The unique identifier of the account.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        name:
+          description: Name of the account.
+          example: A Bank Retail
+          type: string
+        roles:
+          description: List of roles within the account.
+          items:
+            $ref: '#/components/schemas/identity_StandardUserRole'
+          type: array
+      required:
+      - account_type
+      - client_identifier
+      - identifier
+      - name
+      - roles
+      type: object
+    identity_StandardUserRole:
+      description: List of roles within the account.
+      properties:
+        assigned_at:
+          description: Date and time the user was assigned the user role in the account.
+          example: '2023-01-01T10:10:10.000Z'
+          format: date-time
+          type: string
+        name:
+          description: Name of the role
+          example: Admin
+          type: string
+      required:
+      - name
+      type: object
+    identity_ExtendedUserRole:
+      description: List of roles within the account.
+      properties:
+        assigned_at:
+          description: Date and time the user was assigned the user role in the account.
+          example: '2023-01-01T10:10:10.000Z'
+          format: date-time
+          type: string
+        name:
+          description: Name of the role
+          example: Admin
+          type: string
+        user_role_identifier:
+          description: The unique identifier of the user role.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+      required:
+      - name
+      type: object
   securitySchemes:
     apiKeyAuth:
       type: apiKey
       in: header
       name: Authorization
       description: 'API key sent as: Authorization: Token YOUR_API_KEY. Keys are generated in the ComplyAdvantage web platform.'
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http
+x-refined-from:
+- complyadvantage-openapi.yml
+- complyadvantage-users-api-openapi.yml

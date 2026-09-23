@@ -1,0 +1,3136 @@
+openapi: 3.2.0
+info:
+  title: Mesh Cases API
+  version: v2.0
+servers:
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
+security:
+- BearerAuth: []
+tags:
+- name: Cases
+paths:
+  /v2/cases:
+    get:
+      description: 'Returns a paginated list of cases for the user''s account. Accepts filter and sort query parameters.
+
+
+        You need one of the "View cases (customer onboarding)", "View cases (customer monitoring)", "View cases (payment screening)" or "View cases (transaction monitoring)" permissions to use this endpoint.'
+      operationId: casesService/v2/cases.get
+      parameters:
+      - deprecated: true
+        description: User identifier or null.
+        example:
+        - 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: query
+        name: assignee
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+      - description: 'Provide an array of user identifiers or blank with which to filter the case list.
+
+
+          * Includes all cases assigned to user matching user identifiers.
+
+
+          * If array includes blank, also includes cases without an assignee (i.e. unassigned).'
+        example:
+        - 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: query
+        name: assignee_identifier
+        required: false
+        schema:
+          items:
+            format: uuid
+            type: string
+          type: array
+      - description: Filter cases by specific case types
+        example:
+        - CUSTOMER_ONBOARDING
+        in: query
+        name: type
+        required: false
+        schema:
+          items:
+            enum:
+            - CUSTOMER_ONBOARDING
+            - CUSTOMER_MONITORING
+            - PAYMENT_SCREENING
+            - TRANSACTION_MONITORING
+            type: string
+          type: array
+      - description: Filter cases created on or after this date and time.
+        example: '2024-01-22T15:54:27.265Z'
+        in: query
+        name: created_at_from
+        required: false
+        schema:
+          format: date-time
+          type: string
+      - description: Filter cases created on or before this date and time.
+        example: '2024-01-22T15:54:27.265Z'
+        in: query
+        name: created_at_to
+        required: false
+        schema:
+          format: date-time
+          type: string
+      - description: Filter cases by a list of customer identifiers
+        example:
+        - 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: query
+        name: customer.identifier
+        required: false
+        schema:
+          items:
+            format: uuid
+            type: string
+          type: array
+      - description: Filter cases by a list of customer risk levels.
+        example:
+        - HIGH
+        in: query
+        name: customer.risk_level
+        required: false
+        schema:
+          items:
+            enum:
+            - LOW
+            - MEDIUM
+            - HIGH
+            - PROHIBITED
+            - SKIPPED
+            type: string
+          type: array
+      - description: 'Provide an array of customer label identifiers or blank with which to filter the case list.
+
+
+          * Includes all cases matching at least one customer label.
+
+
+          * If array includes blank, also includes cases without a customer label.'
+        example:
+        - 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: query
+        name: customer.label
+        required: false
+        schema:
+          items:
+            format: uuid
+            type: string
+          type: array
+      - description: 'Provide an array of customer acquisition sources or blank with which to filter the case list.
+
+
+          * Includes all cases matching at least one customer acquisition source.
+
+
+          * If array includes blank, also includes cases without a customer acquisition source.'
+        example:
+        - Business Co.
+        in: query
+        name: customer.acquisition_source
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+      - description: Search for cases by customer name, customer external identifier, counterparty name, counterparty external identifier, or external activity identifier (for payment screening cases only). Supports wildcard search.
+        example: Boris Johnson
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+      - deprecated: true
+        description: 'The current state of the case.
+
+
+          For those using the deprecated case_state, if any new case stages are added the case state response for these will be returned as USER_DEFINED'
+        example:
+        - ONBOARDING_IN_PROGRESS
+        in: query
+        name: state
+        required: false
+        schema:
+          items:
+            enum:
+            - ONBOARDING_NOT_STARTED
+            - ONBOARDING_IN_PROGRESS
+            - ONBOARDING_ESCALATED
+            - ONBOARDING_BLOCKED
+            - ONBOARDING_POSITIVE_END_STATE
+            - ONBOARDING_MANAGEABLE_RISK_POSITIVE_END_STATE
+            - ONBOARDING_NEGATIVE_END_STATE
+            - MONITORING_NOT_STARTED
+            - MONITORING_IN_PROGRESS
+            - MONITORING_ESCALATED
+            - MONITORING_BLOCKED
+            - MONITORING_NO_RISK_DETECTED_POSITIVE_END_STATE
+            - MONITORING_RISK_DETECTED_POSITIVE_END_STATE
+            - MONITORING_RISK_DETECTED_NEGATIVE_END_STATE
+            - PAYMENT_SCREENING_NOT_STARTED
+            - PAYMENT_SCREENING_IN_PROGRESS
+            - PAYMENT_SCREENING_ESCALATED
+            - PAYMENT_SCREENING_BLOCKED
+            - PAYMENT_SCREENING_AWAITING_INFORMATION
+            - PAYMENT_SCREENING_PROCESS_PAYMENT_END_STATE
+            - PAYMENT_SCREENING_REJECT_PAYMENT_END_STATE
+            - TRANSACTION_MONITORING_NOT_STARTED
+            - TRANSACTION_MONITORING_IN_PROGRESS
+            - TRANSACTION_MONITORING_ESCALATED
+            - TRANSACTION_MONITORING_BLOCKED
+            - TRANSACTION_MONITORING_ACCEPTED_POSITIVE_END_STATE
+            - TRANSACTION_MONITORING_ESCALATED_NEGATIVE_END_STATE
+            - USER_DEFINED
+            type: string
+          type: array
+      - description: Provide an array of stage identifiers with which to filter the case list.
+        example:
+        - 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: query
+        name: stage.identifier
+        required: false
+        schema:
+          items:
+            format: uuid
+            type: string
+          type: array
+      - description: Filter cases by a list of risk types. You can retrieve the full list of available risk types from the `/v2/risk-types` endpoint.
+        example:
+        - PEP_CLASS_1
+        in: query
+        name: risk_type
+        required: false
+        schema:
+          items:
+            enum:
+            - ADVERSE_MEDIA_CYBERCRIME
+            - ADVERSE_MEDIA_EU_AML_DIRECTIVE
+            - ADVERSE_MEDIA_FINANCIAL_AML_CFT
+            - ADVERSE_MEDIA_FINANCIAL_CRIME
+            - ADVERSE_MEDIA_FINANCIAL_DIFFICULTY
+            - ADVERSE_MEDIA_FRAUD_LINKED
+            - ADVERSE_MEDIA_FRAUD
+            - ADVERSE_MEDIA_GENERAL_AML_CFT
+            - ADVERSE_MEDIA_GENERAL
+            - ADVERSE_MEDIA_HIGH_RISK
+            - ADVERSE_MEDIA_NARCOTICS_AML_CFT
+            - ADVERSE_MEDIA_NARCOTICS
+            - ADVERSE_MEDIA_OTHER_FINANCIAL
+            - ADVERSE_MEDIA_OTHER_MINOR
+            - ADVERSE_MEDIA_OTHER_SERIOUS
+            - ADVERSE_MEDIA_PROPERTY
+            - ADVERSE_MEDIA_REGULATORY
+            - ADVERSE_MEDIA_SEXUAL_CRIME
+            - ADVERSE_MEDIA_TERRORISM
+            - ADVERSE_MEDIA_VIOLENCE_AML_CFT
+            - ADVERSE_MEDIA_VIOLENCE_NON_AML_CFT
+            - ADVERSE_MEDIA_VIOLENT_CRIME
+            - ADVERSE_MEDIA
+            - FITNESS_PROBITY
+            - PEP_CLASS_1_TO_3
+            - PEP_CLASS_1
+            - PEP_CLASS_2
+            - PEP_CLASS_3
+            - PEP_CLASS_4
+            - PEP
+            - SANCTION_RELATED
+            - SANCTION
+            - WARNING
+            - CUSTOM
+            - RISK_WORDS
+            type: string
+          type: array
+      - description: 'Filter cases by alert title(s).
+
+
+          Allows filtering for cases with alerts matching any of the provided titles.'
+        example:
+        - Customer screening
+        - Payment screening
+        in: query
+        name: alerts.title
+        required: false
+        schema:
+          items:
+            type: string
+          minLength: 1
+          type: array
+      - description: 'Filter cases by the highest priority alert (1-9).
+
+
+          Allows filtering for cases where the highest priority alert matches the provided value.'
+        example:
+        - 1
+        - 2
+        in: query
+        name: alerts.highest_priority
+        required: false
+        schema:
+          items:
+            format: int32
+            type: integer
+          maximum: 9
+          minimum: 1
+          type: array
+      - description: 'Filter cases by risk catalog risk type keys.
+
+
+          Allows filtering for cases with risk types matching any of the provided keys.'
+        example:
+        - r_sanctions_exposure
+        - r_political_exposure
+        in: query
+        name: risk_catalog_risk_types.key
+        required: false
+        schema:
+          items:
+            type: string
+          minLength: 1
+          type: array
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 25
+          minimum: 1
+          type: integer
+      - description: 'Sorting criteria in the format of: `[-]property` (`-` descending modifier).
+
+
+          * Default sort order is ascending (without `-`).
+
+
+          * Multiple sort criteria are supported.'
+        example:
+        - -timestamp
+        in: query
+        name: sort
+        required: false
+        schema:
+          default:
+          - -CREATED_AT
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_PaginatedResponseCaseResultResponse'
+          description: OK
+      summary: Get list of cases
+      tags:
+      - Cases
+  /v2/cases/assign/bulk:
+    post:
+      description: 'This endpoint synchronously updates assignee for up to 100 cases.
+
+
+        You need the "Update cases" permission to use this endpoint.'
+      operationId: casesService/v2/cases/assign/bulk.post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/case-management_AssignCasesRequest'
+        required: true
+      responses:
+        '207':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_BulkActionResponse'
+          description: Multi-Status
+        '400':
+          content:
+            application/problem+json:
+              examples:
+                Too many cases:
+                  description: Request exceeds the maximum number of cases that can be updated.
+                  value:
+                    detail: The maximum allowed number of cases to update is 100
+                    identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                    timestamp: '2023-12-19T09:27:17.835Z'
+                    title: TOO_MANY_CASES
+              schema:
+                $ref: '#/components/schemas/case-management_ProblemDetailErrorResponse'
+          description: Bad Request
+      summary: Assign cases in bulk
+      tags:
+      - Cases
+  /v2/cases/notes/bulk:
+    post:
+      description: 'This endpoint creates a note for multiple cases. Up to 100 cases.
+
+
+        You need the "Update cases" permission to use this endpoint.'
+      operationId: casesService/v2/cases/notes/bulk.post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/case-management_CreateCasesNoteRequest'
+        required: true
+      responses:
+        '207':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_BulkActionResponse'
+          description: Multi-Status
+        '400':
+          content:
+            application/problem+json:
+              examples:
+                Too many cases:
+                  description: Request exceeds the maximum number of cases that can be updated.
+                  value:
+                    detail: The maximum allowed number of cases to update is 100
+                    identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                    timestamp: '2023-12-19T09:27:17.835Z'
+                    title: TOO_MANY_CASES
+              schema:
+                $ref: '#/components/schemas/case-management_ProblemDetailErrorResponse'
+          description: Bad Request
+      summary: Leave a note on multiple cases in bulk
+      tags:
+      - Cases
+  /v2/cases/states:
+    get:
+      deprecated: true
+      description: This endpoint returns all possible states to which a case can be transitioned.
+      operationId: casesService/v2/cases/states.get
+      parameters:
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 25
+          minimum: 1
+          type: integer
+      - description: 'Sorting criteria in the format of: `[-]property` (`-` descending modifier).
+
+
+          * Default sort order is ascending (without `-`).
+
+
+          * Multiple sort criteria are supported.'
+        example:
+        - -timestamp
+        in: query
+        name: sort
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_PaginatedResponseCaseStatesResponse'
+          description: OK
+      summary: Get a list of available case states
+      tags:
+      - Cases
+  /v2/cases/transition/bulk:
+    post:
+      description: 'This endpoint synchronously updates state (or stage) for up to 100 cases.
+
+
+        You need the "Update cases" permission to use this endpoint.'
+      operationId: casesService/v2/cases/transition/bulk.post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/case-management_TransitionCasesRequest'
+        required: true
+      responses:
+        '207':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_BulkActionResponse'
+          description: Multi-Status
+        '400':
+          content:
+            application/problem+json:
+              examples:
+                Too many cases:
+                  description: Request exceeds the maximum number of cases that can be updated.
+                  value:
+                    detail: The maximum allowed number of cases to update is 100
+                    identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                    timestamp: '2023-12-19T09:27:17.835Z'
+                    title: TOO_MANY_CASES
+              schema:
+                $ref: '#/components/schemas/case-management_ProblemDetailErrorResponse'
+          description: Bad Request
+      summary: Transition cases in bulk
+      tags:
+      - Cases
+  /v2/cases/{case_identifier}:
+    get:
+      description: 'This endpoint returns a single case by ID.
+
+
+        You need one of the "View cases (customer onboarding)", "View cases (customer monitoring)", "View cases (payment screening)" or "View cases (transaction monitoring)" permissions to use this endpoint.'
+      operationId: casesService/v2/cases/case_identifier.get
+      parameters:
+      - description: The unique identifier of the case.
+        example: 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: path
+        name: case_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_CaseResponse'
+          description: OK
+      summary: Get a specific case
+      tags:
+      - Cases
+  /v2/cases/{case_identifier}/alerts:
+    get:
+      description: 'Returns a paginated list of alerts associated with a case.
+
+
+        You need one of the "View cases (customer onboarding)", "View cases (customer monitoring)", "View cases (payment screening)" or "View cases (transaction monitoring)" permissions to use this endpoint.'
+      operationId: casesService/v2/cases/case_identifier/alerts.get
+      parameters:
+      - description: The unique identifier of the case.
+        example: 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: path
+        name: case_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: Filter alerts by alert identifier
+        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        in: query
+        name: identifier
+        required: false
+        schema:
+          format: uuid
+          type: string
+      - description: Filter alerts by states
+        example:
+        - NOT_STARTED
+        in: query
+        name: states
+        required: false
+        schema:
+          items:
+            enum:
+            - NOT_STARTED
+            - IN_PROGRESS
+            - POSITIVE_END_STATE
+            - NEGATIVE_END_STATE
+            type: string
+          type: array
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 25
+          minimum: 1
+          type: integer
+      - description: 'Sorting criteria in the format of: `[-]property` (`-` descending modifier).
+
+
+          * Default sort order is ascending (without `-`).
+
+
+          * Multiple sort criteria are supported.'
+        example:
+        - -timestamp
+        in: query
+        name: sort
+        required: false
+        schema:
+          default:
+          - -CREATED_AT
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_PaginatedResponseCaseAlertResponseV2'
+          description: OK
+      summary: Retrieve the alerts for a case
+      tags:
+      - Cases
+  /v2/cases/{case_identifier}/alerts/{alert_identifier}/notes:
+    get:
+      description: Returns a paginated list of notes associated with a specific alert. You need the "View alerts" permission to use this endpoint.
+      operationId: casesService/v2/cases/case_identifier/alerts/alert_identifier/notes.get
+      parameters:
+      - description: The unique identifier of the case.
+        example: 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: path
+        name: case_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: The unique identifier of the alert.
+        example: 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: path
+        name: alert_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 25
+          minimum: 1
+          type: integer
+      - description: 'Sorting criteria in the format of: `[-]property` (`-` descending modifier).
+
+
+          * Default sort order is ascending (without `-`).
+
+
+          * Multiple sort criteria are supported.'
+        example:
+        - -timestamp
+        in: query
+        name: sort
+        required: false
+        schema:
+          default:
+          - -CREATED_AT
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_PaginatedResponseAlertNoteResponse'
+          description: OK
+        '404':
+          content:
+            application/problem+json:
+              examples:
+                Alert not found:
+                  description: No alert exists for the given alert identifier, or it does not belong to the specified case.
+                  value:
+                    detail: Alert 3fa85f64-5717-4562-b3fc-2c963f66afa6 not found for client 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                    identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                    timestamp: '2023-12-19T09:27:17.835Z'
+                    title: ALERT_NOT_FOUND
+                Case not found:
+                  description: No case exists for the given case identifier.
+                  value:
+                    detail: Case 3fa85f64-5717-4562-b3fc-2c963f66afa6 not found
+                    identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                    timestamp: '2023-12-19T09:27:17.835Z'
+                    title: CASE_NOT_FOUND
+              schema:
+                $ref: '#/components/schemas/case-management_ProblemDetailErrorResponse'
+          description: Not found
+      summary: Get the notes on an alert
+      tags:
+      - Cases
+    post:
+      description: Creates a note linked to a specific alert. You need the "Update alerts" permission to use this endpoint.
+      operationId: casesService/v2/cases/case_identifier/alerts/alert_identifier/notes.post
+      parameters:
+      - description: The unique identifier of the case.
+        example: 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: path
+        name: case_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: The unique identifier of the alert.
+        example: 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: path
+        name: alert_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/case-management_CreateCaseNoteRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_AlertNoteResponse'
+          description: Created
+        '400':
+          content:
+            application/problem+json:
+              examples:
+                Note content is blank:
+                  description: The note content must not be blank.
+                  value:
+                    detail: Added note cannot be blank.
+                    identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                    timestamp: '2023-12-19T09:27:17.835Z'
+                    title: BAD_REQUEST
+              schema:
+                $ref: '#/components/schemas/case-management_ProblemDetailErrorResponse'
+          description: Bad request
+        '404':
+          content:
+            application/problem+json:
+              examples:
+                Alert not found:
+                  description: No alert exists for the given alert identifier, or it does not belong to the specified case.
+                  value:
+                    detail: Alert 3fa85f64-5717-4562-b3fc-2c963f66afa6 not found for client 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                    identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                    timestamp: '2023-12-19T09:27:17.835Z'
+                    title: ALERT_NOT_FOUND
+                Case not found:
+                  description: No case exists for the given case identifier.
+                  value:
+                    detail: Case 3fa85f64-5717-4562-b3fc-2c963f66afa6 not found
+                    identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                    timestamp: '2023-12-19T09:27:17.835Z'
+                    title: CASE_NOT_FOUND
+              schema:
+                $ref: '#/components/schemas/case-management_ProblemDetailErrorResponse'
+          description: Not found
+      summary: Leave a note on an alert
+      tags:
+      - Cases
+  /v2/cases/{case_identifier}/assign:
+    post:
+      description: 'This endpoint updates the assignee for a single case (to a new value or to null).
+
+
+        You need the "Update cases" permission to use this endpoint.'
+      operationId: casesService/v2/cases/case_identifier/assign.post
+      parameters:
+      - description: The unique identifier of the case.
+        example: 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: path
+        name: case_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/case-management_CaseAssignment'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_AssignedCaseResponse'
+          description: OK
+      summary: Assign a case to a user
+      tags:
+      - Cases
+  /v2/cases/{case_identifier}/notes:
+    get:
+      description: 'Returns a paginated list of notes associated with a case.
+
+
+        You need one of the "View cases (customer onboarding)", "View cases (customer monitoring)", "View cases (payment screening)" or "View cases (transaction monitoring)" permissions to use this endpoint.'
+      operationId: casesService/v2/cases/case_identifier/notes.get
+      parameters:
+      - description: The unique identifier of the case.
+        example: 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: path
+        name: case_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 25
+          minimum: 1
+          type: integer
+      - description: 'Sorting criteria in the format of: `[-]property` (`-` descending modifier).
+
+
+          * Default sort order is ascending (without `-`).
+
+
+          * Multiple sort criteria are supported.'
+        example:
+        - -timestamp
+        in: query
+        name: sort
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_PaginatedResponseNoteResponse'
+          description: OK
+      summary: Get the notes on a case
+      tags:
+      - Cases
+    post:
+      description: Creates a note linked to a specific case.
+      operationId: casesService/v2/cases/case_identifier/notes.post
+      parameters:
+      - description: The unique identifier of the case.
+        example: 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: path
+        name: case_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/case-management_CreateCaseNoteRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_NoteResponse'
+          description: Created
+      summary: Leave a note on a case
+      tags:
+      - Cases
+  /v2/cases/{case_identifier}/subjects:
+    get:
+      description: 'Returns a paginated list of subjects associated with a case.
+
+
+        You need one of the "View cases (customer onboarding)", "View cases (customer monitoring)", "View cases (payment screening)" or "View cases (transaction monitoring)" permissions to use this endpoint.'
+      operationId: casesService/v2/cases/case_identifier/subjects.get
+      parameters:
+      - description: The unique identifier of the case.
+        example: 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: path
+        name: case_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 25
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_PaginatedResponseSubjectApi'
+          description: OK
+      summary: Retrieve the subjects for a case
+      tags:
+      - Cases
+  /v2/cases/{case_identifier}/transition:
+    post:
+      description: 'This endpoint transitions a case to a new stage.
+
+
+        Note:
+
+
+        - case_state is deprecated. Please use case_stage instead.
+
+
+        - For those already integrated using case_state, if any new case stages are added the case state response for these will be returned as USER_DEFINED
+
+
+        You need the "Update cases" permission to use this endpoint.'
+      operationId: casesService/v2/cases/case_identifier/transition.post
+      parameters:
+      - description: The unique identifier of the case.
+        example: 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: path
+        name: case_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/case-management_CaseTransitionRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_CaseTransitionResponse'
+          description: OK
+        '400':
+          content:
+            application/problem+json:
+              examples:
+                Invalid state for case type:
+                  description: The target case state is not valid for this type of case.
+                  value:
+                    detail: State MONITORING_BLOCKED is not a valid state for case type CUSTOMER_ONBOARDING
+                    identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                    timestamp: '2023-12-19T09:27:17.835Z'
+                    title: INVALID_STATE_FOR_CASE_TYPE
+                Target state is not an end state:
+                  description: The target state must be a valid end state.
+                  value:
+                    detail: State ONBOARDING_NOT_STARTED is not a valid end state
+                    identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                    timestamp: '2023-12-19T09:27:17.835Z'
+                    title: INVALID_END_STATE
+                Unable to update state for a payment screening case in end state:
+                  description: Once a payment screening case is in an end state, its state cannot be updated again.
+                  value:
+                    detail: Case 3fa85f64-5717-4562-b3fc-2c963f66afa6 is a payment screening case and is already in an end state, so its state cannot be changed.
+                    identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                    timestamp: '2023-12-19T09:27:17.835Z'
+                    title: CANNOT_TRANSITION_PAYMENT_SCREENING_CASES_FROM_END_STATE
+              schema:
+                $ref: '#/components/schemas/case-management_ProblemDetailErrorResponse'
+          description: Bad request
+      summary: Transition a case to a stage
+      tags:
+      - Cases
+components:
+  schemas:
+    case-management_NoteResponse:
+      description: Base note model.
+      discriminator:
+        mapping:
+          CASE: '#/components/schemas/case-management_CaseNoteResponse'
+          CASE_ASSIGNMENT: '#/components/schemas/case-management_CaseAssignmentNoteResponse'
+          CASE_TRANSITION: '#/components/schemas/case-management_CaseTransitionNoteResponse'
+        propertyName: type
+      oneOf:
+      - $ref: '#/components/schemas/case-management_CaseNoteResponse'
+      - $ref: '#/components/schemas/case-management_CaseAssignmentNoteResponse'
+      - $ref: '#/components/schemas/case-management_CaseTransitionNoteResponse'
+      properties:
+        contents:
+          description: The contents of the note.
+          type: string
+        created_at:
+          description: The date and time at which this note was created.
+          format: date-time
+          type: string
+        created_by:
+          description: The user identifier that created this note.
+          format: uuid
+          type: string
+        identifier:
+          description: Unique identifier of the note.
+          format: uuid
+          type: string
+        type:
+          description: Defines the type of a note.
+          enum:
+          - CASE
+          - CASE_ASSIGNMENT
+          - CASE_TRANSITION
+          type: string
+      required:
+      - contents
+      - created_at
+      - created_by
+      - identifier
+      - type
+      type: object
+    case-management_TransitionCaseBulkActionPayload:
+      oneOf:
+      - $ref: '#/components/schemas/case-management_TransitionCaseStateBulkActionPayload'
+      - $ref: '#/components/schemas/case-management_TransitionCaseStageBulkActionPayload'
+      type: object
+    case-management_CardPaymentSubjectDetail:
+      description: Card payment subject detail.
+      properties:
+        type:
+          enum:
+          - CARD_PAYMENT
+          example: CARD_PAYMENT
+          type: string
+      required:
+      - type
+      type: object
+    case-management_PersonSubject:
+      description: Person customer subject.
+      properties:
+        detail:
+          $ref: '#/components/schemas/case-management_PersonSubjectDetail'
+        external_identifier:
+          description: Customer external identifier.
+          type:
+          - string
+          - 'null'
+        identifier:
+          description: Customer unique identifier.
+          format: uuid
+          type: string
+        name:
+          description: Customer name.
+          type: string
+        risk_level:
+          description: Customer current risk level.
+          enum:
+          - LOW
+          - MEDIUM
+          - HIGH
+          - PROHIBITED
+          - SKIPPED
+          type:
+          - string
+          - 'null'
+        type:
+          enum:
+          - CUSTOMER
+          example: CUSTOMER
+          type: string
+        version:
+          description: Customer version.
+          format: int32
+          type: integer
+      required:
+      - detail
+      - identifier
+      - name
+      - type
+      - version
+      type: object
+    case-management_PaymentSummaryResponse:
+      description: Summary of payment information.
+      oneOf:
+      - $ref: '#/components/schemas/case-management_BankPaymentSummaryResponse'
+      - $ref: '#/components/schemas/case-management_CardPaymentSummaryResponse'
+      - $ref: '#/components/schemas/case-management_RemittancePaymentSummaryResponse'
+      - $ref: '#/components/schemas/case-management_CryptoPaymentSummaryResponse'
+      type: object
+    case-management_RiskTypesResponse:
+      description: Risk reference.
+      properties:
+        children:
+          description: Risk type children. Only PEP and ADVERSE_MEDIA risk types have child objects.
+          items:
+            $ref: '#/components/schemas/case-management_RiskTypesChildResponse'
+          type: array
+        name:
+          description: Risk type name.
+          enum:
+          - ADVERSE_MEDIA_CYBERCRIME
+          - ADVERSE_MEDIA_EU_AML_DIRECTIVE
+          - ADVERSE_MEDIA_FINANCIAL_AML_CFT
+          - ADVERSE_MEDIA_FINANCIAL_CRIME
+          - ADVERSE_MEDIA_FINANCIAL_DIFFICULTY
+          - ADVERSE_MEDIA_FRAUD_LINKED
+          - ADVERSE_MEDIA_FRAUD
+          - ADVERSE_MEDIA_GENERAL_AML_CFT
+          - ADVERSE_MEDIA_GENERAL
+          - ADVERSE_MEDIA_HIGH_RISK
+          - ADVERSE_MEDIA_NARCOTICS_AML_CFT
+          - ADVERSE_MEDIA_NARCOTICS
+          - ADVERSE_MEDIA_OTHER_FINANCIAL
+          - ADVERSE_MEDIA_OTHER_MINOR
+          - ADVERSE_MEDIA_OTHER_SERIOUS
+          - ADVERSE_MEDIA_PROPERTY
+          - ADVERSE_MEDIA_REGULATORY
+          - ADVERSE_MEDIA_SEXUAL_CRIME
+          - ADVERSE_MEDIA_TERRORISM
+          - ADVERSE_MEDIA_VIOLENCE_AML_CFT
+          - ADVERSE_MEDIA_VIOLENCE_NON_AML_CFT
+          - ADVERSE_MEDIA_VIOLENT_CRIME
+          - ADVERSE_MEDIA
+          - FITNESS_PROBITY
+          - PEP_CLASS_1_TO_3
+          - PEP_CLASS_1
+          - PEP_CLASS_2
+          - PEP_CLASS_3
+          - PEP_CLASS_4
+          - PEP
+          - SANCTION_RELATED
+          - SANCTION
+          - WARNING
+          - CUSTOM
+          - RISK_WORDS
+          type: string
+        priority:
+          description: 'Risk type priority. This can be used to sort cases by priority.
+
+            Priorities are:
+
+            1. ADVERSE_MEDIA
+
+            2. FITNESS_PROBITY
+
+            3. WARNING
+
+            4. PEP
+
+            5. SANCTION_RELATED
+
+            6. SANCTION'
+          format: int32
+          type: integer
+      required:
+      - children
+      - name
+      - priority
+      type: object
+    case-management_RiskCatalogRiskTypesResponse:
+      description: Risk type.
+      properties:
+        key:
+          description: Unique key for the risk type
+          type: string
+      required:
+      - key
+      type: object
+    case-management_RemittancePaymentSubjectDetail:
+      description: Remittance payment subject detail.
+      properties:
+        type:
+          enum:
+          - REMITTANCE
+          example: REMITTANCE
+          type: string
+      required:
+      - type
+      type: object
+    case-management_CounterpartySubject:
+      description: Counterparty subject.
+      properties:
+        external_identifier:
+          description: Counterparty external identifier.
+          type: string
+        name:
+          description: Counterparty name.
+          type:
+          - string
+          - 'null'
+        type:
+          enum:
+          - COUNTERPARTY
+          example: COUNTERPARTY
+          type: string
+      required:
+      - external_identifier
+      - type
+      type: object
+    case-management_UndefinedSubject:
+      description: Undefined customer subject.
+      properties:
+        detail:
+          $ref: '#/components/schemas/case-management_UndefinedSubjectDetail'
+        external_identifier:
+          description: Customer external identifier.
+          type:
+          - string
+          - 'null'
+        identifier:
+          description: Customer unique identifier.
+          format: uuid
+          type: string
+        name:
+          description: Customer name.
+          type: string
+        risk_level:
+          description: Customer current risk level.
+          enum:
+          - LOW
+          - MEDIUM
+          - HIGH
+          - PROHIBITED
+          - SKIPPED
+          type:
+          - string
+          - 'null'
+        type:
+          enum:
+          - CUSTOMER
+          example: CUSTOMER
+          type: string
+        version:
+          description: Customer version.
+          format: int32
+          type: integer
+      required:
+      - detail
+      - identifier
+      - name
+      - type
+      - version
+      type: object
+    case-management_BulkActionError:
+      description: An error in a bulk action.
+      properties:
+        detail:
+          description: Detail on the particular instance of the error.
+          type: string
+        message:
+          description: Summary of the error.
+          type: string
+      required:
+      - detail
+      - message
+      type:
+      - object
+      - 'null'
+    case-management_PaginatedResponseCaseResultResponse:
+      properties:
+        cases:
+          items:
+            $ref: '#/components/schemas/case-management_CaseResultResponse'
+          type: array
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - cases
+      type: object
+    case-management_CryptoPaymentSubjectDetail:
+      description: Crypto payment subject detail.
+      properties:
+        type:
+          enum:
+          - CRYPTO
+          example: CRYPTO
+          type: string
+      required:
+      - type
+      type: object
+    case-management_CaseTransitionNoteResponse:
+      description: Note associated to a case state transition action.
+      properties:
+        contents:
+          description: The contents of the note.
+          type: string
+        created_at:
+          description: The date and time at which this note was created.
+          format: date-time
+          type: string
+        created_by:
+          description: The user identifier that created this note.
+          format: uuid
+          type: string
+        identifier:
+          description: Unique identifier of the note.
+          format: uuid
+          type: string
+        stage:
+          $ref: '#/components/schemas/case-management_Stage'
+        state:
+          deprecated: true
+          description: Available state to transition a case.
+          enum:
+          - ONBOARDING_NOT_STARTED
+          - ONBOARDING_IN_PROGRESS
+          - ONBOARDING_ESCALATED
+          - ONBOARDING_BLOCKED
+          - ONBOARDING_POSITIVE_END_STATE
+          - ONBOARDING_MANAGEABLE_RISK_POSITIVE_END_STATE
+          - ONBOARDING_NEGATIVE_END_STATE
+          - MONITORING_NOT_STARTED
+          - MONITORING_IN_PROGRESS
+          - MONITORING_ESCALATED
+          - MONITORING_BLOCKED
+          - MONITORING_NO_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_NEGATIVE_END_STATE
+          - PAYMENT_SCREENING_NOT_STARTED
+          - PAYMENT_SCREENING_IN_PROGRESS
+          - PAYMENT_SCREENING_ESCALATED
+          - PAYMENT_SCREENING_BLOCKED
+          - PAYMENT_SCREENING_AWAITING_INFORMATION
+          - PAYMENT_SCREENING_PROCESS_PAYMENT_END_STATE
+          - PAYMENT_SCREENING_REJECT_PAYMENT_END_STATE
+          - TRANSACTION_MONITORING_NOT_STARTED
+          - TRANSACTION_MONITORING_IN_PROGRESS
+          - TRANSACTION_MONITORING_ESCALATED
+          - TRANSACTION_MONITORING_BLOCKED
+          - TRANSACTION_MONITORING_ACCEPTED_POSITIVE_END_STATE
+          - TRANSACTION_MONITORING_ESCALATED_NEGATIVE_END_STATE
+          - USER_DEFINED
+          example: ONBOARDING_POSITIVE_END_STATE
+          type: string
+        type:
+          description: Defines the type of a note.
+          enum:
+          - CASE_TRANSITION
+          example: CASE_TRANSITION
+          type: string
+      required:
+      - contents
+      - created_at
+      - created_by
+      - identifier
+      - stage
+      - state
+      - type
+      type: object
+    case-management_BulkActionResult:
+      description: A single result of a bulk action.
+      properties:
+        errors:
+          description: Errors of bulk action.
+          items:
+            $ref: '#/components/schemas/case-management_BulkActionError'
+          type:
+          - array
+          - 'null'
+        identifier:
+          description: The identifier of a case for which an update was attempted.
+          format: uuid
+          type: string
+        success:
+          description: Boolean indicating if this case was successfully updated.
+          type: boolean
+      required:
+      - identifier
+      - success
+      type:
+      - object
+      - 'null'
+    case-management_TransitionCasesRequest:
+      description: Bulk action for case state transition.
+      properties:
+        payload:
+          $ref: '#/components/schemas/case-management_TransitionCaseBulkActionPayload'
+        query:
+          $ref: '#/components/schemas/case-management_BulkActionQuery'
+      required:
+      - payload
+      - query
+      type: object
+    case-management_AssignedCaseResponse:
+      description: Assignee case information.
+      properties:
+        assignee:
+          description: The user identifier to whom the case is assigned, or null if unassigned.
+          format: uuid
+          type:
+          - string
+          - 'null'
+        updated_at:
+          description: The date and time at which this case was last updated.
+          format: date-time
+          type: string
+        updated_by:
+          description: The user identifier that last updated this case.
+          format: uuid
+          type:
+          - string
+          - 'null'
+      required:
+      - updated_at
+      type: object
+    case-management_BankPaymentSubjectDetail:
+      description: Bank payment subject detail.
+      properties:
+        type:
+          enum:
+          - BANK_PAYMENT
+          example: BANK_PAYMENT
+          type: string
+      required:
+      - type
+      type: object
+    case-management_BankPaymentSubject:
+      description: Transaction subject as a bank payment.
+      properties:
+        detail:
+          $ref: '#/components/schemas/case-management_BankPaymentSubjectDetail'
+        external_identifier:
+          description: Transaction external identifier.
+          type: string
+        identifier:
+          description: Transaction unique identifier.
+          format: uuid
+          type: string
+        type:
+          enum:
+          - TRANSACTION
+          example: TRANSACTION
+          type: string
+      required:
+      - detail
+      - external_identifier
+      - identifier
+      - type
+      type: object
+    case-management_RiskTypesChildResponse:
+      description: Risk child.
+      properties:
+        name:
+          description: Risk child name.
+          enum:
+          - ADVERSE_MEDIA_CYBERCRIME
+          - ADVERSE_MEDIA_EU_AML_DIRECTIVE
+          - ADVERSE_MEDIA_FINANCIAL_AML_CFT
+          - ADVERSE_MEDIA_FINANCIAL_CRIME
+          - ADVERSE_MEDIA_FINANCIAL_DIFFICULTY
+          - ADVERSE_MEDIA_FRAUD_LINKED
+          - ADVERSE_MEDIA_FRAUD
+          - ADVERSE_MEDIA_GENERAL_AML_CFT
+          - ADVERSE_MEDIA_GENERAL
+          - ADVERSE_MEDIA_HIGH_RISK
+          - ADVERSE_MEDIA_NARCOTICS_AML_CFT
+          - ADVERSE_MEDIA_NARCOTICS
+          - ADVERSE_MEDIA_OTHER_FINANCIAL
+          - ADVERSE_MEDIA_OTHER_MINOR
+          - ADVERSE_MEDIA_OTHER_SERIOUS
+          - ADVERSE_MEDIA_PROPERTY
+          - ADVERSE_MEDIA_REGULATORY
+          - ADVERSE_MEDIA_SEXUAL_CRIME
+          - ADVERSE_MEDIA_TERRORISM
+          - ADVERSE_MEDIA_VIOLENCE_AML_CFT
+          - ADVERSE_MEDIA_VIOLENCE_NON_AML_CFT
+          - ADVERSE_MEDIA_VIOLENT_CRIME
+          - ADVERSE_MEDIA
+          - FITNESS_PROBITY
+          - PEP_CLASS_1_TO_3
+          - PEP_CLASS_1
+          - PEP_CLASS_2
+          - PEP_CLASS_3
+          - PEP_CLASS_4
+          - PEP
+          - SANCTION_RELATED
+          - SANCTION
+          - WARNING
+          - CUSTOM
+          - RISK_WORDS
+          type: string
+      required:
+      - name
+      type: object
+    case-management_BulkActionQuery:
+      description: The case to be updated will be those that match the properties in this object.
+      properties:
+        identifier:
+          description: The unique identifier of cases to be updated in bulk action.
+          items:
+            description: The unique identifier of cases to be updated in bulk action.
+            format: uuid
+            type: string
+          maxItems: 100
+          minItems: 0
+          type: array
+      required:
+      - identifier
+      type: object
+    case-management_CreateCaseNoteRequest:
+      description: Create case note request.
+      properties:
+        contents:
+          description: The contents of the note to be created (up to 5000 characters).
+          maxLength: 5000
+          minLength: 0
+          type: string
+      required:
+      - contents
+      type: object
+    case-management_VesselSubject:
+      description: Vessel customer subject.
+      properties:
+        detail:
+          $ref: '#/components/schemas/case-management_VesselSubjectDetail'
+        external_identifier:
+          description: Customer external identifier.
+          type:
+          - string
+          - 'null'
+        identifier:
+          description: Customer unique identifier.
+          format: uuid
+          type: string
+        name:
+          description: Customer name.
+          type: string
+        risk_level:
+          description: Customer current risk level.
+          enum:
+          - LOW
+          - MEDIUM
+          - HIGH
+          - PROHIBITED
+          - SKIPPED
+          type:
+          - string
+          - 'null'
+        type:
+          enum:
+          - CUSTOMER
+          example: CUSTOMER
+          type: string
+        version:
+          description: Customer version.
+          format: int32
+          type: integer
+      required:
+      - detail
+      - identifier
+      - name
+      - type
+      - version
+      type: object
+    case-management_PaginatedResponseCaseAlertResponseV2:
+      properties:
+        alerts:
+          items:
+            $ref: '#/components/schemas/case-management_CaseAlertResponseV2'
+          type: array
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - alerts
+      type: object
+    case-management_CreateCasesNoteRequest:
+      description: Add note to multiple cases (bulk action).
+      properties:
+        payload:
+          $ref: '#/components/schemas/case-management_BulkActionPayloadNote'
+        query:
+          $ref: '#/components/schemas/case-management_BulkActionQuery'
+      required:
+      - payload
+      - query
+      type: object
+    case-management_CaseAssignmentNoteResponse:
+      description: Note associated to a case assignment action.
+      properties:
+        contents:
+          description: The contents of the note.
+          type: string
+        created_at:
+          description: The date and time at which this note was created.
+          format: date-time
+          type: string
+        created_by:
+          description: The user identifier that created this note.
+          format: uuid
+          type: string
+        current_assignee:
+          description: Current case assigned user identifier. When null, case was un-assigned.
+          format: uuid
+          type:
+          - string
+          - 'null'
+        identifier:
+          description: Unique identifier of the note.
+          format: uuid
+          type: string
+        previous_assignee:
+          description: Previous case assigned user identifier. When null, case was un-assigned.
+          format: uuid
+          type:
+          - string
+          - 'null'
+        type:
+          description: Defines the type of a note.
+          enum:
+          - CASE_ASSIGNMENT
+          example: CASE_ASSIGNMENT
+          type: string
+      required:
+      - contents
+      - created_at
+      - created_by
+      - identifier
+      - type
+      type: object
+    case-management_CaseAssignment:
+      description: Case assignment update request.
+      properties:
+        assignee:
+          description: The user identifier to whom the case should be assigned, or null to un-assign.
+          format: uuid
+          type:
+          - string
+          - 'null'
+      type: object
+    case-management_TransactionSubject:
+      description: Transaction subject.
+      discriminator:
+        mapping:
+          BANK_PAYMENT: '#/components/schemas/case-management_BankPaymentSubject'
+          CARD_PAYMENT: '#/components/schemas/case-management_CardPaymentSubject'
+          CRYPTO: '#/components/schemas/case-management_CryptoPaymentSubject'
+          REMITTANCE: '#/components/schemas/case-management_RemittancePaymentSubject'
+        propertyName: detail.type
+      oneOf:
+      - $ref: '#/components/schemas/case-management_BankPaymentSubject'
+      - $ref: '#/components/schemas/case-management_CardPaymentSubject'
+      - $ref: '#/components/schemas/case-management_RemittancePaymentSubject'
+      - $ref: '#/components/schemas/case-management_CryptoPaymentSubject'
+      type: object
+    case-management_PersonSubjectDetail:
+      description: Person customer subject detail.
+      properties:
+        type:
+          enum:
+          - PERSON
+          example: PERSON
+          type: string
+      required:
+      - type
+      type: object
+    case-management_TransitionCaseStateBulkActionPayload:
+      deprecated: true
+      properties:
+        note:
+          deprecated: true
+          description: 'Note: content to be associated with case transition. Only required if case transition is an end state.'
+          example: Case accepted after confirmation from company.
+          maxLength: 5000
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        state:
+          deprecated: true
+          description: 'Note: Fixed case states are deprecated and replaced with case stages as part of a configurable case workflow.
+
+
+            Available state to transition a case.'
+          enum:
+          - ONBOARDING_NOT_STARTED
+          - ONBOARDING_IN_PROGRESS
+          - ONBOARDING_ESCALATED
+          - ONBOARDING_BLOCKED
+          - ONBOARDING_POSITIVE_END_STATE
+          - ONBOARDING_MANAGEABLE_RISK_POSITIVE_END_STATE
+          - ONBOARDING_NEGATIVE_END_STATE
+          - MONITORING_NOT_STARTED
+          - MONITORING_IN_PROGRESS
+          - MONITORING_ESCALATED
+          - MONITORING_BLOCKED
+          - MONITORING_NO_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_NEGATIVE_END_STATE
+          - PAYMENT_SCREENING_NOT_STARTED
+          - PAYMENT_SCREENING_IN_PROGRESS
+          - PAYMENT_SCREENING_ESCALATED
+          - PAYMENT_SCREENING_BLOCKED
+          - PAYMENT_SCREENING_AWAITING_INFORMATION
+          - PAYMENT_SCREENING_PROCESS_PAYMENT_END_STATE
+          - PAYMENT_SCREENING_REJECT_PAYMENT_END_STATE
+          - TRANSACTION_MONITORING_NOT_STARTED
+          - TRANSACTION_MONITORING_IN_PROGRESS
+          - TRANSACTION_MONITORING_ESCALATED
+          - TRANSACTION_MONITORING_BLOCKED
+          - TRANSACTION_MONITORING_ACCEPTED_POSITIVE_END_STATE
+          - TRANSACTION_MONITORING_ESCALATED_NEGATIVE_END_STATE
+          example: ONBOARDING_POSITIVE_END_STATE
+          type: string
+      required:
+      - state
+      type: object
+    case-management_CardPaymentSummaryResponse:
+      description: Summary of a Card Payment.
+      properties:
+        external_identifier:
+          description: Payment external identifier.
+          type: string
+        identifier:
+          description: Payment unique identifier.
+          format: uuid
+          type: string
+        type:
+          description: Payment type.
+          enum:
+          - CARD_PAYMENT
+          example: CARD_PAYMENT
+          type: string
+      required:
+      - external_identifier
+      - identifier
+      - type
+      type: object
+    case-management_CardPaymentSubject:
+      description: Transaction subject as a card payment.
+      properties:
+        detail:
+          $ref: '#/components/schemas/case-management_CardPaymentSubjectDetail'
+        external_identifier:
+          description: Transaction external identifier.
+          type: string
+        identifier:
+          description: Transaction unique identifier.
+          format: uuid
+          type: string
+        type:
+          enum:
+          - TRANSACTION
+          example: TRANSACTION
+          type: string
+      required:
+      - detail
+      - external_identifier
+      - identifier
+      - type
+      type: object
+    case-management_PaginatedResponseCaseStatesResponse:
+      properties:
+        case_states:
+          items:
+            $ref: '#/components/schemas/case-management_CaseStatesResponse'
+          type: array
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - case_states
+      type: object
+    case-management_CaseTransitionRequest:
+      oneOf:
+      - $ref: '#/components/schemas/case-management_CaseStateTransitionRequest'
+      - $ref: '#/components/schemas/case-management_CaseStageTransitionRequest'
+      type: object
+    case-management_Subject:
+      description: Case subject.
+      discriminator:
+        mapping:
+          COUNTERPARTY: '#/components/schemas/case-management_CounterpartySubject'
+          CUSTOMER: '#/components/schemas/case-management_CustomerSubject'
+          TRANSACTION: '#/components/schemas/case-management_TransactionSubject'
+        propertyName: type
+      oneOf:
+      - $ref: '#/components/schemas/case-management_CustomerSubject'
+      - $ref: '#/components/schemas/case-management_TransactionSubject'
+      - $ref: '#/components/schemas/case-management_CounterpartySubject'
+      properties:
+        type:
+          description: The type of the subject.
+          enum:
+          - CUSTOMER
+          - TRANSACTION
+          - COUNTERPARTY
+          example: CUSTOMER
+          type: string
+      required:
+      - type
+      type: object
+    case-management_TransitionCaseStageBulkActionPayload:
+      properties:
+        note:
+          description: 'Note: content to be associated with case transition. Only required if case transition is an end stage.'
+          example: Case accepted after confirmation from company.
+          maxLength: 5000
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        stage_identifier:
+          description: The stage identifier to which the cases should be transitioned. To get this identifier for the API call, you can find it within the responses of either the 'Get list of case workflows' or 'Get a specific case workflow' endpoints.
+          format: uuid
+          type: string
+      required:
+      - stage_identifier
+      type: object
+    case-management_BulkActionResponse:
+      description: Contains all the results of a bulk action.
+      properties:
+        results:
+          description: Results of the bulk action.
+          items:
+            $ref: '#/components/schemas/case-management_BulkActionResult'
+          type:
+          - array
+          - 'null'
+      required:
+      - results
+      type: object
+    case-management_CaseTransitionResponse:
+      description: Case transition response.
+      properties:
+        last_user_stage_identifier:
+          description: The stage identifier to which the case was last transitioned by a user.
+          format: uuid
+          type:
+          - string
+          - 'null'
+        last_user_state:
+          deprecated: true
+          description: 'The last state the case was transitioned to by a user (as opposed to a system action).
+
+
+            For those using the deprecated case_state, if any new case stages are added the case state response for these will be returned as  USER_DEFINED'
+          enum:
+          - ONBOARDING_NOT_STARTED
+          - ONBOARDING_IN_PROGRESS
+          - ONBOARDING_ESCALATED
+          - ONBOARDING_BLOCKED
+          - ONBOARDING_POSITIVE_END_STATE
+          - ONBOARDING_MANAGEABLE_RISK_POSITIVE_END_STATE
+          - ONBOARDING_NEGATIVE_END_STATE
+          - MONITORING_NOT_STARTED
+          - MONITORING_IN_PROGRESS
+          - MONITORING_ESCALATED
+          - MONITORING_BLOCKED
+          - MONITORING_NO_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_NEGATIVE_END_STATE
+          - PAYMENT_SCREENING_NOT_STARTED
+          - PAYMENT_SCREENING_IN_PROGRESS
+          - PAYMENT_SCREENING_ESCALATED
+          - PAYMENT_SCREENING_BLOCKED
+          - PAYMENT_SCREENING_AWAITING_INFORMATION
+          - PAYMENT_SCREENING_PROCESS_PAYMENT_END_STATE
+          - PAYMENT_SCREENING_REJECT_PAYMENT_END_STATE
+          - TRANSACTION_MONITORING_NOT_STARTED
+          - TRANSACTION_MONITORING_IN_PROGRESS
+          - TRANSACTION_MONITORING_ESCALATED
+          - TRANSACTION_MONITORING_BLOCKED
+          - TRANSACTION_MONITORING_ACCEPTED_POSITIVE_END_STATE
+          - TRANSACTION_MONITORING_ESCALATED_NEGATIVE_END_STATE
+          - USER_DEFINED
+          example: ONBOARDING_POSITIVE_END_STATE
+          type:
+          - string
+          - 'null'
+        stage_identifier:
+          description: The stage identifier to which the case has been transitioned.
+          format: uuid
+          type: string
+        state:
+          deprecated: true
+          description: 'The current state of the case.
+
+
+            For those using the deprecated case_state, if any new case stages are added the case state response for these will be returned as USER_DEFINED'
+          enum:
+          - ONBOARDING_NOT_STARTED
+          - ONBOARDING_IN_PROGRESS
+          - ONBOARDING_ESCALATED
+          - ONBOARDING_BLOCKED
+          - ONBOARDING_POSITIVE_END_STATE
+          - ONBOARDING_MANAGEABLE_RISK_POSITIVE_END_STATE
+          - ONBOARDING_NEGATIVE_END_STATE
+          - MONITORING_NOT_STARTED
+          - MONITORING_IN_PROGRESS
+          - MONITORING_ESCALATED
+          - MONITORING_BLOCKED
+          - MONITORING_NO_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_NEGATIVE_END_STATE
+          - PAYMENT_SCREENING_NOT_STARTED
+          - PAYMENT_SCREENING_IN_PROGRESS
+          - PAYMENT_SCREENING_ESCALATED
+          - PAYMENT_SCREENING_BLOCKED
+          - PAYMENT_SCREENING_AWAITING_INFORMATION
+          - PAYMENT_SCREENING_PROCESS_PAYMENT_END_STATE
+          - PAYMENT_SCREENING_REJECT_PAYMENT_END_STATE
+          - TRANSACTION_MONITORING_NOT_STARTED
+          - TRANSACTION_MONITORING_IN_PROGRESS
+          - TRANSACTION_MONITORING_ESCALATED
+          - TRANSACTION_MONITORING_BLOCKED
+          - TRANSACTION_MONITORING_ACCEPTED_POSITIVE_END_STATE
+          - TRANSACTION_MONITORING_ESCALATED_NEGATIVE_END_STATE
+          - USER_DEFINED
+          example: ONBOARDING_POSITIVE_END_STATE
+          type: string
+        updated_at:
+          description: The date and time at which this case was last updated.
+          format: date-time
+          type: string
+        updated_by:
+          description: The user identifier that last updated this case.
+          format: uuid
+          type:
+          - string
+          - 'null'
+      required:
+      - stage_identifier
+      - state
+      - updated_at
+      type: object
+    case-management_SubjectsSummary:
+      description: Summary information about the subjects associated with a case.
+      properties:
+        total_count:
+          description: The total number of subjects associated with the case.
+          format: int32
+          type: integer
+      required:
+      - total_count
+      type: object
+    case-management_RemittancePaymentSummaryResponse:
+      description: Summary of a Remittance Payment.
+      properties:
+        external_identifier:
+          description: Payment external identifier.
+          type: string
+        identifier:
+          description: Payment unique identifier.
+          format: uuid
+          type: string
+        type:
+          description: Payment type.
+          enum:
+          - REMITTANCE
+          example: REMITTANCE
+          type: string
+      required:
+      - external_identifier
+      - identifier
+      - type
+      type: object
+    case-management_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
+    case-management_CaseStateTransitionRequest:
+      deprecated: true
+      description: Case state update request.
+      properties:
+        note:
+          description: 'Note: content to be associated with case transition. Only required if case transition is an end state.'
+          example: Case accepted after confirmation from user.
+          maxLength: 5000
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        state:
+          description: Available state to transition a case.
+          enum:
+          - ONBOARDING_NOT_STARTED
+          - ONBOARDING_IN_PROGRESS
+          - ONBOARDING_ESCALATED
+          - ONBOARDING_BLOCKED
+          - ONBOARDING_POSITIVE_END_STATE
+          - ONBOARDING_MANAGEABLE_RISK_POSITIVE_END_STATE
+          - ONBOARDING_NEGATIVE_END_STATE
+          - MONITORING_NOT_STARTED
+          - MONITORING_IN_PROGRESS
+          - MONITORING_ESCALATED
+          - MONITORING_BLOCKED
+          - MONITORING_NO_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_NEGATIVE_END_STATE
+          - PAYMENT_SCREENING_NOT_STARTED
+          - PAYMENT_SCREENING_IN_PROGRESS
+          - PAYMENT_SCREENING_ESCALATED
+          - PAYMENT_SCREENING_BLOCKED
+          - PAYMENT_SCREENING_AWAITING_INFORMATION
+          - PAYMENT_SCREENING_PROCESS_PAYMENT_END_STATE
+          - PAYMENT_SCREENING_REJECT_PAYMENT_END_STATE
+          - TRANSACTION_MONITORING_NOT_STARTED
+          - TRANSACTION_MONITORING_IN_PROGRESS
+          - TRANSACTION_MONITORING_ESCALATED
+          - TRANSACTION_MONITORING_BLOCKED
+          - TRANSACTION_MONITORING_ACCEPTED_POSITIVE_END_STATE
+          - TRANSACTION_MONITORING_ESCALATED_NEGATIVE_END_STATE
+          example: ONBOARDING_POSITIVE_END_STATE
+          type: string
+      required:
+      - state
+      type: object
+    case-management_PaginatedResponseNoteResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        notes:
+          items:
+            $ref: '#/components/schemas/case-management_NoteResponse'
+          type: array
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - notes
+      type: object
+    case-management_BulkActionPayloadNote:
+      description: Bulk action for adding a note to Cases.
+      properties:
+        note:
+          description: The contents of the note to be created (up to 5000 characters).
+          example: These cases need to be double-checked.
+          maxLength: 5000
+          minLength: 0
+          type: string
+      required:
+      - note
+      type: object
+    case-management_AssignCasesRequest:
+      description: Assign multiple cases (bulk action).
+      properties:
+        payload:
+          $ref: '#/components/schemas/case-management_AssignCaseBulkActionPayload'
+        query:
+          $ref: '#/components/schemas/case-management_BulkActionQuery'
+      required:
+      - payload
+      - query
+      type: object
+    case-management_Stage:
+      description: Stage
+      properties:
+        decision_type:
+          description: The decision type of the stage (decision stages only).
+          enum:
+          - POSITIVE
+          - NEGATIVE
+          - PARTIAL_POSITIVE
+          type:
+          - string
+          - 'null'
+        display_name:
+          description: The display name of the stage.
+          maxLength: 30
+          minLength: 3
+          type: string
+        display_order:
+          description: The display order of the stage.
+          format: int32
+          minimum: 1
+          type: integer
+        identifier:
+          description: Stage unique identifier.
+          format: uuid
+          type: string
+        stage_type:
+          description: The type of the stage.
+          enum:
+          - INITIAL
+          - REVIEW
+          - DECISION
+          type: string
+      required:
+      - display_name
+      - display_order
+      - identifier
+      - stage_type
+      type: object
+    case-management_CaseResponse:
+      description: Case result detail.
+      properties:
+        assignee:
+          description: "User unique identifier that is currently assigned to case.\n\n null if un-assigned."
+          format: uuid
+          type:
+          - string
+          - 'null'
+        created_at:
+          description: Case created date and time.
+          format: date-time
+          type: string
+        customer:
+          $ref: '#/components/schemas/case-management_CaseCustomerSummaryResponse'
+        identifier:
+          description: Case unique identifier.
+          format: uuid
+          type: string
+        last_user_stage:
+          $ref: '#/components/schemas/case-management_Stage'
+        last_user_state:
+          deprecated: true
+          description: 'The last state the case was transitioned to by a user (as opposed to a system action).
+
+
+            For those using the deprecated case_state, if any new case stages are added the case state response for these will be returned as  USER_DEFINED'
+          enum:
+          - ONBOARDING_NOT_STARTED
+          - ONBOARDING_IN_PROGRESS
+          - ONBOARDING_ESCALATED
+          - ONBOARDING_BLOCKED
+          - ONBOARDING_POSITIVE_END_STATE
+          - ONBOARDING_MANAGEABLE_RISK_POSITIVE_END_STATE
+          - ONBOARDING_NEGATIVE_END_STATE
+          - MONITORING_NOT_STARTED
+          - MONITORING_IN_PROGRESS
+          - MONITORING_ESCALATED
+          - MONITORING_BLOCKED
+          - MONITORING_NO_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_NEGATIVE_END_STATE
+          - PAYMENT_SCREENING_NOT_STARTED
+          - PAYMENT_SCREENING_IN_PROGRESS
+          - PAYMENT_SCREENING_ESCALATED
+          - PAYMENT_SCREENING_BLOCKED
+          - PAYMENT_SCREENING_AWAITING_INFORMATION
+          - PAYMENT_SCREENING_PROCESS_PAYMENT_END_STATE
+          - PAYMENT_SCREENING_REJECT_PAYMENT_END_STATE
+          - TRANSACTION_MONITORING_NOT_STARTED
+          - TRANSACTION_MONITORING_IN_PROGRESS
+          - TRANSACTION_MONITORING_ESCALATED
+          - TRANSACTION_MONITORING_BLOCKED
+          - TRANSACTION_MONITORING_ACCEPTED_POSITIVE_END_STATE
+          - TRANSACTION_MONITORING_ESCALATED_NEGATIVE_END_STATE
+          - USER_DEFINED
+          example: ONBOARDING_POSITIVE_END_STATE
+          type:
+          - string
+          - 'null'
+        payment:
+          $ref: '#/components/schemas/case-management_PaymentSummaryResponse'
+        review_items_count:
+          description: Number of items to review in case.
+          format: int32
+          type: integer
+        risk_catalog_risk_types:
+          description: Risk catalog risk types associated with the case
+          items:
+            $ref: '#/components/schemas/case-management_RiskCatalogResponse'
+          type: array
+        risk_types:
+          description: Risk types of case.
+          items:
+            $ref: '#/components/schemas/case-management_RiskTypesResponse'
+          type: array
+        stage:
+          $ref: '#/components/schemas/case-management_Stage'
+        state:
+          deprecated: true
+          description: 'The current state of the case.
+
+
+            For those using the deprecated case_state, if any new case stages are added the case state response for these will be returned as USER_DEFINED'
+          enum:
+          - ONBOARDING_NOT_STARTED
+          - ONBOARDING_IN_PROGRESS
+          - ONBOARDING_ESCALATED
+          - ONBOARDING_BLOCKED
+          - ONBOARDING_POSITIVE_END_STATE
+          - ONBOARDING_MANAGEABLE_RISK_POSITIVE_END_STATE
+          - ONBOARDING_NEGATIVE_END_STATE
+          - MONITORING_NOT_STARTED
+          - MONITORING_IN_PROGRESS
+          - MONITORING_ESCALATED
+          - MONITORING_BLOCKED
+          - MONITORING_NO_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_NEGATIVE_END_STATE
+          - PAYMENT_SCREENING_NOT_STARTED
+          - PAYMENT_SCREENING_IN_PROGRESS
+          - PAYMENT_SCREENING_ESCALATED
+          - PAYMENT_SCREENING_BLOCKED
+          - PAYMENT_SCREENING_AWAITING_INFORMATION
+          - PAYMENT_SCREENING_PROCESS_PAYMENT_END_STATE
+          - PAYMENT_SCREENING_REJECT_PAYMENT_END_STATE
+          - TRANSACTION_MONITORING_NOT_STARTED
+          - TRANSACTION_MONITORING_IN_PROGRESS
+          - TRANSACTION_MONITORING_ESCALATED
+          - TRANSACTION_MONITORING_BLOCKED
+          - TRANSACTION_MONITORING_ACCEPTED_POSITIVE_END_STATE
+          - TRANSACTION_MONITORING_ESCALATED_NEGATIVE_END_STATE
+          - USER_DEFINED
+          example: ONBOARDING_POSITIVE_END_STATE
+          type: string
+        subjects:
+          description: Subjects associated with the case, capped at the first 100.
+          items:
+            $ref: '#/components/schemas/case-management_Subject'
+          maxItems: 100
+          type: array
+        subjects_summary:
+          $ref: '#/components/schemas/case-management_SubjectsSummary'
+        type:
+          description: Case type.
+          enum:
+          - CUSTOMER_ONBOARDING
+          - CUSTOMER_MONITORING
+          - PAYMENT_SCREENING
+          - TRANSACTION_MONITORING
+          example: CUSTOMER_ONBOARDING
+          type: string
+        updated_at:
+          description: Case last updated date and time.
+          format: date-time
+          type: string
+        updated_by:
+          description: Last state of case set by an user.
+          format: uuid
+          type:
+          - string
+          - 'null'
+      required:
+      - created_at
+      - identifier
+      - review_items_count
+      - risk_catalog_risk_types
+      - risk_types
+      - stage
+      - state
+      - subjects
+      - subjects_summary
+      - type
+      - updated_at
+      type: object
+    case-management_CaseResultResponse:
+      description: Case result detail for list endpoint.
+      properties:
+        alerts:
+          $ref: '#/components/schemas/case-management_AlertsSummary'
+        assignee:
+          description: "User identifier that is currently assigned to case.\n\n null if un-assigned."
+          format: uuid
+          type:
+          - string
+          - 'null'
+        created_at:
+          description: Case created date and time.
+          format: date-time
+          type: string
+        customer:
+          $ref: '#/components/schemas/case-management_CaseCustomerSummaryResponse'
+        identifier:
+          description: Case unique identifier.
+          format: uuid
+          type: string
+        last_user_stage:
+          $ref: '#/components/schemas/case-management_Stage'
+        last_user_state:
+          deprecated: true
+          description: 'The last state the case was transitioned to by a user (as opposed to a system action).
+
+
+            For those using the deprecated case_state, if any new case stages are added the case state response for these will be returned as  USER_DEFINED'
+          enum:
+          - ONBOARDING_NOT_STARTED
+          - ONBOARDING_IN_PROGRESS
+          - ONBOARDING_ESCALATED
+          - ONBOARDING_BLOCKED
+          - ONBOARDING_POSITIVE_END_STATE
+          - ONBOARDING_MANAGEABLE_RISK_POSITIVE_END_STATE
+          - ONBOARDING_NEGATIVE_END_STATE
+          - MONITORING_NOT_STARTED
+          - MONITORING_IN_PROGRESS
+          - MONITORING_ESCALATED
+          - MONITORING_BLOCKED
+          - MONITORING_NO_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_NEGATIVE_END_STATE
+          - PAYMENT_SCREENING_NOT_STARTED
+          - PAYMENT_SCREENING_IN_PROGRESS
+          - PAYMENT_SCREENING_ESCALATED
+          - PAYMENT_SCREENING_BLOCKED
+          - PAYMENT_SCREENING_AWAITING_INFORMATION
+          - PAYMENT_SCREENING_PROCESS_PAYMENT_END_STATE
+          - PAYMENT_SCREENING_REJECT_PAYMENT_END_STATE
+          - TRANSACTION_MONITORING_NOT_STARTED
+          - TRANSACTION_MONITORING_IN_PROGRESS
+          - TRANSACTION_MONITORING_ESCALATED
+          - TRANSACTION_MONITORING_BLOCKED
+          - TRANSACTION_MONITORING_ACCEPTED_POSITIVE_END_STATE
+          - TRANSACTION_MONITORING_ESCALATED_NEGATIVE_END_STATE
+          - USER_DEFINED
+          example: ONBOARDING_POSITIVE_END_STATE
+          type:
+          - string
+          - 'null'
+        payment:
+          $ref: '#/components/schemas/case-management_PaymentSummaryResponse'
+        review_items_count:
+          description: Number of items to review in case.
+          format: int32
+          type: integer
+        risk_catalog_risk_types:
+          description: Risk catalog risk types associated with the case
+          items:
+            $ref: '#/components/schemas/case-management_RiskCatalogResponse'
+          type: array
+        risk_types:
+          description: Risk types of case.
+          items:
+            $ref: '#/components/schemas/case-management_RiskTypesResponse'
+          type: array
+        stage:
+          $ref: '#/components/schemas/case-management_Stage'
+        state:
+          deprecated: true
+          description: 'The current state of the case.
+
+
+            For those using the deprecated case_state, if any new case stages are added the case state response for these will be returned as USER_DEFINED'
+          enum:
+          - ONBOARDING_NOT_STARTED
+          - ONBOARDING_IN_PROGRESS
+          - ONBOARDING_ESCALATED
+          - ONBOARDING_BLOCKED
+          - ONBOARDING_POSITIVE_END_STATE
+          - ONBOARDING_MANAGEABLE_RISK_POSITIVE_END_STATE
+          - ONBOARDING_NEGATIVE_END_STATE
+          - MONITORING_NOT_STARTED
+          - MONITORING_IN_PROGRESS
+          - MONITORING_ESCALATED
+          - MONITORING_BLOCKED
+          - MONITORING_NO_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_NEGATIVE_END_STATE
+          - PAYMENT_SCREENING_NOT_STARTED
+          - PAYMENT_SCREENING_IN_PROGRESS
+          - PAYMENT_SCREENING_ESCALATED
+          - PAYMENT_SCREENING_BLOCKED
+          - PAYMENT_SCREENING_AWAITING_INFORMATION
+          - PAYMENT_SCREENING_PROCESS_PAYMENT_END_STATE
+          - PAYMENT_SCREENING_REJECT_PAYMENT_END_STATE
+          - TRANSACTION_MONITORING_NOT_STARTED
+          - TRANSACTION_MONITORING_IN_PROGRESS
+          - TRANSACTION_MONITORING_ESCALATED
+          - TRANSACTION_MONITORING_BLOCKED
+          - TRANSACTION_MONITORING_ACCEPTED_POSITIVE_END_STATE
+          - TRANSACTION_MONITORING_ESCALATED_NEGATIVE_END_STATE
+          - USER_DEFINED
+          example: ONBOARDING_POSITIVE_END_STATE
+          type: string
+        subjects:
+          description: Subjects associated with the case, capped at the first 100.
+          items:
+            $ref: '#/components/schemas/case-management_Subject'
+          maxItems: 100
+          type: array
+        subjects_summary:
+          $ref: '#/components/schemas/case-management_SubjectsSummary'
+        type:
+          description: Case type.
+          enum:
+          - CUSTOMER_ONBOARDING
+          - CUSTOMER_MONITORING
+          - PAYMENT_SCREENING
+          - TRANSACTION_MONITORING
+          example: CUSTOMER_ONBOARDING
+          type: string
+        updated_at:
+          description: Case last updated date and time.
+          format: date-time
+          type: string
+        updated_by:
+          description: Last state of case set by an user.
+          format: uuid
+          type:
+          - string
+          - 'null'
+      required:
+      - alerts
+      - created_at
+      - identifier
+      - last_user_stage
+      - payment
+      - review_items_count
+      - risk_catalog_risk_types
+      - risk_types
+      - stage
+      - state
+      - subjects
+      - subjects_summary
+      - type
+      - updated_at
+      type: object
+    case-management_PaginatedResponseSubjectApi:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        subjects:
+          items:
+            $ref: '#/components/schemas/case-management_Subject'
+          type: array
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - subjects
+      type: object
+    case-management_CryptoPaymentSummaryResponse:
+      description: Summary of a Crypto Payment.
+      properties:
+        external_identifier:
+          description: Payment external identifier.
+          type: string
+        identifier:
+          description: Payment unique identifier.
+          format: uuid
+          type: string
+        type:
+          description: Payment type.
+          enum:
+          - CRYPTO
+          example: CRYPTO
+          type: string
+      required:
+      - external_identifier
+      - identifier
+      - type
+      type: object
+    case-management_VesselSubjectDetail:
+      description: Vessel customer subject detail.
+      properties:
+        type:
+          enum:
+          - VESSEL
+          example: VESSEL
+          type: string
+      required:
+      - type
+      type: object
+    case-management_UndefinedSubjectDetail:
+      description: Undefined customer subject detail.
+      properties:
+        type:
+          enum:
+          - UNDEFINED
+          example: UNDEFINED
+          type: string
+      required:
+      - type
+      type: object
+    case-management_CompanySubject:
+      description: Company customer subject.
+      properties:
+        detail:
+          $ref: '#/components/schemas/case-management_CompanySubjectDetail'
+        external_identifier:
+          description: Customer external identifier.
+          type:
+          - string
+          - 'null'
+        identifier:
+          description: Customer unique identifier.
+          format: uuid
+          type: string
+        name:
+          description: Customer name.
+          type: string
+        risk_level:
+          description: Customer current risk level.
+          enum:
+          - LOW
+          - MEDIUM
+          - HIGH
+          - PROHIBITED
+          - SKIPPED
+          type:
+          - string
+          - 'null'
+        type:
+          enum:
+          - CUSTOMER
+          example: CUSTOMER
+          type: string
+        version:
+          description: Customer version.
+          format: int32
+          type: integer
+      required:
+      - detail
+      - identifier
+      - name
+      - type
+      - version
+      type: object
+    case-management_CompanySubjectDetail:
+      description: Company customer subject detail.
+      properties:
+        type:
+          enum:
+          - COMPANY
+          example: COMPANY
+          type: string
+      required:
+      - type
+      type: object
+    case-management_AlertNoteResponse:
+      description: Note associated to a specific alert.
+      properties:
+        alert_identifier:
+          description: The identifier of the alert this note is linked to.
+          format: uuid
+          type: string
+        contents:
+          description: The contents of the note.
+          type: string
+        created_at:
+          description: The date and time at which this note was created.
+          format: date-time
+          type: string
+        created_by:
+          description: The user identifier that created this note.
+          format: uuid
+          type: string
+        identifier:
+          description: Unique identifier of the note.
+          format: uuid
+          type: string
+      required:
+      - alert_identifier
+      - contents
+      - created_at
+      - created_by
+      - identifier
+      type: object
+    case-management_CaseCustomerSummaryResponse:
+      description: Customer summary that is associated to a case.
+      properties:
+        acquisition_source:
+          description: Customer acquisition source.
+          type:
+          - string
+          - 'null'
+        external_identifier:
+          description: Customer external identifier.
+          type:
+          - string
+          - 'null'
+        identifier:
+          description: Customer unique identifier.
+          format: uuid
+          type: string
+        name:
+          description: Customer name.
+          type: string
+        risk_level:
+          description: Customer current risk level.
+          enum:
+          - LOW
+          - MEDIUM
+          - HIGH
+          - PROHIBITED
+          - SKIPPED
+          type: string
+        type:
+          description: Customer type.
+          enum:
+          - PERSON
+          - COMPANY
+          - VESSEL
+          - UNDEFINED
+          type: string
+        version:
+          description: Customer version.
+          format: int32
+          type: integer
+      required:
+      - identifier
+      - name
+      - risk_level
+      - type
+      - version
+      type: object
+    case-management_RiskCatalogResponse:
+      description: Risk catalog response containing catalog key and associated risk types.
+      properties:
+        catalog_key:
+          description: Unique key for the risk catalog
+          type: string
+        risk_types:
+          description: List of risk types associated with this risk catalog
+          items:
+            $ref: '#/components/schemas/case-management_RiskCatalogRiskTypesResponse'
+          type: array
+      required:
+      - catalog_key
+      - risk_types
+      type: object
+    case-management_BankPaymentSummaryResponse:
+      description: Summary of a Bank Payment.
+      properties:
+        external_identifier:
+          description: Payment external identifier.
+          type: string
+        identifier:
+          description: Payment unique identifier.
+          format: uuid
+          type: string
+        type:
+          description: Payment type.
+          enum:
+          - BANK_PAYMENT
+          example: BANK_PAYMENT
+          type: string
+      required:
+      - external_identifier
+      - identifier
+      - type
+      type: object
+    case-management_RemittancePaymentSubject:
+      description: Transaction subject as a remittance payment.
+      properties:
+        detail:
+          $ref: '#/components/schemas/case-management_RemittancePaymentSubjectDetail'
+        external_identifier:
+          description: Transaction external identifier.
+          type: string
+        identifier:
+          description: Transaction unique identifier.
+          format: uuid
+          type: string
+        type:
+          enum:
+          - TRANSACTION
+          example: TRANSACTION
+          type: string
+      required:
+      - detail
+      - external_identifier
+      - identifier
+      - type
+      type: object
+    case-management_CaseStatesResponse:
+      description: Case state & type.
+      properties:
+        case_type:
+          description: Case type.
+          enum:
+          - CUSTOMER_ONBOARDING
+          - CUSTOMER_MONITORING
+          - PAYMENT_SCREENING
+          - TRANSACTION_MONITORING
+          example: CUSTOMER_ONBOARDING
+          type: string
+        name:
+          description: The current state of the case.
+          enum:
+          - ONBOARDING_NOT_STARTED
+          - ONBOARDING_IN_PROGRESS
+          - ONBOARDING_ESCALATED
+          - ONBOARDING_BLOCKED
+          - ONBOARDING_POSITIVE_END_STATE
+          - ONBOARDING_MANAGEABLE_RISK_POSITIVE_END_STATE
+          - ONBOARDING_NEGATIVE_END_STATE
+          - MONITORING_NOT_STARTED
+          - MONITORING_IN_PROGRESS
+          - MONITORING_ESCALATED
+          - MONITORING_BLOCKED
+          - MONITORING_NO_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_POSITIVE_END_STATE
+          - MONITORING_RISK_DETECTED_NEGATIVE_END_STATE
+          - PAYMENT_SCREENING_NOT_STARTED
+          - PAYMENT_SCREENING_IN_PROGRESS
+          - PAYMENT_SCREENING_ESCALATED
+          - PAYMENT_SCREENING_BLOCKED
+          - PAYMENT_SCREENING_AWAITING_INFORMATION
+          - PAYMENT_SCREENING_PROCESS_PAYMENT_END_STATE
+          - PAYMENT_SCREENING_REJECT_PAYMENT_END_STATE
+          - TRANSACTION_MONITORING_NOT_STARTED
+          - TRANSACTION_MONITORING_IN_PROGRESS
+          - TRANSACTION_MONITORING_ESCALATED
+          - TRANSACTION_MONITORING_BLOCKED
+          - TRANSACTION_MONITORING_ACCEPTED_POSITIVE_END_STATE
+          - TRANSACTION_MONITORING_ESCALATED_NEGATIVE_END_STATE
+          - USER_DEFINED
+          example: ONBOARDING_POSITIVE_END_STATE
+          type: string
+      required:
+      - case_type
+      - name
+      type: object
+    case-management_CaseAlertResponseV2:
+      description: Case alert response.
+      properties:
+        identifier:
+          description: Alert unique identifier.
+          format: uuid
+          type: string
+        priority:
+          description: 'Alerts priority:
+
+
+            1-3 -> High
+
+
+            4-6 -> Medium
+
+
+            7-9 -> Low
+
+
+            `null` -> No priority'
+          format: int32
+          maximum: 9
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+        risk_source:
+          description: The sources of risk.
+          enum:
+          - CUSTOMER_SCREENING
+          - PAYMENT_SCREENING
+          - TRANSACTION_MONITORING
+          type: string
+        state:
+          description: Alert state.
+          enum:
+          - NOT_STARTED
+          - IN_PROGRESS
+          - POSITIVE_END_STATE
+          - NEGATIVE_END_STATE
+          type: string
+        title:
+          description: Alert title.
+          example: Customer screening
+          type: string
+        type:
+          description: Alert type.
+          enum:
+          - CUSTOMER_SCREENING
+          - MONITORING
+          - PAYMENT_SCREENING
+          - TRANSACTION_MONITORING
+          type: string
+        updated_at:
+          description: Alert last updated date and time.
+          format: date-time
+          type: string
+        updated_by:
+          description: User identifier who last updated the alert.
+          format: uuid
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - priority
+      - risk_source
+      - state
+      - title
+      - type
+      - updated_at
+      type: object
+    case-management_CustomerSubject:
+      description: Customer subject.
+      discriminator:
+        mapping:
+          COMPANY: '#/components/schemas/case-management_CompanySubject'
+          PERSON: '#/components/schemas/case-management_PersonSubject'
+          UNDEFINED: '#/components/schemas/case-management_UndefinedSubject'
+          VESSEL: '#/components/schemas/case-management_VesselSubject'
+        propertyName: detail.type
+      oneOf:
+      - $ref: '#/components/schemas/case-management_PersonSubject'
+      - $ref: '#/components/schemas/case-management_CompanySubject'
+      - $ref: '#/components/schemas/case-management_VesselSubject'
+      - $ref: '#/components/schemas/case-management_UndefinedSubject'
+      type: object
+    case-management_AssignCaseBulkActionPayload:
+      properties:
+        assignee:
+          description: User identifier to whom the case should be assigned, or null to un-assign.
+          format: uuid
+          type:
+          - string
+          - 'null'
+        note:
+          description: 'Note: content to be associated with case assignment (optional).'
+          example: Assigning case to John Doe due to his expertise.
+          maxLength: 5000
+          minLength: 0
+          type:
+          - string
+          - 'null'
+      required:
+      - assignee
+      type: object
+    case-management_CaseNoteResponse:
+      description: Note associated to a case.
+      properties:
+        contents:
+          description: The contents of the note.
+          type: string
+        created_at:
+          description: The date and time at which this note was created.
+          format: date-time
+          type: string
+        created_by:
+          description: The user identifier that created this note.
+          format: uuid
+          type: string
+        identifier:
+          description: Unique identifier of the note.
+          format: uuid
+          type: string
+        type:
+          description: Defines the type of a note.
+          enum:
+          - CASE
+          example: CASE
+          type: string
+      required:
+      - contents
+      - created_at
+      - created_by
+      - identifier
+      - type
+      type: object
+    case-management_AlertsSummary:
+      description: Summary of alerts information, including the highest priority.
+      properties:
+        count:
+          format: int32
+          type: integer
+        highest_priority:
+          description: 'The highest priority of alerts associated with the case.
+
+
+            Alerts priority:
+
+
+            1-3 -> High
+
+
+            4-6 -> Medium
+
+
+            7-9 -> Low
+
+
+            `null` -> No priority'
+          format: int32
+          maximum: 9
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+      required:
+      - count
+      - highest_priority
+      type: object
+    case-management_CryptoPaymentSubject:
+      description: Transaction subject as a crypto payment.
+      properties:
+        detail:
+          $ref: '#/components/schemas/case-management_CryptoPaymentSubjectDetail'
+        external_identifier:
+          description: Transaction external identifier.
+          type: string
+        identifier:
+          description: Transaction unique identifier.
+          format: uuid
+          type: string
+        type:
+          enum:
+          - TRANSACTION
+          example: TRANSACTION
+          type: string
+      required:
+      - detail
+      - external_identifier
+      - identifier
+      - type
+      type: object
+    case-management_CaseStageTransitionRequest:
+      description: Case stage update request.
+      properties:
+        note:
+          description: 'Note: content to be associated with case transition. Only required if case transition is an end stage.'
+          example: Case accepted after confirmation from user.
+          maxLength: 5000
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        stage_identifier:
+          description: The stage identifier to which the case should be transitioned.
+          format: uuid
+          type: string
+      required:
+      - stage_identifier
+      type: object
+    case-management_PaginatedResponseAlertNoteResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        notes:
+          items:
+            $ref: '#/components/schemas/case-management_AlertNoteResponse'
+          type: array
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - notes
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http

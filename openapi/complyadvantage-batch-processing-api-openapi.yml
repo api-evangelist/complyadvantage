@@ -1,0 +1,600 @@
+openapi: 3.2.0
+info:
+  title: Mesh Batch Processing API
+  version: v2.0
+servers:
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
+security:
+- BearerAuth: []
+tags:
+- name: Batch Processing
+paths:
+  /v2/batch-processing:
+    get:
+      description: 'This endpoint will return a list of all batch processes that have been initiated, including their `identifiers`, status and errors.
+
+
+        You need one of the "View customers" or "View transactions" permissions to use this endpoint.'
+      operationId: bulkUploaderGetAllV2BatchProcessing
+      parameters:
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 25
+          minimum: 1
+          type: integer
+      - description: 'Sorting criteria in the format of: `[-]property` (`-` descending modifier).
+
+
+          * Default sort order is ascending (without `-`).
+
+
+          * Multiple sort criteria are supported.'
+        example:
+        - -timestamp
+        in: query
+        name: sort
+        required: false
+        schema:
+          default: []
+          items:
+            type: string
+          type: array
+      - example:
+        - VALIDATING
+        in: query
+        name: status
+        required: false
+        schema:
+          items:
+            enum:
+            - NOT_STARTED
+            - VALIDATING
+            - VALIDATING_ERROR
+            - PROCESSING
+            - PROCESSING_ERROR
+            - COMPLETED
+            - INTERNAL_ERROR
+            type: string
+          type: array
+      - example:
+        - 5256d7de-702b-4669-b1ba-0ce5c99da18c
+        in: query
+        name: created_by
+        required: false
+        schema:
+          items:
+            format: uuid
+            type: string
+          type: array
+      - description: The workflow type for the batch process
+        in: query
+        name: workflow_type
+        required: true
+        schema:
+          default: create-and-screen
+          description: The workflow type for the batch process
+          enum:
+          - create-and-screen
+          - create-and-monitor
+          - manage-lookup-list
+          type: string
+      - description: Filter by target identifier
+        example: 164dbbc6-d255-4854-9f1d-56f8474f2835
+        in: query
+        name: target_identifier
+        required: false
+        schema:
+          example: 164dbbc6-d255-4854-9f1d-56f8474f2835
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bulk_PaginatedResponseBatch'
+          description: OK
+      summary: Get the states for all batch processes
+      tags:
+      - Batch Processing
+    post:
+      description: 'This endpoint initiates a batch process asynchronously for a given workflow type.
+
+
+        The response will return an `identifier` that can be used to retrieve the file processing status by polling GET /v2/batch-processing/{identifier}.
+
+
+        The workflow types available are:
+
+
+        1. **Create and screen a batch of customers** - This workflow will initiate all of the steps in the ''Create and screen customer asynchronously'' for each of the customers in your file.
+
+
+        2. **Create and monitor a batch of transactions** - This workflow will initiate all of the steps in the ''Create and process transactions asynchronously'' for each of the transactions in your file. To learn more about the format of the batch file, see Batch transaction upload.
+
+
+        The response will include an `identifier` that can be used to check the status of the batch process,as well as any validation errors that have caused the file to not be processed.
+
+
+        To invoke ''create-and-screen'' workflow, you need "Access to base customer screening functionality" enabled and the "Create and screen customers" permission.
+
+        To invoke ''create-and-monitor'' workflow, you need "Access to base transaction monitoring functionality" enabled.'
+      operationId: bulkUploaderPostV2BatchProcessing
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  format: binary
+                  type: string
+                target_identifier:
+                  description: The identifier of the existing list in Mesh where you’re uploading. Required in some workflows when uploading files to a list that already exists.
+                  example: 164dbbc6-d255-4854-9f1d-56f8474f2835
+                  format: uuid
+                  type: string
+                workflow_type:
+                  default: create-and-screen
+                  description: The workflow type for the batch process
+                  enum:
+                  - create-and-screen
+                  - create-and-monitor
+                  - manage-lookup-list
+                  type: string
+              required:
+              - file
+              type: object
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bulk_Batch'
+          description: OK
+      summary: Initiate a batch-process
+      tags:
+      - Batch Processing
+  /v2/batch-processing/{identifier}:
+    delete:
+      description: 'Given an `identifier`, this endpoint will delete a file that has failed validation. Files that were successful cannot be deleted using this endpoint.
+
+
+        You need "Access to base transaction monitoring functionality" enabled and the "Create and screen customers" permission to use this endpoint.'
+      operationId: bulkUploaderDeleteV2BatchProcessing
+      parameters:
+      - example: 95913b76-050c-40f3-9075-25f0737ac7d3
+        in: path
+        name: identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bulk_DeletedBatch'
+          description: OK
+      summary: Delete a batch process
+      tags:
+      - Batch Processing
+    get:
+      description: 'Given an `identifier`, this endpoint will return the status for a single batch process.
+
+
+        You need one of the "View customers" or "View transactions" permissions to use this endpoint.'
+      operationId: bulkUploaderGetV2BatchProcessing
+      parameters:
+      - example: 95913b76-050c-40f3-9075-25f0737ac7d3
+        in: path
+        name: identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bulk_Batch'
+          description: OK
+      summary: Get the state for a single batch process
+      tags:
+      - Batch Processing
+  /v2/batch-processing/{identifier}/report:
+    get:
+      description: 'This endpoint returns a URL to download a CSV report for batch upload processes where one or more customers failed to be processed.
+
+
+        Use the batch process identifier in the request in order to access the report URL.
+
+
+        You need one of the "View customers" or "View transactions" permissions to use this endpoint.'
+      operationId: bulkUploaderDownloadReportV2BatchProcessing
+      parameters:
+      - example: 95913b76-050c-40f3-9075-25f0737ac7d3
+        in: path
+        name: identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bulk_BatchReport'
+          description: OK
+      summary: Download a summary report
+      tags:
+      - Batch Processing
+components:
+  schemas:
+    bulk_PaginatedResponseBatch:
+      properties:
+        batches:
+          items:
+            $ref: '#/components/schemas/bulk_Batch'
+          type: array
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - batches
+      type: object
+    bulk_BatchReport:
+      properties:
+        workflows_download_link:
+          format: url
+          type:
+          - string
+          - 'null'
+      type: object
+    bulk_ErrorAttributes:
+      properties:
+        affected_rows:
+          items:
+            format: int64
+            type: integer
+          type: array
+          uniqueItems: true
+        column_names:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        column_options:
+          items:
+            items:
+              type: string
+            type: array
+            uniqueItems: true
+          type: array
+          uniqueItems: true
+        expected_range:
+          items:
+            format: int64
+            type: integer
+          type: array
+          uniqueItems: true
+        max_row_limit:
+          format: int64
+          type:
+          - integer
+          - 'null'
+        rejected_values:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        required_format:
+          deprecated: true
+          type: string
+        required_formats:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+      required:
+      - affected_rows
+      - column_names
+      - column_options
+      - expected_range
+      - rejected_values
+      - required_format
+      - required_formats
+      type: object
+    bulk_FileError:
+      properties:
+        attributes:
+          $ref: '#/components/schemas/bulk_ErrorAttributes'
+        code:
+          enum:
+          - UNSUPPORTED_MIMETYPE
+          - MULTIPLE_SHEETS_FOUND
+          - MALFORMED_CONTENT
+          - UNSUPPORTED_COLUMN
+          - MAX_ROW_LIMIT_EXCEEDED
+          - INVALID_CUSTOM_LIST_IDENTIFIER
+          - INVALID_LOOKUP_LIST_IDENTIFIER
+          - INVALID_LOOKUP_LIST_STATUS
+          type: string
+      required:
+      - code
+      type: object
+    bulk_BatchStatistics:
+      properties:
+        num_of_completed_workflows:
+          format: int32
+          type: integer
+        num_of_created_workflows:
+          format: int32
+          type: integer
+        num_of_errored_workflows:
+          format: int32
+          type: integer
+        num_of_processed_rows:
+          format: int64
+          type: integer
+        num_of_validated_rows:
+          format: int32
+          type: integer
+      required:
+      - num_of_completed_workflows
+      - num_of_created_workflows
+      - num_of_errored_workflows
+      - num_of_processed_rows
+      - num_of_validated_rows
+      type: object
+    bulk_BatchRequest:
+      properties:
+        file_name:
+          type: string
+        upload_method:
+          enum:
+          - HTTP
+          - SFTP
+          type: string
+        workflow_type:
+          enum:
+          - create-and-screen
+          - create-and-monitor
+          - manage-lookup-list
+          type: string
+      required:
+      - file_name
+      - upload_method
+      - workflow_type
+      type: object
+    bulk_DeletedBatch:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+      required:
+      - identifier
+      type: object
+    bulk_BatchErrors:
+      properties:
+        file_errors:
+          items:
+            $ref: '#/components/schemas/bulk_FileError'
+          type: array
+          uniqueItems: true
+        reason:
+          enum:
+          - INTERNAL_ERROR
+          - MALFORMED_FILE
+          - INVALID_ROWS
+          - INVALID_SEQUENCE_KEY
+          type:
+          - string
+          - 'null'
+        row_errors:
+          items:
+            $ref: '#/components/schemas/bulk_RowError'
+          type: array
+          uniqueItems: true
+      required:
+      - file_errors
+      - row_errors
+      type: object
+    bulk_Batch:
+      properties:
+        account_identifier:
+          format: uuid
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        created_by:
+          format: uuid
+          type:
+          - string
+          - 'null'
+        errors:
+          $ref: '#/components/schemas/bulk_BatchErrors'
+        identifier:
+          format: uuid
+          type: string
+        request:
+          $ref: '#/components/schemas/bulk_BatchRequest'
+        statistics:
+          $ref: '#/components/schemas/bulk_BatchStatistics'
+        status:
+          enum:
+          - NOT_STARTED
+          - VALIDATING
+          - VALIDATING_ERROR
+          - PROCESSING
+          - PROCESSING_ERROR
+          - COMPLETED
+          - INTERNAL_ERROR
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      required:
+      - account_identifier
+      - created_at
+      - identifier
+      - request
+      - status
+      - updated_at
+      type: object
+    bulk_RowErrorMessage:
+      properties:
+        attributes:
+          $ref: '#/components/schemas/bulk_ErrorAttributes'
+        code:
+          enum:
+          - MANDATORY_COLUMN_MISSING
+          - ONE_OF_REQUIRED
+          - MUTUALLY_EXCLUSIVE
+          - INVALID_RESIDENTIAL_STATUS
+          - INVALID_CURRENCY_CODE
+          - INVALID_COUNTRY_CODE
+          - INVALID_COUNTRY_SUBDIVISION_CODE
+          - INVALID_IDENTIFIER
+          - INVALID_NUMBER
+          - INVALID_BIRTH_DATE_YEAR
+          - INVALID_PHONE_NUMBER
+          - INVALID_EMAIL_ADDRESS
+          - INVALID_URL
+          - INVALID_GENDER
+          - INVALID_COMPANY_STATUS
+          - INVALID_ADDRESS_TYPE
+          - INVALID_ADDRESS_TYPE_PERSON
+          - INVALID_ADDRESS_TYPE_COMPANY
+          - INVALID_PERSONAL_IDENTIFICATION_TYPE
+          - CUSTOMER_LABEL_NOT_FOUND
+          - SCREENING_CONFIGURATION_NOT_FOUND
+          - MAX_SIZE_LIMIT_REACHED
+          - MIN_SIZE_LIMIT_REACHED
+          - INVALID_IBAN
+          - INVALID_IP_ADDRESS
+          - INVALID_DATE
+          - DATE_NOT_IN_PAST
+          - DATE_EXCEEDS_PRESENT
+          - INVALID_DATE_OF_EXPIRY
+          - INVALID_SALARY_AMOUNT
+          - INVALID_SALARY_CURRENCY
+          - INVALID_BIC
+          - INVALID_CHARACTER
+          - INVALID_BOOLEAN
+          - INVALID_TIMESTAMP
+          - INVALID_TRANSACTION_TYPE
+          - INVALID_TRANSACTION_CLASSIFICATION
+          - INVALID_BANK_PAYMENT_STATE
+          - INVALID_CARD_PAYMENT_STAGE
+          - INVALID_CARD_SCHEME
+          - INVALID_CARD_PAYMENT_SCOPE
+          - INVALID_BANK_IDENTIFICATION_NUMBER
+          - TOO_MANY_CUSTOM_FIELDS
+          - INVALID_PAYMENT_SCHEME
+          - INVALID_PAYMENT_CHANNEL
+          - INVALID_REMITTANCE_PAYMENT_METHOD
+          - INVALID_REMITTANCE_RELATIONSHIP
+          - INVALID_REMITTANCE_PURPOSE
+          - INVALID_REMITTANCE_SOURCE_OF_FUNDS
+          - INVALID_REMITTANCE_SERVICE_PROVIDER_TYPE
+          - INVALID_BLOCKCHAIN_NETWORK_TYPE
+          - INVALID_CASH_PICKUP_METHOD_MISMATCH
+          - INVALID_CARD_VERIFICATION_RESULT
+          - TOO_MANY_AGENTS
+          - INVALID_AGENT_ROLE
+          - INVALID_SCENARIO_CONFIGURATION_IDENTIFIER
+          - TOO_MANY_SCENARIO_CONFIGURATION_IDENTIFIERS
+          - INVALID_CUSTOMER_EXTERNAL_IDENTIFIER
+          - MULTIPLE_CUSTOMERS
+          - CUSTOMER_EXTERNAL_IDENTIFIER_MISMATCH
+          - MIXED_CUSTOMER_DATA_TYPES
+          - CARD_PARTY_CUSTOMER_IDENTIFIER_MISMATCH
+          - INVALID_CARD_PAYMENT_TYPE
+          - INVALID_POS_CONDITION_CODE
+          - INVALID_POS_ENTRY_MODE_CODE
+          - INVALID_CARD_WALLET_TYPE
+          - INVALID_ALPHANUMERIC_VALUE
+          - INVALID_CARD_FUNDING_TYPE
+          - INVALID_MERCHANT_CATEGORY_TYPE
+          - INVALID_MERCHANT_CATEGORY_CODE
+          - INVALID_CARD_CHARGEBACK_OUTCOME
+          - INVALID_CARD_AUTHORIZATION_RESPONSE_CODE
+          - INVALID_CARD_AUTHORIZATION_STATE
+          - INVALID_CARD_AUTHORIZATION_TYPE
+          - CUSTOM_LIST_NOT_FOUND
+          - CUSTOM_LIST_IDENTIFIER_MISMATCH
+          - COUNTERPARTY_NOT_ALLOWED_ON_ULTIMATE_PARTY
+          - INVALID_CAIP_2_IDENTIFIER
+          - INVALID_CAIP_19_IDENTIFIER
+          - INVALID_LATITUDE
+          - INVALID_LONGITUDE
+          - INVALID_LOAN_TYPE
+          - INVALID_CLEARING_IDENTIFIER_TYPE
+          - INVALID_FINCEN_CASH_TRANSACTION_SUBTYPE
+          type: string
+      required:
+      - code
+      type: object
+    bulk_RowError:
+      properties:
+        errors:
+          items:
+            $ref: '#/components/schemas/bulk_RowErrorMessage'
+          type: array
+          uniqueItems: true
+        row_number:
+          format: int64
+          type: integer
+      required:
+      - errors
+      - row_number
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http

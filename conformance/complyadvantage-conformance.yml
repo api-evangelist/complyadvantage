@@ -1,0 +1,193 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  openapi/complyadvantage-mesh-api-openapi.json,
+  https://docs.mesh.complyadvantage.com/docs/errors.md,
+  https://docs.mesh.complyadvantage.com/docs/webhooks.md,
+  https://docs.mesh.complyadvantage.com/docs/rate-limiting.md,
+  https://docs.mesh.complyadvantage.com/.well-known/api-catalog
+provider: ComplyAdvantage
+providerId: complyadvantage
+description: >-
+  Standards the ComplyAdvantage contract actually declares, each with the exact spec or
+  docs location that evidences it. The notable one is Standard Webhooks v1: ComplyAdvantage
+  names the specification by URL and states the signing scheme in full, which is unusual -
+  most providers describe an HMAC scheme without claiming a standard. The FinCEN CTR/SAR
+  prefill endpoints are the domain-standard signature for this market: the contract speaks
+  US Bank Secrecy Act report structures directly, so a customer already filing CTRs and
+  SARs integrates without a bespoke mapping layer.
+standards:
+- id: oauth2
+  name: OAuth 2.0 Client Credentials
+  conforms: true
+  evidence: >-
+    POST /v3/token (createTokenV3) - "API access to Mesh uses the OAuth2 client credentials
+    flow. Users can generate a set of credentials (consisting of an access key and secret)
+    in the UI." Tokens are 24h, non-refreshable.
+    https://docs.mesh.complyadvantage.com/reference/createtokenv3
+  note: >-
+    Declared in prose and implemented by a token endpoint, but NOT declared in the
+    contract's securitySchemes - components.securitySchemes has only BearerAuth
+    (type http, scheme bearer). A client reading the OpenAPI alone sees an opaque bearer
+    token, not an OAuth2 flow.
+- id: oidc
+  name: OpenID Connect
+  conforms: false
+  evidence: >-
+    No openIdConnect security scheme in the contract; /.well-known/openid-configuration
+    returns 404 on complyadvantage.com, docs.mesh.complyadvantage.com and
+    auth.complyadvantage.com (the AWS Cognito hosted-UI domain behind app.complyadvantage.com).
+- id: rfc9457
+  name: RFC 9457 Problem Details for HTTP APIs
+  conforms: true
+  evidence: >-
+    identity_ProblemDetailErrorResponse and activity_ProblemDetailErrorResponse in
+    components.schemas carry type/title/status/detail/instance; 88 declared 400 responses
+    and 28 declared 403 responses reference them.
+    https://docs.mesh.complyadvantage.com/docs/errors
+  deviations:
+  - '`type` is always emitted as about:blank - no dereferenceable problem-type URIs.'
+  - '429 does not use the envelope: it returns {"message": "API rate limit exceeded"}.'
+  - 401 omits type/identifier/timestamp.
+  - Adds non-standard required members `identifier` (uuid) and `timestamp` (date-time).
+- id: standard-webhooks
+  name: Standard Webhooks v1
+  conforms: true
+  evidence: >-
+    "Our signing format is compatible with the Standard Webhooks v1 specification
+    (https://www.standardwebhooks.com/), so any Standard Webhooks library will work out of
+    the box." Headers webhook-id / webhook-timestamp / webhook-signature; signature =
+    base64(HMAC-SHA256(secret, "{webhook-id}.{webhook-timestamp}.{body}")); v1, prefix;
+    multi-signature during rotation; +/-5 minute timestamp tolerance.
+    https://docs.mesh.complyadvantage.com/docs/webhooks
+  deviations:
+  - Signing is opt-in per account rather than always-on - unsigned delivery is the default.
+  - The secret is raw base64 with no `whsec_` prefix, which the docs call out explicitly.
+- id: rfc9727
+  name: RFC 9727 api-catalog well-known URI
+  conforms: true
+  evidence: >-
+    GET https://docs.mesh.complyadvantage.com/.well-known/api-catalog returns HTTP 200
+    application/linkset+json with service-desc pointing at
+    https://docs.mesh.complyadvantage.com/openapi/mesh-api.json
+    (application/vnd.oai.openapi+json) and service-doc at the HTML reference.
+    Saved verbatim as well-known/complyadvantage-api-catalog.json.
+  note: Served by the ReadMe documentation platform on the provider's own host.
+- id: rfc9116
+  name: RFC 9116 security.txt
+  conforms: false
+  evidence: >-
+    /.well-known/security.txt returns 404 on complyadvantage.com and
+    docs.mesh.complyadvantage.com, 403 on docs.complyadvantage.com, and 401 on both API
+    hosts. No security.txt is published on any host.
+- id: pagination
+  name: Consistent pagination
+  conforms: true
+  evidence: >-
+    page_number + page_size query parameters on 47 operations, with a uniform response
+    envelope carrying first/prev/self/next/total_count
+    (activity_PaginatedResponseCustomField, am_PaginatedResponseAlertMuteV3Response and 
+    siblings). The legacy REST API uses a different, offset/limit scheme with a 100-item cap.
+  deviations:
+  - Two APIs, two incompatible pagination models.
+  - Link fields are relative URL paths, not absolute URLs.
+- id: idempotency
+  name: Idempotency keys on unsafe methods
+  conforms: partial
+  evidence: >-
+    X-ComplyAdvantage-Idempotency-Key (optional, maxLength 255, "we recommend using a
+    standard UUID") declared on exactly one operation:
+    POST /v2/customers/{customer_identifier}/workflows/sync/rescreen. Two further workflow
+    endpoints document behavioural idempotency in prose. Inbound webhooks carry a stable
+    webhook-id across retries and the docs name it as the receiver's idempotency key.
+  deviations:
+  - 1 of 163 operations exposes the header.
+  - Customer creation and screening, the billable duplicate-prone write, has no key.
+  - No retention window is published for a replayed key.
+- id: rfc6749-bearer
+  name: RFC 6750 Bearer Token Usage
+  conforms: true
+  evidence: 'Authorization: Bearer {access_token} on every Mesh operation; global security is [{BearerAuth: []}].'
+- id: json-api
+  name: JSON:API
+  conforms: false
+  evidence: Plain JSON resource representations; no JSON:API document structure, media type or included/relationships members.
+- id: odata
+  name: OData
+  conforms: false
+  evidence: No $metadata surface, no OData query options.
+- id: scim
+  name: SCIM
+  conforms: false
+  evidence: >-
+    Mesh has a full IAM surface (/v2/iam/roles, /v2/iam/permissions, /v3/iam/permissions,
+    users under /v2/accounts/me/users) but it is bespoke - no urn:ietf:params:scim:schemas
+    URNs, no /Users or /Groups resources, no SCIM media types. A customer running an IdP
+    needs a bespoke connector to provision Mesh users.
+- id: fapi
+  name: FAPI / FAPI 2.0
+  conforms: false
+  evidence: No mTLS, no DPoP, no PAR, no JARM, no signed request objects in the contract.
+- id: psd2
+  name: PSD2 / Berlin Group
+  conforms: false
+  evidence: Not an account-information or payment-initiation API - not in scope for this provider.
+domain_standards:
+- id: fincen-ctr
+  name: FinCEN Currency Transaction Report (BSA CTR, FinCEN Form 112)
+  conforms: true
+  category: regulatory-reporting
+  evidence: >-
+    POST /v2/regulatory-reports/prefill-information/fincen/ctr/transaction-locations/bulk
+    (regulatoryReportingBulkUpsertCtrTransactionLocations) and
+    POST /v2/regulatory-reports/prefill-information/fincen/ctr/transaction-locations/bulk-delete
+    in openapi/complyadvantage-mesh-api-openapi.json. The contract addresses CTR transaction
+    locations as a first-class resource, named for the FinCEN form structure.
+  buyer_impact: >-
+    A US financial institution already filing CTRs recognises the shape and maps its own
+    branch/location data straight in; a vendor without this surface requires the customer
+    to build the CTR prefill layer themselves.
+- id: fincen-sar
+  name: FinCEN Suspicious Activity Report (BSA SAR, FinCEN Form 111)
+  conforms: true
+  category: regulatory-reporting
+  evidence: >-
+    POST /v2/regulatory-reports/prefill-information/fincen/sar/financial-institutions/bulk
+    (regulatoryReportingBulkUpsertSarFinancialInstitutions) and the matching bulk-delete
+    operation in openapi/complyadvantage-mesh-api-openapi.json - SAR filing institutions
+    modeled as a managed resource.
+- id: aml-typology-vocabulary
+  name: AML risk-type vocabulary (sanctions / PEP class / adverse media / warning)
+  conforms: true
+  category: domain-vocabulary
+  evidence: >-
+    The screening result enumerations published in the WORKFLOW_COMPLETED webhook payload
+    and the screening step output use the industry AML typology directly - SANCTION,
+    WARNING, PEP_CLASS_1, PEP_CLASS_2, ADVERSE_MEDIA, ADVERSE_MEDIA_V2_CYBERCRIME.
+    https://docs.mesh.complyadvantage.com/reference/notificationcreatewebhookconfiguration
+  note: >-
+    PEP class 1-4 is the market-standard tiering used across AML vendors, so the values
+    are portable between screening providers even though no formal standards body owns them.
+absent_domain_standards:
+  note: >-
+    Recorded for completeness, not as a penalty. No ISO 20022 message types (this is not a
+    payment-message API - transactions are ingested in ComplyAdvantage's own transaction
+    schema), no goAML XML export surface for the ~60 FIUs that mandate it, and no FATF
+    Travel Rule / IVMS 101 shapes despite crypto being a named customer segment.
+certifications:
+  published: false
+  probed:
+  - url: https://trust.complyadvantage.com
+    status: <no response - DNS/connection failed>
+  - url: https://complyadvantage.com/security/
+    status: 404
+  - url: https://complyadvantage.com/trust-centre/
+    status: 404
+  - url: https://complyadvantage.com/information-security/
+    status: 404
+  note: >-
+    No trust centre and no page naming ISO 27001, SOC 2, PCI DSS or FedRAMP was found on
+    complyadvantage.com. GDPR is referenced on the contact and privacy pages. For a vendor
+    selling financial-crime compliance to regulated banks this is a conspicuous gap - the
+    certifications almost certainly exist inside the sales process, but they are not
+    published anywhere a machine or a prospect can read them.

@@ -3,8 +3,12 @@ specificationVersion: '0.1'
 schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/Plans
 provider: ComplyAdvantage
 providerId: complyadvantage
+generated: '2026-08-27'
+method: searched
+source: https://complyadvantage.com/pricing/
+plan_count: 3
 created: '2026-07-11'
-modified: '2026-07-11'
+modified: '2026-08-27'
 reconciled: false
 tags:
 - Anti-Money Laundering

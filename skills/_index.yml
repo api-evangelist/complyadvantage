@@ -1,0 +1,58 @@
+generated: '2026-08-27'
+method: generated
+source: >-
+  openapi/complyadvantage-mesh-api-openapi.json (163 operations, all operationIds verified
+  against the spec before use) plus the Mesh guides at docs.mesh.complyadvantage.com
+provider: ComplyAdvantage
+providerId: complyadvantage
+description: >-
+  Five packaged Agent Skills covering the marquee ComplyAdvantage Mesh flows: customer
+  onboarding and screening, case and alert triage, ongoing monitoring and rescreening,
+  transaction screening and review, and the webhook receiving end. Every operationId
+  referenced was checked against openapi/complyadvantage-mesh-api-openapi.json - none are
+  invented. Each skill carries the required Mesh permissions and account entitlements, the
+  runtime conventions (24h non-refreshable bearer token, RFC 9457 errors with the 429
+  exception, Ratelimit-* headers, page_number/page_size pagination) and, where it matters,
+  an explicit reversibility warning.
+  No provider-published skills or AGENTS.md were found on any ComplyAdvantage host.
+skills:
+- name: complyadvantage-onboard-and-screen-a-customer
+  file: complyadvantage-onboard-and-screen-a-customer.md
+  api: complyadvantage:complyadvantage-mesh-platform-api
+  category: onboarding
+  operations: 7
+  consequence: write - billable and not reversible; no delete-customer operation exists
+- name: complyadvantage-triage-a-screening-case
+  file: complyadvantage-triage-a-screening-case.md
+  api: complyadvantage:complyadvantage-mesh-platform-api
+  category: case-management
+  operations: 13
+  consequence: write - transitions are reversible only within the account's configured stage machine
+- name: complyadvantage-monitor-and-rescreen-customers
+  file: complyadvantage-monitor-and-rescreen-customers.md
+  api: complyadvantage:complyadvantage-mesh-platform-api
+  category: ongoing-monitoring
+  operations: 11
+  consequence: >-
+    write - the only operation in the contract accepting X-ComplyAdvantage-Idempotency-Key;
+    a manual risk-score override permanently disables automatic recalculation
+- name: complyadvantage-screen-and-review-a-transaction
+  file: complyadvantage-screen-and-review-a-transaction.md
+  api: complyadvantage:complyadvantage-mesh-platform-api
+  category: transaction-monitoring
+  operations: 9
+  consequence: >-
+    write - activityStorePostTransactionReviewDecision is terminal with no published
+    reversal; the skill instructs the agent to escalate to a human rather than call it
+- name: complyadvantage-receive-and-verify-webhooks
+  file: complyadvantage-receive-and-verify-webhooks.md
+  api: complyadvantage:complyadvantage-mesh-platform-api
+  category: events
+  operations: 5
+  consequence: configuration write; the receiving side is read-only
+not_covered:
+  legacy_rest_api: >-
+    No skills are packaged for the legacy REST API (api.complyadvantage.com). Its 19
+    operations are documented only as HTML at docs.complyadvantage.com/api-docs and the
+    specs in openapi/ for it were modeled by API Evangelist rather than published by
+    ComplyAdvantage, so skills grounded in them would inherit that weaker provenance.

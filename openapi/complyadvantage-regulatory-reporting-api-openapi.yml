@@ -1,0 +1,983 @@
+openapi: 3.2.0
+info:
+  title: Mesh Regulatory Reporting API
+  version: v2.0
+servers:
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
+security:
+- BearerAuth: []
+tags:
+- name: Regulatory Reporting
+paths:
+  /v2/regulatory-reports/prefill-information/fincen/ctr/transaction-locations/bulk:
+    post:
+      description: 'Bulk create or update CTR transaction location prefill information, identified by their external identifier: existing entries are updated and new ones are created. Each entry is independently validated and processed — partial success is a valid outcome.
+
+
+        You need the account-level "Account has access to FinCEN CTR reports" permission and the user-level "Manage settings such as pre-fill data for FinCEN CTR reports" permission to use this endpoint.'
+      operationId: regulatoryReportingBulkUpsertCtrTransactionLocations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/reg_BulkCreateTransactionLocationRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/reg_BulkCreateResponse'
+          description: OK
+      summary: Bulk create or update CTR transaction locations
+      tags:
+      - Regulatory Reporting
+  /v2/regulatory-reports/prefill-information/fincen/ctr/transaction-locations/bulk-delete:
+    post:
+      description: 'Bulk delete CTR transaction location prefill information by external identifier. Each entry is independently processed — partial success is a valid outcome.
+
+
+        You need the account-level "Account has access to FinCEN CTR reports" permission and the user-level "Manage settings such as pre-fill data for FinCEN CTR reports" permission to use this endpoint.'
+      operationId: regulatoryReportingBulkDeleteCtrTransactionLocations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/reg_BulkDeleteRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/reg_BulkDeleteResponse'
+          description: OK
+      summary: Bulk delete CTR transaction locations
+      tags:
+      - Regulatory Reporting
+  /v2/regulatory-reports/prefill-information/fincen/sar/financial-institutions/bulk:
+    post:
+      description: 'Bulk create or update SAR financial institutions, agents, and branches, identified by their external identifier: existing entries are updated and new ones are created. Processing order is: standalone FIs → agents → branches. Each entry is independently validated — partial success is a valid outcome.
+
+
+        You need the account-level "Account has access to FinCEN SAR reports" permission and the user-level "Manage settings such as pre-fill data for FinCEN SAR reports" permission to use this endpoint.'
+      operationId: regulatoryReportingBulkUpsertSarFinancialInstitutions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/reg_BulkCreateFinancialInstitutionRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/reg_BulkCreateResponse'
+          description: OK
+      summary: Bulk create or update SAR financial institutions
+      tags:
+      - Regulatory Reporting
+  /v2/regulatory-reports/prefill-information/fincen/sar/financial-institutions/bulk-delete:
+    post:
+      description: 'Bulk delete SAR financial institutions, agents, and branches by external identifier. Each entry is independently processed — partial success is a valid outcome.
+
+
+        You need the account-level "Account has access to FinCEN SAR reports" permission and the user-level "Manage settings such as pre-fill data for FinCEN SAR reports" permission to use this endpoint.'
+      operationId: regulatoryReportingBulkDeleteSarFinancialInstitutions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/reg_SarFinancialInstitutionBulkDeleteRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/reg_SarFinancialInstitutionBulkDeleteResponse'
+          description: OK
+      summary: Bulk delete SAR financial institutions
+      tags:
+      - Regulatory Reporting
+components:
+  schemas:
+    reg_PrefillTransactionLocation:
+      description: FinCEN CTR transaction location prefill data.
+      properties:
+        address:
+          allOf:
+          - $ref: '#/components/schemas/reg_InstitutionAddress'
+        alternate_name:
+          description: Alternate or DBA name. No leading/trailing spaces, no tabs/newlines.
+          maxLength: 150
+          minLength: 1
+          pattern: ^[^ \t\n\r\v\f]([^\t\n\r\v\f]*[^ \t\n\r\v\f])?$
+          type:
+          - string
+          - 'null'
+        classification:
+          allOf:
+          - $ref: '#/components/schemas/reg_Classification'
+        ein:
+          allOf:
+          - $ref: '#/components/schemas/reg_Ein'
+        identification:
+          allOf:
+          - $ref: '#/components/schemas/reg_InstitutionIdentification'
+        name:
+          description: Legal name. No leading/trailing spaces, no tabs/newlines.
+          maxLength: 150
+          minLength: 1
+          pattern: ^[^ \t\n\r\v\f]([^\t\n\r\v\f]*[^ \t\n\r\v\f])?$
+          type:
+          - string
+          - 'null'
+        primary_regulator:
+          description: 'Primary federal regulator. Allowed values depend on classification type — CASINO_OR_CARD_CLUB: IRS. MSB: IRS. DEPOSITORY_INSTITUTION: FRB, FDIC, IRS, NCUA, OCC, UNKNOWN_PRIMARY_REGULATOR. SECURITIES_OR_FUTURES: CFTC, SEC, UNKNOWN_PRIMARY_REGULATOR. OTHER_CLASSIFICATION: all values allowed.'
+          enum:
+          - CFTC
+          - FRB
+          - FDIC
+          - IRS
+          - NCUA
+          - OCC
+          - SEC
+          - UNKNOWN_PRIMARY_REGULATOR
+          type: string
+      required:
+      - address
+      - classification
+      - ein
+      - name
+      - primary_regulator
+      type: object
+    reg_FinancialInstitutionClassification:
+      description: SAR financial institution classification. sub_type is required when type is CASINO_OR_CARD_CLUB. sub_types is required when type is SECURITIES_OR_FUTURES. other_type is required when type is OTHER_CLASSIFICATION.
+      properties:
+        other_type:
+          description: Free-text description. Required when type is OTHER_CLASSIFICATION. No leading/trailing spaces, no tabs/newlines.
+          maxLength: 50
+          minLength: 1
+          pattern: ^[^ \t\n\r\v\f]([^\t\n\r\v\f]*[^ \t\n\r\v\f])?$
+          type:
+          - string
+          - 'null'
+        sub_type:
+          $ref: '#/components/schemas/reg_CasinoCardClubSubType'
+        sub_types:
+          $ref: '#/components/schemas/reg_SecuritiesFuturesSubTypes'
+        type:
+          description: The institution classification type.
+          enum:
+          - CASINO_OR_CARD_CLUB
+          - DEPOSITORY_INSTITUTION
+          - INSURANCE_COMPANY
+          - MSB
+          - LOAN_OR_FINANCE_COMPANY
+          - HOUSING_GSE
+          - SECURITIES_OR_FUTURES
+          - OTHER_CLASSIFICATION
+          type:
+          - string
+          - 'null'
+      required:
+      - type
+      type: object
+    reg_SarBulkDeleteItemResult:
+      description: Result for a single item in a SAR bulk delete operation.
+      properties:
+        errors:
+          description: Errors for this item. Only present on failure.
+          items:
+            $ref: '#/components/schemas/reg_ValidationError'
+          type:
+          - array
+          - 'null'
+        external_identifier:
+          description: The client-supplied identifier echoed back from the request.
+          type: string
+        prefill_information_identifier:
+          description: Identifier of the deleted prefill information record. Only present on success.
+          format: uuid
+          type:
+          - string
+          - 'null'
+        status:
+          description: Outcome of processing this item.
+          enum:
+          - SUCCESS
+          - FAILURE
+          type: string
+      required:
+      - external_identifier
+      - status
+      type: object
+    reg_TransactionLocationItem:
+      description: A single transaction location item in a bulk request.
+      properties:
+        data:
+          $ref: '#/components/schemas/reg_PrefillTransactionLocation'
+        external_identifier:
+          description: Client-supplied identifier used to correlate this item in the bulk response and as the upsert key.
+          minLength: 1
+          type: string
+      required:
+      - data
+      - external_identifier
+      type: object
+    reg_BranchItem:
+      description: A single branch item.
+      properties:
+        data:
+          $ref: '#/components/schemas/reg_PrefillFinancialInstitutionBranch'
+        external_identifier:
+          description: Client-supplied identifier for this branch.
+          minLength: 1
+          type: string
+        parent_external_identifier:
+          description: Client's unique identifier of the parent financial institution. Required as a branch cannot exist independently.
+          minLength: 1
+          type: string
+      required:
+      - data
+      - external_identifier
+      - parent_external_identifier
+      type: object
+    reg_Classification:
+      description: Institution classification. sub_type is required when type is CASINO_OR_CARD_CLUB. other_type is required when type is OTHER_CLASSIFICATION.
+      properties:
+        other_type:
+          description: Free-text description. Required when type is OTHER_CLASSIFICATION. No leading/trailing spaces, no tabs/newlines.
+          maxLength: 50
+          minLength: 1
+          pattern: ^[^ \t\n\r\v\f]([^\t\n\r\v\f]*[^ \t\n\r\v\f])?$
+          type:
+          - string
+          - 'null'
+        sub_type:
+          $ref: '#/components/schemas/reg_CasinoCardClubSubType'
+        type:
+          description: The institution classification type.
+          enum:
+          - CASINO_OR_CARD_CLUB
+          - DEPOSITORY_INSTITUTION
+          - MSB
+          - SECURITIES_OR_FUTURES
+          - OTHER_CLASSIFICATION
+          type:
+          - string
+          - 'null'
+      required:
+      - type
+      type: object
+    reg_SarInstitutionIdentification:
+      description: Optional institution identification. When type is provided, value is required.
+      properties:
+        type:
+          description: Identification type.
+          enum:
+          - CRD
+          - IARD
+          - NAIC
+          - NFA
+          - NMLS
+          - RSSD
+          - SEC
+          type:
+          - string
+          - 'null'
+        value:
+          description: Identification value. Required when type is not null. Alphanumeric, 1-10 characters. Must not be all same digits or sequential (non-consecutive, non-incremental).
+          maxLength: 10
+          minLength: 1
+          pattern: ^[a-zA-Z0-9]*$
+          type:
+          - string
+          - 'null'
+      type:
+      - object
+      - 'null'
+    reg_AddressWithUnknowns:
+      description: Address with unknown flags. When an _unknown flag is true, the corresponding field must be null.
+      properties:
+        city:
+          description: City. Required when city_unknown is not true. No leading/trailing spaces, no tabs/newlines.
+          maxLength: 50
+          minLength: 1
+          pattern: ^[^ \t\n\r\v\f]([^\t\n\r\v\f]*[^ \t\n\r\v\f])?$
+          type:
+          - string
+          - 'null'
+        city_unknown:
+          description: Set to true if city is unknown. When true, city must be null.
+          type:
+          - boolean
+          - 'null'
+        country:
+          description: Country code. Required when country_unknown is not true.
+          type:
+          - string
+          - 'null'
+        country_unknown:
+          description: Set to true if country is unknown. When true, country must be null.
+          type:
+          - boolean
+          - 'null'
+        state:
+          description: 'State/province code. Required for US, CA, MX when state_unknown is not true. If country is US: valid US state code (e.g. AL, CA, NY) including DC and military codes (AA, AE, AP). If country is CA: valid Canadian province/territory code (e.g. ON, BC, QC). If country is MX: valid Mexican state code (e.g. AGU, BCN, CMX).'
+          type:
+          - string
+          - 'null'
+        state_unknown:
+          description: Set to true if state is unknown. When true, state must be null.
+          type:
+          - boolean
+          - 'null'
+        street_address:
+          description: Street address. Required when street_address_unknown is not true. No leading/trailing spaces, no tabs/newlines.
+          maxLength: 100
+          minLength: 1
+          pattern: ^[^ \t\n\r\v\f]([^\t\n\r\v\f]*[^ \t\n\r\v\f])?$
+          type:
+          - string
+          - 'null'
+        street_address_unknown:
+          description: Set to true if street address is unknown. When true, street_address must be null.
+          type:
+          - boolean
+          - 'null'
+        zip:
+          description: 'ZIP/postal code. Required when zip_unknown is not true. US/territories: 5 or 9 digits, must not end in 0000 or 9999. Non-US: 1-9 alphanumeric characters.'
+          maxLength: 9
+          minLength: 1
+          type:
+          - string
+          - 'null'
+        zip_unknown:
+          description: Set to true if ZIP is unknown. When true, zip must be null.
+          type:
+          - boolean
+          - 'null'
+      type: object
+    reg_BulkDeleteResult:
+      description: Result for a single item in the bulk delete operation.
+      properties:
+        errors:
+          description: Validation errors for this item. Only present on failure.
+          items:
+            $ref: '#/components/schemas/reg_ValidationError'
+          type:
+          - array
+          - 'null'
+        external_identifier:
+          description: The client-supplied identifier echoed back from the request.
+          type: string
+        prefill_information_identifier:
+          description: Identifier of the deleted prefill information record. Only present on success.
+          format: uuid
+          type:
+          - string
+          - 'null'
+        status:
+          description: Outcome of processing this item.
+          enum:
+          - SUCCESS
+          - FAILURE
+          type: string
+      required:
+      - external_identifier
+      - status
+      type: object
+    reg_BulkCreateTransactionLocationRequest:
+      description: Bulk create/update request for CTR transaction locations.
+      properties:
+        transaction_locations:
+          description: List of transaction location entries to create or update.
+          items:
+            $ref: '#/components/schemas/reg_TransactionLocationItem'
+          maxItems: 10000
+          minItems: 1
+          type: array
+      required:
+      - transaction_locations
+      type: object
+    reg_FinancialInstitutionItem:
+      description: A single financial institution or agent item.
+      properties:
+        data:
+          $ref: '#/components/schemas/reg_PrefillFinancialInstitution'
+        external_identifier:
+          description: Client-supplied identifier for this financial institution or agent.
+          minLength: 1
+          type: string
+        parent_external_identifier:
+          description: If set, this entry is an agent and the value references the external_identifier of the parent financial institution.
+          type:
+          - string
+          - 'null'
+      required:
+      - data
+      - external_identifier
+      type: object
+    reg_SarFinancialInstitutionBulkDeleteResponse:
+      description: Response for a SAR financial institution bulk delete operation.
+      properties:
+        results:
+          $ref: '#/components/schemas/reg_SarBulkDeleteResults'
+        summary:
+          $ref: '#/components/schemas/reg_SarBulkDeleteSummary'
+      required:
+      - results
+      - summary
+      type: object
+    reg_InstitutionAddress:
+      description: Institution address.
+      properties:
+        city:
+          description: City name. No leading/trailing spaces, no tabs/newlines.
+          maxLength: 50
+          minLength: 1
+          pattern: ^[^ \t\n\r\v\f]([^\t\n\r\v\f]*[^ \t\n\r\v\f])?$
+          type:
+          - string
+          - 'null'
+        country:
+          description: Country code. Must be US or a US territory (AS, GU, MH, MP, PR, PW, VI, FM).
+          enum:
+          - US
+          - AS
+          - GU
+          - MH
+          - MP
+          - PR
+          - PW
+          - VI
+          - FM
+          minLength: 1
+          type:
+          - string
+          - 'null'
+        state:
+          description: 'State/territory code (2-letter). Required. If country is US: valid US state code (e.g. AL, CA, NY) including DC and military codes (AA, AE, AP). If country is a US territory: must match the territory code (e.g. country=PR → state=PR).'
+          type:
+          - string
+          - 'null'
+        street_address:
+          description: Street address. No leading/trailing spaces, no tabs/newlines.
+          maxLength: 100
+          minLength: 1
+          pattern: ^[^ \t\n\r\v\f]([^\t\n\r\v\f]*[^ \t\n\r\v\f])?$
+          type: string
+        zip:
+          description: 'US ZIP code: 5-digit or 9-digit without dash. Must not end in 0000 or 9999.'
+          minLength: 1
+          pattern: ^([0-9]{5}([0-9]{4})?)(?<!0000|9999)$
+          type:
+          - string
+          - 'null'
+      required:
+      - city
+      - country
+      - state
+      - street_address
+      - zip
+      type: object
+    reg_BulkCreateResult:
+      description: Result for a single item in the bulk operation.
+      properties:
+        errors:
+          description: Validation errors for this item. Only present on failure.
+          items:
+            $ref: '#/components/schemas/reg_ValidationError'
+          type:
+          - array
+          - 'null'
+        external_identifier:
+          description: The client-supplied identifier echoed back from the request.
+          type: string
+        operation:
+          description: The operation performed. Only present on success.
+          enum:
+          - CREATED
+          - UPDATED
+          type:
+          - string
+          - 'null'
+        prefill_information_identifier:
+          description: Identifier of the created or updated prefill information record. Only present on success.
+          format: uuid
+          type:
+          - string
+          - 'null'
+        status:
+          description: Outcome of processing this item.
+          enum:
+          - SUCCESS
+          - FAILURE
+          type: string
+      required:
+      - external_identifier
+      - status
+      type: object
+    reg_SarBulkDeleteSummary:
+      description: Aggregated counts for a SAR bulk delete operation.
+      properties:
+        failed:
+          description: Number of items that failed.
+          format: int32
+          type: integer
+        succeeded:
+          description: Number of items successfully deleted.
+          format: int32
+          type: integer
+        total:
+          description: Total number of items in the request.
+          format: int32
+          type: integer
+      required:
+      - failed
+      - succeeded
+      - total
+      type: object
+    reg_BulkCreateResponse:
+      description: Response for a bulk create/update operation.
+      properties:
+        results:
+          description: Per-item results.
+          items:
+            $ref: '#/components/schemas/reg_BulkCreateResult'
+          type: array
+        summary:
+          $ref: '#/components/schemas/reg_BulkCreateSummary'
+      required:
+      - results
+      - summary
+      type: object
+    reg_BulkCreateSummary:
+      description: Aggregated counts for the bulk operation.
+      properties:
+        failed:
+          description: Number of items that failed processing.
+          format: int32
+          type: integer
+        succeeded:
+          description: Number of items successfully processed.
+          format: int32
+          type: integer
+        total:
+          description: Total number of items in the request.
+          format: int32
+          type: integer
+      required:
+      - failed
+      - succeeded
+      - total
+      type: object
+    reg_ValidationErrorReason:
+      description: Reason for a validation failure.
+      properties:
+        key:
+          description: Machine-readable error key.
+          type: string
+        message:
+          description: Human-readable description of the validation failure.
+          type: string
+        parameters:
+          additionalProperties:
+            description: Additional context parameters for the error.
+            type: object
+          description: Additional context parameters for the error.
+          type: object
+      required:
+      - key
+      - message
+      - parameters
+      type: object
+    reg_BulkDeleteResponse:
+      description: Response for a bulk delete operation.
+      properties:
+        results:
+          description: Per-item results.
+          items:
+            $ref: '#/components/schemas/reg_BulkDeleteResult'
+          type: array
+        summary:
+          $ref: '#/components/schemas/reg_BulkDeleteSummary'
+      required:
+      - results
+      - summary
+      type: object
+    reg_Ein:
+      description: Employer Identification Number. Provide value (9-digit numeric string) or set is_unknown to true.
+      properties:
+        is_unknown:
+          description: Set to true if the EIN is unknown. When true, value must be null.
+          type:
+          - boolean
+          - 'null'
+        value:
+          description: 9-digit numeric EIN. Required when is_unknown is not true. Must not be all same digits or sequential.
+          maxLength: 9
+          minLength: 9
+          pattern: ^[0-9]{9}$
+          type:
+          - string
+          - 'null'
+      type: object
+    reg_TinWithUnknown:
+      description: Taxpayer Identification Number with type.
+      properties:
+        type:
+          description: TIN type.
+          enum:
+          - UNKNOWN_TIN
+          - EIN
+          - SSN_ITIN
+          - FOREIGN_TIN
+          type:
+          - string
+          - 'null'
+        value:
+          description: 'TIN value. EIN/SSN_ITIN: 9 digits (numeric, non-consecutive, non-incremental). FOREIGN_TIN: 1-25 alphanumeric. UNKNOWN_TIN: null.'
+          type:
+          - string
+          - 'null'
+      required:
+      - type
+      type: object
+    reg_SecuritiesFuturesSubTypes:
+      description: Securities or futures sub-types. Required when classification type is SECURITIES_OR_FUTURES.
+      properties:
+        type:
+          description: List of securities or futures sub-types. At least one is required.
+          items:
+            description: List of securities or futures sub-types. At least one is required.
+            enum:
+            - CLEARING_BROKER_SECURITIES
+            - EXECUTION_ONLY_BROKER_SECURITIES
+            - FUTURES_COMMISSION_MERCHANT
+            - HOLDING_COMPANY
+            - INTRODUCING_BROKER_COMMODITY
+            - INTRODUCING_BROKER_SECURITIES
+            - INVESTMENT_ADVISER
+            - INVESTMENT_COMPANY
+            - RETAIL_FOREIGN_EXCHANGE_DEALER
+            - SELF_CLEARING_BROKER_SECURITIES
+            - SUBSIDIARY_OF_FINANCIAL_BANK_HOLDING_COMPANY
+            - OTHER_SECURITIES_FUTURES
+            type:
+            - string
+            - 'null'
+          maxItems: 2147483647
+          minItems: 1
+          type:
+          - array
+          - 'null'
+      type:
+      - object
+      - 'null'
+    reg_PrefillFinancialInstitutionBranch:
+      description: SAR financial institution branch data.
+      properties:
+        address:
+          $ref: '#/components/schemas/reg_BranchAddress'
+        rssd_number:
+          description: RSSD number. Numeric digits only, must not be all same digits or sequential.
+          maxLength: 20
+          minLength: 1
+          pattern: ^[0-9]*$
+          type:
+          - string
+          - 'null'
+      required:
+      - address
+      type: object
+    reg_SarBulkDeleteResults:
+      description: Per-item results for a SAR bulk delete operation, split by record type.
+      properties:
+        branches:
+          description: Results for branch identifiers.
+          items:
+            $ref: '#/components/schemas/reg_SarBulkDeleteItemResult'
+          type: array
+        financial_institutions:
+          description: Results for financial institution and agent identifiers.
+          items:
+            $ref: '#/components/schemas/reg_SarBulkDeleteItemResult'
+          type: array
+      required:
+      - branches
+      - financial_institutions
+      type: object
+    reg_BulkCreateFinancialInstitutionRequest:
+      description: Bulk create/update request for SAR financial institutions and branches.
+      properties:
+        branches:
+          description: Branches of financial institutions or agents. Optional, but the request must contain at least one financial institution or branch.
+          items:
+            $ref: '#/components/schemas/reg_BranchItem'
+          maxItems: 10000
+          minItems: 0
+          type:
+          - array
+          - 'null'
+        financial_institutions:
+          description: Financial institutions and agents. Agents have parent_external_identifier pointing to the parent FI. Optional, but the request must contain at least one financial institution or branch.
+          items:
+            $ref: '#/components/schemas/reg_FinancialInstitutionItem'
+          maxItems: 10000
+          minItems: 0
+          type:
+          - array
+          - 'null'
+      type: object
+    reg_SarFinancialInstitutionBulkDeleteRequest:
+      description: Bulk delete request for SAR financial institutions, agents, and branches.
+      properties:
+        branches:
+          description: External identifiers of SAR branches to delete.
+          items:
+            description: External identifiers of SAR branches to delete.
+            type: string
+          maxItems: 10000
+          minItems: 0
+          type: array
+        financial_institutions:
+          description: External identifiers of SAR financial institutions and agents to delete.
+          items:
+            description: External identifiers of SAR financial institutions and agents to delete.
+            type: string
+          maxItems: 10000
+          minItems: 0
+          type: array
+      required:
+      - branches
+      - financial_institutions
+      type: object
+    reg_BulkDeleteSummary:
+      description: Aggregated counts for the bulk delete operation.
+      properties:
+        deleted:
+          description: Number of items successfully deleted.
+          format: int32
+          type: integer
+        failed:
+          description: Number of items that failed.
+          format: int32
+          type: integer
+        total:
+          description: Total number of items in the request.
+          format: int32
+          type: integer
+      required:
+      - deleted
+      - failed
+      - total
+      type: object
+    reg_AlternateName:
+      description: An alternate name entry.
+      properties:
+        name:
+          description: Alternate name. No leading/trailing spaces, no tabs/newlines.
+          maxLength: 150
+          minLength: 1
+          pattern: ^[^ \t\n\r\v\f]([^\t\n\r\v\f]*[^ \t\n\r\v\f])?$
+          type:
+          - string
+          - 'null'
+        type:
+          description: Alternate name type. Required when name is provided.
+          enum:
+          - AKA
+          - DBA
+          type:
+          - string
+          - 'null'
+      type:
+      - object
+      - 'null'
+    reg_CasinoCardClubSubType:
+      description: Casino or card club sub-type.
+      properties:
+        other_type:
+          description: Free-text description. Required when type is OTHER_CARD_CLUB_OR_CASINO. No leading/trailing spaces, no tabs/newlines.
+          maxLength: 50
+          minLength: 1
+          pattern: ^[^ \t\n\r\v\f]([^\t\n\r\v\f]*[^ \t\n\r\v\f])?$
+          type:
+          - string
+          - 'null'
+        type:
+          description: The casino or card club sub-type.
+          enum:
+          - STATE_LICENSED_CASINO
+          - TRIBAL_AUTHORIZED_CASINO
+          - CARD_CLUB
+          - OTHER_CARD_CLUB_OR_CASINO
+          type:
+          - string
+          - 'null'
+      type:
+      - object
+      - 'null'
+    reg_BulkDeleteRequest:
+      description: Bulk delete request for CTR transaction locations.
+      properties:
+        external_identifiers:
+          description: List of client's unique identifiers of CTR Transaction Locations to delete.
+          items:
+            description: List of client's unique identifiers of CTR Transaction Locations to delete.
+            type: string
+          maxItems: 10000
+          minItems: 1
+          type: array
+      required:
+      - external_identifiers
+      type: object
+    reg_ValidationError:
+      description: Validation error for a specific field.
+      properties:
+        field:
+          description: JSON Pointer path to the field that failed validation (e.g. /data/address/zip).
+          type: string
+        reasons:
+          description: Reasons for the validation failure.
+          items:
+            $ref: '#/components/schemas/reg_ValidationErrorReason'
+          type: array
+        rejected:
+          description: The value that was rejected.
+          type:
+          - string
+          - 'null'
+      required:
+      - field
+      - reasons
+      type:
+      - object
+      - 'null'
+    reg_PrefillFinancialInstitution:
+      description: FinCEN SAR financial institution prefill data.
+      properties:
+        address:
+          allOf:
+          - $ref: '#/components/schemas/reg_AddressWithUnknowns'
+        alternate_names:
+          description: Alternate names for the financial institution. Maximum 99 entries, unique items.
+          items:
+            $ref: '#/components/schemas/reg_AlternateName'
+          maxItems: 99
+          minItems: 0
+          type:
+          - array
+          - 'null'
+        classification:
+          allOf:
+          - $ref: '#/components/schemas/reg_FinancialInstitutionClassification'
+        identification:
+          allOf:
+          - $ref: '#/components/schemas/reg_SarInstitutionIdentification'
+        name:
+          description: Legal name. No leading/trailing spaces, no tabs/newlines.
+          maxLength: 150
+          minLength: 1
+          pattern: ^[^ \t\n\r\v\f]([^\t\n\r\v\f]*[^ \t\n\r\v\f])?$
+          type:
+          - string
+          - 'null'
+        primary_regulator:
+          description: 'Primary federal regulator. Allowed values depend on classification type — CASINO_OR_CARD_CLUB: IRS. INSURANCE_COMPANY: IRS. MSB: IRS. All other classification types: all values allowed.'
+          enum:
+          - CFTC
+          - FRB
+          - FDIC
+          - FHFA
+          - IRS
+          - NCUA
+          - OCC
+          - SEC
+          - NOT_APPLICABLE
+          type: string
+        tin:
+          allOf:
+          - $ref: '#/components/schemas/reg_TinWithUnknown'
+      required:
+      - address
+      - classification
+      - name
+      - primary_regulator
+      - tin
+      type: object
+    reg_InstitutionIdentification:
+      description: Optional institution identification. When type is provided, value is required.
+      properties:
+        type:
+          description: Identification type.
+          enum:
+          - CRD
+          - IARD
+          - NFA
+          - RSSD
+          - SEC
+          type:
+          - string
+          - 'null'
+        value:
+          description: Identification value. Required when type is not null. Alphanumeric, 1-10 characters. Must not be all same digits or sequential (non-consecutive, non-incremental).
+          maxLength: 10
+          minLength: 1
+          pattern: ^[a-zA-Z0-9]*$
+          type:
+          - string
+          - 'null'
+      type:
+      - object
+      - 'null'
+    reg_BranchAddress:
+      description: Branch address.
+      properties:
+        city:
+          description: City. No leading/trailing spaces, no tabs/newlines.
+          maxLength: 50
+          minLength: 1
+          pattern: ^[^ \t\n\r\v\f]([^\t\n\r\v\f]*[^ \t\n\r\v\f])?$
+          type:
+          - string
+          - 'null'
+        country:
+          description: Country code (required).
+          minLength: 1
+          type:
+          - string
+          - 'null'
+        state:
+          description: 'State/province code. Required for US, CA, MX. If country is US: valid US state code (e.g. AL, CA, NY) including DC and military codes (AA, AE, AP). If country is CA: valid Canadian province/territory code (e.g. ON, BC, QC). If country is MX: valid Mexican state code (e.g. AGU, BCN, CMX).'
+          type:
+          - string
+          - 'null'
+        street_address:
+          description: Street address. No leading/trailing spaces, no tabs/newlines.
+          maxLength: 100
+          minLength: 1
+          pattern: ^[^ \t\n\r\v\f]([^\t\n\r\v\f]*[^ \t\n\r\v\f])?$
+          type:
+          - string
+          - 'null'
+        zip:
+          description: 'ZIP/postal code. US/territories: 5 or 9 digits, must not end in 0000 or 9999. Non-US: 1-9 alphanumeric characters.'
+          maxLength: 9
+          minLength: 1
+          type:
+          - string
+          - 'null'
+      required:
+      - country
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http

@@ -1,0 +1,456 @@
+openapi: 3.2.0
+info:
+  title: Mesh Case Workflows API
+  version: v2.0
+servers:
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
+security:
+- BearerAuth: []
+tags:
+- name: Case Workflows
+paths:
+  /v2/cases/workflows:
+    get:
+      description: This endpoint returns a page of workflows.
+      operationId: casesService/v2/cases/workflows.get
+      parameters:
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 25
+          minimum: 1
+          type: integer
+      - description: 'Sorting criteria in the format of: `[-]property` (`-` descending modifier).
+
+
+          * Default sort order is ascending (without `-`).
+
+
+          * Multiple sort criteria are supported.'
+        example:
+        - -timestamp
+        in: query
+        name: sort
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_PaginatedResponseWorkflowResponse'
+          description: OK
+      summary: Get list of case workflows
+      tags:
+      - Case Workflows
+  /v2/cases/workflows/{workflow_identifier}:
+    get:
+      description: This endpoint returns the latest version of a single workflow by ID.
+      operationId: casesService/v2/cases/workflows/workflow_identifier.get
+      parameters:
+      - description: The unique identifier of the workflow.
+        example: 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: path
+        name: workflow_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_WorkflowResponse'
+          description: OK
+      summary: Get a specific case workflow
+      tags:
+      - Case Workflows
+    put:
+      description: 'This endpoint updates a single workflow by ID.
+
+
+        Supported Operations:
+
+        - Rename Stages:
+
+        - You can change the name of existing stages
+
+        - Any change in name will apply to all cases, including closed cases. Ensure the new stage name preserves the original meaning to maintain integrity in audit logs, insights, and reports
+
+        - Renaming decisions does not change their decision type
+
+        - Reorder Stages:
+
+        - Stages of types Reviews and Decision can be reordered across the new display order
+
+        - Stages can only be reordered within their types
+
+
+        - Add Stages:
+
+        - Review stage:
+
+        - a minimum of 1 review stage is needed
+
+        - a maximum of 8 review stages are allowed
+
+        - Decisions:
+
+        - a minimum of 2 decisions are needed and this should include one of each:
+
+        - positive
+
+        - negative
+
+        - a maximum of 8 decisions are allowed
+
+        - Change Alert Grouping:
+
+        - Alert Grouping can be set to true or false
+
+        - If the property is not set no change will be made
+
+
+        You need the "Update case workflows" permission to use this endpoint.'
+      operationId: casesService/v2/cases/workflows/workflow_identifier.put
+      parameters:
+      - description: The unique identifier of the workflow.
+        example: 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: path
+        name: workflow_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            example:
+              stages:
+              - display_name: The initial stage
+                display_order: 1
+                identifier: 018f348d-e9a1-7641-ab3f-371d3d7e314d
+                stage_type: INITIAL
+              - display_name: A review stage
+                display_order: 2
+                identifier: 018f348d-e9a1-7af5-a843-f743f3eb4846
+                stage_type: REVIEW
+              - decision_type: POSITIVE
+                display_name: An existing decision stage
+                display_order: 3
+                identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                stage_type: DECISION
+              - decision_type: NEGATIVE
+                display_name: A new decision stage
+                display_order: 4
+                stage_type: DECISION
+            schema:
+              $ref: '#/components/schemas/case-management_UpdateWorkflowRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+                alert_grouping_enabled: true
+                case_type: CUSTOMER_ONBOARDING
+                created_at: '2025-02-13T10:18:10.324Z'
+                created_by: 3fa85f64-5717-4562-b3fc-2c963f66afd6
+                identifier: 3fa85f64-5717-4562-b3fc-2c963f66afe6
+                stages:
+                - display_name: The initial stage
+                  display_order: 1
+                  identifier: 018f348d-e9a1-7641-ab3f-371d3d7e314d
+                  stage_type: INITIAL
+                - display_name: A review stage
+                  display_order: 2
+                  identifier: 018f348d-e9a1-7af5-a843-f743f3eb4846
+                  stage_type: REVIEW
+                - decision_type: POSITIVE
+                  display_name: An existing decision stage
+                  display_order: 3
+                  identifier: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                  stage_type: DECISION
+                - decision_type: NEGATIVE
+                  display_name: A new decision stage
+                  display_order: 4
+                  identifier: 3fa85f64-5717-4562-b3fc-2c963f66afc6
+                  stage_type: DECISION
+                version: 3
+              schema:
+                $ref: '#/components/schemas/case-management_WorkflowResponse'
+          description: OK
+      summary: Update a specific case workflow
+      tags:
+      - Case Workflows
+  /v2/cases/workflows/{workflow_identifier}/versions/{version}:
+    get:
+      description: This endpoint returns a specific version of a single workflow by ID.
+      operationId: casesService/v2/cases/workflows/workflow_identifier/versions/version.get
+      parameters:
+      - description: The unique identifier of the workflow.
+        example: 01899c37-576b-7677-b41a-9c9fdbd3bde1
+        in: path
+        name: workflow_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: The version of the workflow.
+        example: 1
+        in: path
+        name: version
+        required: true
+        schema:
+          format: int32
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/case-management_WorkflowResponse'
+          description: OK
+      summary: Get a specific version of a case workflow
+      tags:
+      - Case Workflows
+components:
+  schemas:
+    case-management_WorkflowResponse:
+      description: Workflow
+      properties:
+        alert_grouping_enabled:
+          description: Clients can enable or disable grouping of multiple alerts in a case via this configuration. When enabled, if new alerts are generated, these will continue to group within an existing open case rather than trigger the creation of new cases. We recommend that this configuration must always remain enabled for Transaction monitoring cases, as having alerts grouped in a single case provides an overall view of alert activity for a given customer or counterparty.
+          type: boolean
+        case_type:
+          description: The type of the case to which the workflow applies.
+          enum:
+          - CUSTOMER_ONBOARDING
+          - CUSTOMER_MONITORING
+          - PAYMENT_SCREENING
+          - TRANSACTION_MONITORING
+          type: string
+        created_at:
+          description: Workflow created date and time.
+          format: date-time
+          type: string
+        created_by:
+          description: User identifier that created the workflow; null if created by a system action.
+          format: uuid
+          type:
+          - string
+          - 'null'
+        identifier:
+          description: Workflow unique identifier.
+          format: uuid
+          type: string
+        stages:
+          description: List of all stages in the workflow.
+          items:
+            $ref: '#/components/schemas/case-management_Stage'
+          type: array
+        version:
+          description: The version of the workflow.
+          format: int32
+          type: integer
+      required:
+      - alert_grouping_enabled
+      - case_type
+      - created_at
+      - identifier
+      - stages
+      - version
+      type: object
+    case-management_NewStage:
+      additionalProperties: false
+      description: The stage to be created
+      properties:
+        decision_type:
+          description: The decision type of the stage (decision stages only).
+          enum:
+          - POSITIVE
+          - NEGATIVE
+          - PARTIAL_POSITIVE
+          type:
+          - string
+          - 'null'
+        display_name:
+          description: The display name of the stage.
+          maxLength: 30
+          minLength: 3
+          type: string
+        display_order:
+          description: The display order of the stage.
+          format: int32
+          minimum: 1
+          type: integer
+        stage_type:
+          description: The type of the stage.
+          enum:
+          - INITIAL
+          - REVIEW
+          - DECISION
+          type: string
+      required:
+      - display_name
+      - display_order
+      - stage_type
+      type: object
+    case-management_UpdateWorkflowRequest:
+      properties:
+        alert_grouping_enabled:
+          description: Clients can enable or disable grouping of multiple alerts in a case via this configuration. When enabled, if new alerts are generated, these will continue to group within an existing open case rather than trigger the creation of new cases. We recommend that this configuration must always remain enabled for Transaction monitoring cases, as having alerts grouped in a single case provides an overall view of alert activity for a given customer or counterparty.
+          type:
+          - boolean
+          - 'null'
+        stages:
+          items:
+            $ref: '#/components/schemas/case-management_StageData'
+          type: array
+      required:
+      - stages
+      type: object
+    case-management_Stage:
+      description: Stage
+      properties:
+        decision_type:
+          description: The decision type of the stage (decision stages only).
+          enum:
+          - POSITIVE
+          - NEGATIVE
+          - PARTIAL_POSITIVE
+          type:
+          - string
+          - 'null'
+        display_name:
+          description: The display name of the stage.
+          maxLength: 30
+          minLength: 3
+          type: string
+        display_order:
+          description: The display order of the stage.
+          format: int32
+          minimum: 1
+          type: integer
+        identifier:
+          description: Stage unique identifier.
+          format: uuid
+          type: string
+        stage_type:
+          description: The type of the stage.
+          enum:
+          - INITIAL
+          - REVIEW
+          - DECISION
+          type: string
+      required:
+      - display_name
+      - display_order
+      - identifier
+      - stage_type
+      type: object
+    case-management_ExistingStage:
+      description: The existing Stage to be updated or remain unchanged
+      properties:
+        decision_type:
+          description: The decision type of the stage (decision stages only).
+          enum:
+          - POSITIVE
+          - NEGATIVE
+          - PARTIAL_POSITIVE
+          type:
+          - string
+          - 'null'
+        display_name:
+          description: The display name of the stage.
+          maxLength: 30
+          minLength: 3
+          type: string
+        display_order:
+          description: The display order of the stage.
+          format: int32
+          minimum: 1
+          type: integer
+        identifier:
+          description: Stage identifier.
+          format: uuid
+          type: string
+        stage_type:
+          description: The type of the stage.
+          enum:
+          - INITIAL
+          - REVIEW
+          - DECISION
+          type: string
+      required:
+      - display_name
+      - display_order
+      - identifier
+      - stage_type
+      type: object
+    case-management_StageData:
+      oneOf:
+      - $ref: '#/components/schemas/case-management_ExistingStage'
+      - $ref: '#/components/schemas/case-management_NewStage'
+      type: object
+    case-management_PaginatedResponseWorkflowResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+        workflows:
+          items:
+            $ref: '#/components/schemas/case-management_WorkflowResponse'
+          type: array
+      required:
+      - first
+      - self
+      - workflows
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http

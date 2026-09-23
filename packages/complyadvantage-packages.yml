@@ -1,0 +1,111 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  npm registry search, pypi.org/pypi/complyadvantage/json,
+  rubygems.org/api/v1/gems/complyadvantage.json,
+  repo.packagist.org/p2/complyadvantage/php-compliance-api.json,
+  api.github.com/orgs/ComplyAdvantage/repos,
+  https://docs.mesh.complyadvantage.com/docs/postman-and-openapi-schema
+provider: ComplyAdvantage
+providerId: complyadvantage
+description: >-
+  ComplyAdvantage published three first-party API client libraries in 2014 - a Python
+  package, a Ruby gem, and a PHP Composer package - all wrapping the original
+  "sanctions API". None has had a release since 2014, the PHP package is flagged
+  abandoned on Packagist, and every one of the three GitHub repositories they name as
+  their source has been removed from the ComplyAdvantage organization (404). The
+  company ships no client library for the current REST API (api.complyadvantage.com)
+  and none for the Mesh platform API (api.mesh.complyadvantage.com, v2/v3, 163
+  operations). The supported integration path published today is the OpenAPI schema
+  plus a forkable Postman collection, not an SDK.
+notes: >-
+  This is the strongest decay signal in the repo: the newest first-party client release
+  is 2014-10-16, twelve years older than the Mesh API it would have to wrap. Treat all
+  three as historical. npm, NuGet, pkg.go.dev and crates.io carry no first-party
+  ComplyAdvantage package - the single npm search hit (@tradle/conf) is a third-party
+  Tradle CLI, not a ComplyAdvantage library.
+packages:
+- name: complyadvantage
+  registry: pypi
+  language: Python
+  url: https://pypi.org/project/complyadvantage/
+  official: true
+  version: '0.3'
+  published: '2014-07-24'
+  status: abandoned
+  repository: https://github.com/complyadvantage/python-sanctions-api
+  repository_status: 404 - removed from the GitHub organization
+  author: ComplyAdvantage
+  summary: ComplyAdvantage sanctions API wrapper
+  releases:
+  - '0.1'
+  - '0.2'
+  - '0.3'
+  note: >-
+    First-party (author "ComplyAdvantage", author_email @complyadvantage.com, homepage
+    on the ComplyAdvantage GitHub org). Wraps the original sanctions API only; predates
+    /searches, monitored searches, case management and the entire Mesh platform.
+- name: complyadvantage
+  registry: rubygems
+  language: Ruby
+  url: https://rubygems.org/gems/complyadvantage
+  official: true
+  version: 0.1.1
+  published: '2014-07-24'
+  status: abandoned
+  repository: null
+  homepage: http://complyadvantage.com
+  author: ComplyAdvantage
+  summary: ComplyAdvantage sanctions API wrapper
+  releases:
+  - 0.0.3
+  - '0.1'
+  - 0.1.1
+  note: >-
+    First-party by author and homepage. rubygems metadata declares no source_code_uri.
+- name: complyadvantage/php-compliance-api
+  registry: packagist
+  language: PHP
+  url: https://packagist.org/packages/complyadvantage/php-compliance-api
+  official: true
+  version: 0.8.1
+  published: '2014-10-16'
+  status: abandoned
+  abandoned_flag: true
+  repository: https://github.com/ComplyAdvantage/php-compliance-api
+  repository_status: 404 - removed from the GitHub organization
+  downloads_total: 717
+  summary: PHP wrapper for the ComplyAdvantage Sanctions API
+  note: >-
+    Packagist marks this package "abandoned: true" - the provider's own explicit
+    end-of-life signal. Newest first-party client release across all registries.
+distributions:
+- name: ComplyAdvantage Mesh Postman collection
+  kind: postman-collection
+  registry: postman
+  url: https://www.postman.com/teamcomplyadvantage/workspace/complyadvantage/collection/37100431-42eb1f77-1374-485d-999c-f2bea24f2bec
+  official: true
+  version: null
+  published: null
+  status: live
+  note: >-
+    Public forkable collection in the teamcomplyadvantage Postman workspace, linked from
+    the provider's own "Postman and OpenAPI Schema" docs page. Not a registry package -
+    Postman publishes no version or release date for a public collection, so both fields
+    are recorded null rather than guessed. HTTP 200 on 2026-08-27.
+absent_registries:
+- registry: npm
+  checked: '2026-08-27'
+  result: no first-party package
+- registry: nuget
+  checked: '2026-08-27'
+  result: no first-party package
+- registry: pkg.go.dev
+  checked: '2026-08-27'
+  result: no first-party package
+- registry: crates.io
+  checked: '2026-08-27'
+  result: no first-party package
+- registry: maven-central
+  checked: '2026-08-27'
+  result: no first-party package

@@ -1,0 +1,3283 @@
+openapi: 3.2.0
+info:
+  title: Mesh Audit API
+  version: v2.0
+servers:
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
+security:
+- BearerAuth: []
+tags:
+- name: Audit
+paths:
+  /v2/audit/accounts/me:
+    get:
+      description: 'Returns the audit log trail for your account.
+
+
+        You need the "View all accounts" permission to use this endpoint.'
+      operationId: auditGetMyAccountAuditTrailV2
+      parameters:
+      - description: Page index
+        example: 1
+        in: query
+        name: page_number
+        schema:
+          type: integer
+      - description: The size of the page to be returned
+        example: 50
+        in: query
+        name: page_size
+        schema:
+          default: 50
+          type: integer
+      - description: Sorting criteria in the format (-)?[parameter]. Default sort order is ascending. for descending prefix the parameter with `-` Multiple sort criteria are supported.
+        example:
+        - -occurred_at
+        in: query
+        name: sort
+        schema:
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_AccountAuditLogsPageV2'
+          description: Returns the audit log trail for the account.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_ProblemDetailErrorResponse'
+          description: Invalid request.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_ProblemDetailErrorResponse'
+          description: Missing CLIENTS_ACCOUNTS_VIEW permission.
+      summary: Get audit log for your account
+      tags:
+      - Audit
+  /v2/audit/cases/{case_identifier}:
+    get:
+      description: 'Returns the audit log trail for a case.
+
+
+        You need one of the "View cases", "View cases (customer onboarding)", "View cases (customer monitoring)", "View cases (payment screening)" or "View cases (transaction monitoring)" permissions to use this endpoint.'
+      operationId: auditGetCaseAuditTrailV2
+      parameters:
+      - description: The case identifier
+        example: 018d0dd4-9b7c-7537-aaac-13f2f48877af
+        in: path
+        name: case_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: Page index
+        example: 1
+        in: query
+        name: page_number
+        schema:
+          type: integer
+      - description: The size of the page to be returned
+        example: 50
+        in: query
+        name: page_size
+        schema:
+          default: 50
+          type: integer
+      - description: Sorting criteria in the format (-)?[parameter]. Default sort order is ascending. for descending prefix the parameter with `-` Multiple sort criteria are supported.
+        example:
+        - -occurred_at
+        in: query
+        name: sort
+        schema:
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_CaseAuditLogsPageV2'
+          description: Returns the audit log trail for the case.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_ProblemDetailErrorResponse'
+          description: Invalid case uuid identifier.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_ProblemDetailErrorResponse'
+          description: No logs found for case.
+      summary: Get audit log for a case
+      tags:
+      - Audit
+  /v2/audit/customers/{customer_identifier}:
+    get:
+      description: 'Returns the audit log trail for a customer.
+
+
+        You need the "View customers" permission to use this endpoint.'
+      operationId: auditGetCustomerAuditTrailV2
+      parameters:
+      - description: The customer identifier
+        example: 018d0dd4-9b7c-7537-aaac-13f2f48877af
+        in: path
+        name: customer_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: Page index
+        example: 1
+        in: query
+        name: page_number
+        schema:
+          type: integer
+      - description: The size of the page to be returned
+        example: 50
+        in: query
+        name: page_size
+        schema:
+          default: 50
+          type: integer
+      - description: Sorting criteria in the format (-)?[parameter]. Default sort order is ascending. for descending prefix the parameter with `-` Multiple sort criteria are supported.
+        example:
+        - -occurred_at
+        in: query
+        name: sort
+        schema:
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_CustomerAuditLogsPageV2'
+          description: Returns the audit log trail for the customer.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_ProblemDetailErrorResponse'
+          description: Invalid customer uuid identifier.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_ProblemDetailErrorResponse'
+          description: No logs found for customer.
+      summary: Get audit log for a customer
+      tags:
+      - Audit
+  /v2/audit/roles/{role_identifier}:
+    get:
+      description: 'Returns the audit log trail for a role.
+
+
+        You need the "View roles in account" permission to use this endpoint.'
+      operationId: auditGetRoleAuditTrailV2
+      parameters:
+      - description: The role identifier
+        example: 018d0dd4-9b7c-7537-aaac-13f2f48877af
+        in: path
+        name: role_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: Page index
+        example: 1
+        in: query
+        name: page_number
+        schema:
+          type: integer
+      - description: The size of the page to be returned
+        example: 50
+        in: query
+        name: page_size
+        schema:
+          default: 50
+          type: integer
+      - description: Sorting criteria in the format (-)?[parameter]. Default sort order is ascending. for descending prefix the parameter with `-` Multiple sort criteria are supported.
+        example:
+        - -occurred_at
+        in: query
+        name: sort
+        schema:
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_RoleAuditLogsPage'
+          description: Returns the audit log trail for the role.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_ProblemDetailErrorResponse'
+          description: Invalid role uuid identifier.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_ProblemDetailErrorResponse'
+          description: Missing ACCOUNTS_ROLES_VIEW permission.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_ProblemDetailErrorResponse'
+          description: No logs found for role.
+      summary: Get audit log for a role
+      tags:
+      - Audit
+  /v2/audit/transactions/{transaction_identifier}:
+    get:
+      description: 'Returns the audit log trail for a transaction.
+
+
+        You need the "View transactions" permission to use this endpoint.'
+      operationId: auditGetTransactionAuditTrailV2
+      parameters:
+      - description: The transaction identifier
+        example: 018d0dd4-9b7c-7537-aaac-13f2f48877af
+        in: path
+        name: transaction_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: Page index
+        example: 1
+        in: query
+        name: page_number
+        schema:
+          type: integer
+      - description: The size of the page to be returned
+        example: 50
+        in: query
+        name: page_size
+        schema:
+          default: 50
+          type: integer
+      - description: Sorting criteria in the format (-)?[parameter]. Default sort order is ascending. for descending prefix the parameter with `-` Multiple sort criteria are supported.
+        example:
+        - -occurred_at
+        in: query
+        name: sort
+        schema:
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_TransactionAuditLogsPageV2'
+          description: Returns the audit log trail for the transaction.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_ProblemDetailErrorResponse'
+          description: Invalid transaction uuid identifier.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_ProblemDetailErrorResponse'
+          description: No logs found for transaction.
+      summary: Get audit log for a transaction
+      tags:
+      - Audit
+  /v2/audit/users/{user_identifier}:
+    get:
+      description: 'Returns the audit log trail for a user.
+
+
+        You need the "View users" permission to use this endpoint.'
+      operationId: auditGetUserAuditTrailV2
+      parameters:
+      - description: The user identifier
+        example: 018d0dd4-9b7c-7537-aaac-13f2f48877af
+        in: path
+        name: user_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: Page index
+        example: 1
+        in: query
+        name: page_number
+        schema:
+          type: integer
+      - description: The size of the page to be returned
+        example: 50
+        in: query
+        name: page_size
+        schema:
+          default: 50
+          type: integer
+      - description: Sorting criteria in the format (-)?[parameter]. Default sort order is ascending. for descending prefix the parameter with `-` Multiple sort criteria are supported.
+        example:
+        - -occurred_at
+        in: query
+        name: sort
+        schema:
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_UserAuditLogsPageV2'
+          description: Returns the audit log trail for the user.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/audit_ProblemDetailErrorResponse'
+          description: Invalid user uuid identifier.
+      summary: Get audit log for a user
+      tags:
+      - Audit
+components:
+  schemas:
+    audit_UserActivatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_UserActivatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - USER_ACTIVATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_UserRolesUpdatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_UserRolesUpdatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - USER_ROLES_UPDATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_AlertStateUpdatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_AlertStateUpdatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - ALERT_STATE_UPDATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_CaseCreatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_CaseCreatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - CASE_CREATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_ScenarioConfiguration:
+      properties:
+        identifier:
+          example: 018d0dd4-9b7c-7537-aaac-13f2f48877af
+          format: uuid
+          type: string
+        outcome:
+          enum:
+          - ALLOW
+          - HOLD
+          - PROCESS
+          - PENDING
+          - ERROR
+          example: HOLD
+          type: string
+      required:
+      - identifier
+      - outcome
+      type: object
+    audit_CustomerScreenedDetailV2:
+      properties:
+        alert:
+          allOf:
+          - $ref: '#/components/schemas/audit_Alert'
+        case:
+          allOf:
+          - $ref: '#/components/schemas/audit_Case'
+        customer:
+          $ref: '#/components/schemas/audit_CustomerReference'
+        risk_identifiers:
+          items:
+            format: uuid
+            type: string
+          type: array
+        risk_source:
+          enum:
+          - CUSTOMER_SCREENING
+          - KYB
+          - PAYMENT_SCREENING
+          - TRANSACTION_MONITORING
+          type: string
+        screening_configuration:
+          $ref: '#/components/schemas/audit_Screening'
+      required:
+      - customer
+      - risk_identifiers
+      - risk_source
+      - screening_configuration
+      type: object
+    audit_AccountAuditLogsPageV2:
+      properties:
+        audit_logs:
+          items:
+            discriminator:
+              mapping:
+                ACCOUNT_ACTIVATED: '#/components/schemas/audit_AccountActivatedLogV2'
+                ACCOUNT_CREATED: '#/components/schemas/audit_AccountCreatedLogV2'
+                ACCOUNT_DEACTIVATED: '#/components/schemas/audit_AccountDeactivatedLogV2'
+                ACCOUNT_IP_RESTRICTIONS_UPDATED: '#/components/schemas/audit_AccountIpRestrictionsUpdatedLogV2'
+                ACCOUNT_NAME_UPDATED: '#/components/schemas/audit_AccountNameUpdatedLogV2'
+                ACCOUNT_PERMISSIONS_UPDATED: '#/components/schemas/audit_AccountPermissionsUpdatedLogV2'
+                ACCOUNT_RATE_LIMITS_UPDATED: '#/components/schemas/audit_AccountRateLimitsUpdatedLogV2'
+                ACCOUNT_TYPE_UPDATED: '#/components/schemas/audit_AccountTypeUpdatedLogV2'
+              propertyName: type
+            oneOf:
+            - $ref: '#/components/schemas/audit_AccountCreatedLogV2'
+            - $ref: '#/components/schemas/audit_AccountDeactivatedLogV2'
+            - $ref: '#/components/schemas/audit_AccountActivatedLogV2'
+            - $ref: '#/components/schemas/audit_AccountNameUpdatedLogV2'
+            - $ref: '#/components/schemas/audit_AccountTypeUpdatedLogV2'
+            - $ref: '#/components/schemas/audit_AccountIpRestrictionsUpdatedLogV2'
+            - $ref: '#/components/schemas/audit_AccountPermissionsUpdatedLogV2'
+            - $ref: '#/components/schemas/audit_AccountRateLimitsUpdatedLogV2'
+            type: object
+          type: array
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - audit_logs
+      - first
+      - self
+      type: object
+    audit_RoleAuditLogsPage:
+      properties:
+        audit_logs:
+          items:
+            $ref: '#/components/schemas/audit_RoleAuditLog'
+          type: array
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - audit_logs
+      - first
+      - self
+      type: object
+    audit_CustomerWithStatus:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+        previous_status:
+          enum:
+          - ONBOARDING
+          - ACTIVE
+          - CLOSED
+          - PROCESSING
+          - ONBOARDING_CASE
+          type:
+          - string
+          - 'null'
+        status:
+          enum:
+          - ONBOARDING
+          - ACTIVE
+          - CLOSED
+          - PROCESSING
+          - ONBOARDING_CASE
+          type: string
+        version:
+          format: int32
+          type: integer
+      required:
+      - identifier
+      - status
+      - version
+      type: object
+    audit_UserReference:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+      required:
+      - identifier
+      type: object
+    audit_CustomerProductUpdatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_CustomerProductUpdatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - CUSTOMER_PRODUCT_UPDATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_CustomerMigratedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_CustomerMigratedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - CUSTOMER_MIGRATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_UserDeactivatedDetailV2:
+      properties:
+        user:
+          $ref: '#/components/schemas/audit_UserReference'
+      required:
+      - user
+      type: object
+    audit_RiskCodeUnmutedForEntityLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_RiskCodeMutedForEntityDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - RISK_CODE_UNMUTED_FOR_ENTITY
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_CaseAssignedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_CaseAssignedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - CASE_ASSIGNED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_VersionedTransactionWithTypeAndReceivedAt:
+      properties:
+        identifier:
+          example: 018d0dd4-9b7c-7537-aaac-13f2f48877af
+          format: uuid
+          type: string
+        received_at:
+          example: '2024-01-15T10:30:00.000Z'
+          format: date-time
+          type: string
+        type:
+          enum:
+          - BANK_PAYMENT
+          - CARD_PAYMENT
+          - REMITTANCE
+          - CRYPTO
+          example: BANK_PAYMENT
+          type: string
+        version:
+          example: 1
+          format: int32
+          type: integer
+      required:
+      - identifier
+      - received_at
+      - type
+      - version
+      type: object
+    audit_PaymentScreenedDetailV2:
+      properties:
+        case:
+          allOf:
+          - $ref: '#/components/schemas/audit_Case'
+        risk_identifiers:
+          example:
+          - 018d0dd4-9b7c-7537-aaac-13f2f48877af
+          items:
+            format: uuid
+            type: string
+          type: array
+          uniqueItems: true
+        transaction:
+          $ref: '#/components/schemas/audit_VersionedTransactionWithType'
+      required:
+      - risk_identifiers
+      - transaction
+      type: object
+    audit_UserCreatedDetailV2:
+      properties:
+        client:
+          $ref: '#/components/schemas/audit_ClientReference'
+        user:
+          $ref: '#/components/schemas/audit_UserReference'
+      required:
+      - client
+      - user
+      type: object
+    audit_CustomerProductUpdatedDetailV2:
+      properties:
+        created_products:
+          items:
+            $ref: '#/components/schemas/audit_ProductDetail'
+          type: array
+          uniqueItems: true
+        customer:
+          $ref: '#/components/schemas/audit_CustomerReference'
+        deleted_products:
+          items:
+            $ref: '#/components/schemas/audit_ProductDetail'
+          type: array
+          uniqueItems: true
+      required:
+      - created_products
+      - customer
+      - deleted_products
+      type: object
+    audit_AccountReference:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+      required:
+      - identifier
+      type: object
+    audit_RiskWithSource:
+      properties:
+        identifier:
+          format: uuid
+          type:
+          - string
+          - 'null'
+        source:
+          enum:
+          - CUSTOMER_SCREENING
+          - KYB
+          - PAYMENT_SCREENING
+          - TRANSACTION_MONITORING
+          type: string
+      required:
+      - source
+      type: object
+    audit_NoteToCustomerDetailV2:
+      properties:
+        customer_identifier:
+          format: uuid
+          type: string
+        note:
+          $ref: '#/components/schemas/audit_Note'
+      required:
+      - customer_identifier
+      - note
+      type: object
+    audit_CaseCreatedDetailV2:
+      properties:
+        case:
+          $ref: '#/components/schemas/audit_CaseInfoV2'
+        customer:
+          $ref: '#/components/schemas/audit_CustomerReference'
+        subjects:
+          items:
+            $ref: '#/components/schemas/audit_CaseSubjectInfo'
+          type:
+          - array
+          - 'null'
+      required:
+      - case
+      - customer
+      type: object
+    audit_UserAccountRemovedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_UserAccountRemovedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - USER_ACCOUNT_REMOVED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_AccountWithRolesInfo:
+      properties:
+        added_role_identifiers:
+          items:
+            $ref: '#/components/schemas/audit_RoleReference'
+          type: array
+          uniqueItems: true
+        identifier:
+          format: uuid
+          type: string
+        removed_role_identifiers:
+          items:
+            $ref: '#/components/schemas/audit_RoleReference'
+          type: array
+          uniqueItems: true
+      required:
+      - added_role_identifiers
+      - identifier
+      - removed_role_identifiers
+      type: object
+    audit_NoteToCaseObjectLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_NoteToCaseObjectDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - NOTE_TO_CASE_OBJECT
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_AccountActivatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_AccountActivatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - ACCOUNT_ACTIVATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_RoleReference:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+      required:
+      - identifier
+      type: object
+    audit_AccountPermissionsUpdatedDetailV2:
+      properties:
+        account:
+          $ref: '#/components/schemas/audit_AccountReference'
+        permissions:
+          items:
+            format: int32
+            type: integer
+          type: array
+        previous_permissions:
+          items:
+            format: int32
+            type: integer
+          type: array
+      required:
+      - account
+      - permissions
+      - previous_permissions
+      type: object
+    audit_UserAuditLogsPageV2:
+      properties:
+        audit_logs:
+          items:
+            discriminator:
+              mapping:
+                USER_ACCOUNT_ASSIGNED: '#/components/schemas/audit_UserAccountAssignedLogV2'
+                USER_ACCOUNT_REMOVED: '#/components/schemas/audit_UserAccountRemovedLogV2'
+                USER_ACTIVATED: '#/components/schemas/audit_UserActivatedLogV2'
+                USER_CREATED: '#/components/schemas/audit_UserCreatedLogV2'
+                USER_DEACTIVATED: '#/components/schemas/audit_UserDeactivatedLogV2'
+                USER_NAME_UPDATED: '#/components/schemas/audit_UserNameUpdatedLogV2'
+                USER_ROLES_UPDATED: '#/components/schemas/audit_UserRolesUpdatedLogV2'
+              propertyName: type
+            oneOf:
+            - $ref: '#/components/schemas/audit_UserCreatedLogV2'
+            - $ref: '#/components/schemas/audit_UserActivatedLogV2'
+            - $ref: '#/components/schemas/audit_UserDeactivatedLogV2'
+            - $ref: '#/components/schemas/audit_UserNameUpdatedLogV2'
+            - $ref: '#/components/schemas/audit_UserAccountAssignedLogV2'
+            - $ref: '#/components/schemas/audit_UserAccountRemovedLogV2'
+            - $ref: '#/components/schemas/audit_UserRolesUpdatedLogV2'
+            type: object
+          type: array
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - audit_logs
+      - first
+      - self
+      type: object
+    audit_RiskScoreAssignedToCustomerLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_RiskScoreAssignedToCustomerDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - RISK_SCORE_CALCULATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_TransactionMonitoredDetailV2:
+      properties:
+        risk_identifiers:
+          example:
+          - 018d0dd4-9b7c-7537-aaac-13f2f48877af
+          items:
+            format: uuid
+            type: string
+          type: array
+          uniqueItems: true
+        risk_source:
+          enum:
+          - CUSTOMER_SCREENING
+          - KYB
+          - PAYMENT_SCREENING
+          - TRANSACTION_MONITORING
+          example: TRANSACTION_MONITORING
+          type: string
+        scenario_evaluations:
+          $ref: '#/components/schemas/audit_ScenarioEvaluations'
+        transaction:
+          $ref: '#/components/schemas/audit_VersionedTransactionWithType'
+      required:
+      - risk_identifiers
+      - risk_source
+      - scenario_evaluations
+      - transaction
+      type: object
+    audit_RiskScoreAssignedToCustomerDetailV2:
+      properties:
+        customer:
+          $ref: '#/components/schemas/audit_CustomerReference'
+        override_reason:
+          type:
+          - string
+          - 'null'
+        previous_override_reason:
+          type:
+          - string
+          - 'null'
+        previous_risk_score:
+          $ref: '#/components/schemas/audit_RiskScore'
+        risk_score:
+          $ref: '#/components/schemas/audit_RiskScore'
+      required:
+      - customer
+      - risk_score
+      type: object
+    audit_AccountActivatedDetailV2:
+      properties:
+        account:
+          $ref: '#/components/schemas/audit_AccountReference'
+      required:
+      - account
+      type: object
+    audit_CustomerScreenedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_CustomerScreenedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - CUSTOMER_SCREENED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_CustomerConfigurationUpdatedDetailV2:
+      properties:
+        customer:
+          $ref: '#/components/schemas/audit_CustomerReference'
+        monitoring:
+          $ref: '#/components/schemas/audit_CustomerMonitoring'
+        previous_monitoring:
+          $ref: '#/components/schemas/audit_CustomerMonitoring'
+      required:
+      - customer
+      - monitoring
+      - previous_monitoring
+      type: object
+    audit_CustomerStatusUpdatedDetailV2:
+      properties:
+        customer:
+          $ref: '#/components/schemas/audit_CustomerWithStatus'
+      required:
+      - customer
+      type: object
+    audit_RoleArchivedDetail:
+      allOf:
+      - $ref: '#/components/schemas/audit_RoleAuditLogDetail'
+      title: Role archived
+      type: object
+    audit_Assignee:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+      required:
+      - identifier
+      type: object
+    audit_NoteToRiskDetailV2:
+      properties:
+        case:
+          $ref: '#/components/schemas/audit_Case'
+        note:
+          $ref: '#/components/schemas/audit_Note'
+        risk:
+          $ref: '#/components/schemas/audit_Risk'
+      required:
+      - case
+      - note
+      - risk
+      type: object
+    audit_SubjectAddedToCaseDetailV2:
+      properties:
+        case:
+          $ref: '#/components/schemas/audit_CaseInfoV2'
+        customer:
+          $ref: '#/components/schemas/audit_CustomerReference'
+        subjects:
+          items:
+            $ref: '#/components/schemas/audit_CaseSubjectInfo'
+          type: array
+      required:
+      - case
+      - customer
+      - subjects
+      type: object
+    audit_AlertAddedToCaseLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_AlertAddedToCaseDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - ALERT_ADDED_TO_CASE
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_RiskWithType:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+        type:
+          enum:
+          - ENTITY_SCREENING
+          - PAYMENT_SCREENING
+          - TRANSACTION_MONITORING
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      type: object
+    audit_NoteToCustomerLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_NoteToCustomerDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - NOTE_CREATED_TO_CUSTOMER
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_UserAccountAssignedDetailV2:
+      properties:
+        account:
+          $ref: '#/components/schemas/audit_AccountReference'
+        user:
+          $ref: '#/components/schemas/audit_UserReference'
+      required:
+      - account
+      - user
+      type: object
+    audit_CaseAssignedDetailV2:
+      properties:
+        assignee:
+          allOf:
+          - $ref: '#/components/schemas/audit_Assignee'
+        case:
+          $ref: '#/components/schemas/audit_CaseInfoV2'
+        customer:
+          $ref: '#/components/schemas/audit_CustomerReference'
+        previous_assignee:
+          $ref: '#/components/schemas/audit_Assignee'
+      required:
+      - case
+      - customer
+      type: object
+    audit_SegmentIdentifier:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+        version:
+          format: int32
+          type: integer
+      required:
+      - identifier
+      - version
+      type: object
+    audit_UserCreatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_UserCreatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - USER_CREATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_AccountCreatedDetailV2:
+      properties:
+        account:
+          $ref: '#/components/schemas/audit_AccountReference'
+        client:
+          $ref: '#/components/schemas/audit_ClientReference'
+      required:
+      - account
+      - client
+      type: object
+    audit_ScenarioEvaluations:
+      properties:
+        configurations:
+          items:
+            $ref: '#/components/schemas/audit_ScenarioConfiguration'
+          type: array
+          uniqueItems: true
+        outcome:
+          enum:
+          - ALLOW
+          - HOLD
+          - PROCESS
+          - PENDING
+          - ERROR
+          example: HOLD
+          type: string
+      required:
+      - configurations
+      - outcome
+      type: object
+    audit_Note:
+      properties:
+        content:
+          type: string
+        identifier:
+          format: uuid
+          type: string
+        is_redacted:
+          type: boolean
+        version:
+          format: int32
+          type: integer
+      required:
+      - content
+      - identifier
+      - is_redacted
+      - version
+      type: object
+    audit_UserRolesUpdatedDetailV2:
+      properties:
+        account:
+          $ref: '#/components/schemas/audit_AccountWithRolesInfo'
+        user:
+          $ref: '#/components/schemas/audit_UserReference'
+      required:
+      - account
+      - user
+      type: object
+    audit_UserNameUpdatedDetailV2:
+      properties:
+        user:
+          $ref: '#/components/schemas/audit_UserWithNameInfo'
+      required:
+      - user
+      type: object
+    audit_CustomerDeletedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_CustomerDeletedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - CUSTOMER_DELETED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_CaseSubjectInfo:
+      properties:
+        identifier:
+          type: string
+        type:
+          enum:
+          - CUSTOMER
+          - PAYMENT
+          - COUNTERPARTY
+          type: string
+      required:
+      - identifier
+      - type
+      type: object
+    audit_TransactionMonitoredLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_TransactionMonitoredDetailV2'
+        grouping_key:
+          example: transaction-group-123
+          type:
+          - string
+          - 'null'
+        identifier:
+          example: 018d0dd4-9b7c-7537-aaac-13f2f48877af
+          format: uuid
+          type: string
+        occurred_at:
+          example: '2024-01-15T10:30:00.000Z'
+          format: date-time
+          type: string
+        type:
+          enum:
+          - TRANSACTION_MONITORED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_CustomerInfoUpdatedDetailV2:
+      properties:
+        customer:
+          $ref: '#/components/schemas/audit_CustomerReference'
+        previous_customer:
+          $ref: '#/components/schemas/audit_CustomerReference'
+      required:
+      - customer
+      type: object
+    audit_UserNameUpdatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_UserNameUpdatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - USER_NAME_UPDATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_TransactionReceivedDetailV2:
+      properties:
+        transaction:
+          $ref: '#/components/schemas/audit_VersionedTransactionWithTypeAndReceivedAt'
+      required:
+      - transaction
+      type: object
+    audit_CustomerLabelsUpdatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_CustomerLabelsUpdatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - CUSTOMER_LABELS_UPDATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_CustomerMigratedDetailV2:
+      properties:
+        csom_search_ref:
+          type: string
+        customer:
+          $ref: '#/components/schemas/audit_Customer'
+      required:
+      - csom_search_ref
+      - customer
+      type: object
+    audit_RoleNameUpdatedDetail:
+      allOf:
+      - $ref: '#/components/schemas/audit_RoleAuditLogDetail'
+      - properties:
+          name:
+            type: string
+          previous_name:
+            type: string
+        type: object
+      required:
+      - name
+      - previous_name
+      title: Role name updated
+      type: object
+    audit_RoleAuditLog:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          oneOf:
+          - $ref: '#/components/schemas/audit_RoleArchivedDetail'
+          - $ref: '#/components/schemas/audit_RoleCreatedDetail'
+          - $ref: '#/components/schemas/audit_RoleDescriptionUpdatedDetail'
+          - $ref: '#/components/schemas/audit_RoleNameUpdatedDetail'
+          - $ref: '#/components/schemas/audit_RolePermissionsUpdatedDetail'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - ROLE_CREATED
+          - ROLE_NAME_UPDATED
+          - ROLE_DESCRIPTION_UPDATED
+          - ROLE_PERMISSIONS_UPDATED
+          - ROLE_ARCHIVED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_TransactionReceivedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_TransactionReceivedDetailV2'
+        grouping_key:
+          example: transaction-group-123
+          type:
+          - string
+          - 'null'
+        identifier:
+          example: 018d0dd4-9b7c-7537-aaac-13f2f48877af
+          format: uuid
+          type: string
+        occurred_at:
+          example: '2024-01-15T10:30:00.000Z'
+          format: date-time
+          type: string
+        type:
+          enum:
+          - TRANSACTION_RECEIVED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_ClientReference:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+      required:
+      - identifier
+      type: object
+    audit_RiskScore:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+        overall_level:
+          enum:
+          - LOW
+          - MEDIUM
+          - HIGH
+          - PROHIBITED
+          - SKIPPED
+          type:
+          - string
+          - 'null'
+        overall_value:
+          format: double
+          type: number
+        risk_model:
+          $ref: '#/components/schemas/audit_RiskModelReference'
+        type:
+          enum:
+          - PARTIAL
+          - FULL
+          - MANUAL
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - overall_value
+      type: object
+    audit_NoteToCaseActionDetailV2:
+      properties:
+        case:
+          $ref: '#/components/schemas/audit_Case'
+        note:
+          $ref: '#/components/schemas/audit_Note'
+      required:
+      - case
+      - note
+      type: object
+    audit_AccountTypeUpdatedDetailV2:
+      properties:
+        account:
+          $ref: '#/components/schemas/audit_AccountReference'
+        previous_type:
+          enum:
+          - PRODUCTION
+          - NON_PRODUCTION
+          type: string
+        type:
+          enum:
+          - PRODUCTION
+          - NON_PRODUCTION
+          type: string
+      required:
+      - account
+      - previous_type
+      - type
+      type: object
+    audit_CaseInfoV2:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+        subject:
+          $ref: '#/components/schemas/audit_CaseSubjectInfo'
+        type:
+          enum:
+          - CUSTOMER_ONBOARDING
+          - CUSTOMER_MONITORING
+          - PAYMENT_SCREENING
+          - TRANSACTION_MONITORING
+          type: string
+      required:
+      - identifier
+      - subject
+      - type
+      type: object
+    audit_TransactionReleaseDecisionLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_TransactionReleaseDecisionDetailV2'
+        grouping_key:
+          example: transaction-group-123
+          type:
+          - string
+          - 'null'
+        identifier:
+          example: 018d0dd4-9b7c-7537-aaac-13f2f48877af
+          format: uuid
+          type: string
+        occurred_at:
+          example: '2024-01-15T10:30:00.000Z'
+          format: date-time
+          type: string
+        type:
+          enum:
+          - TRANSACTION_DECISION
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_CustomerCreatedDetailV2:
+      properties:
+        customer:
+          $ref: '#/components/schemas/audit_CustomerReference'
+      required:
+      - customer
+      type: object
+    audit_PaymentScreenedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_PaymentScreenedDetailV2'
+        grouping_key:
+          example: transaction-group-123
+          type:
+          - string
+          - 'null'
+        identifier:
+          example: 018d0dd4-9b7c-7537-aaac-13f2f48877af
+          format: uuid
+          type: string
+        occurred_at:
+          example: '2024-01-15T10:30:00.000Z'
+          format: date-time
+          type: string
+        type:
+          enum:
+          - PAYMENT_SCREENED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_CustomerInfoUpdatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_CustomerInfoUpdatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - CUSTOMER_INFO_UPDATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_NoteToRiskLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_NoteToRiskDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - NOTE_TO_RISK
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_TransactionAuditLogsPageV2:
+      properties:
+        audit_logs:
+          items:
+            discriminator:
+              mapping:
+                CASE_ASSIGNED: '#/components/schemas/audit_CaseAssignedLogV2'
+                CASE_CREATED: '#/components/schemas/audit_CaseCreatedLogV2'
+                CASE_STAGE_TRANSITIONED: '#/components/schemas/audit_CaseTransitionedLogV2'
+                PAYMENT_SCREENED: '#/components/schemas/audit_PaymentScreenedLogV2'
+                TRANSACTION_ADDED_TO_CASE: '#/components/schemas/audit_TransactionAddedToCaseLogV2'
+                TRANSACTION_DECISION: '#/components/schemas/audit_TransactionReleaseDecisionLogV2'
+                TRANSACTION_MONITORED: '#/components/schemas/audit_TransactionMonitoredLogV2'
+                TRANSACTION_RECEIVED: '#/components/schemas/audit_TransactionReceivedLogV2'
+              propertyName: type
+            oneOf:
+            - $ref: '#/components/schemas/audit_CaseCreatedLogV2'
+            - $ref: '#/components/schemas/audit_CaseTransitionedLogV2'
+            - $ref: '#/components/schemas/audit_CaseAssignedLogV2'
+            - $ref: '#/components/schemas/audit_PaymentScreenedLogV2'
+            - $ref: '#/components/schemas/audit_TransactionMonitoredLogV2'
+            - $ref: '#/components/schemas/audit_TransactionReceivedLogV2'
+            - $ref: '#/components/schemas/audit_TransactionAddedToCaseLogV2'
+            - $ref: '#/components/schemas/audit_TransactionReleaseDecisionLogV2'
+            type: object
+          type: array
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - audit_logs
+      - first
+      - self
+      type: object
+    audit_TransactionAddedToCaseLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_TransactionAddedToCaseDetailV2'
+        grouping_key:
+          example: transaction-group-123
+          type:
+          - string
+          - 'null'
+        identifier:
+          example: 018d0dd4-9b7c-7537-aaac-13f2f48877af
+          format: uuid
+          type: string
+        occurred_at:
+          example: '2024-01-15T10:30:00.000Z'
+          format: date-time
+          type: string
+        type:
+          enum:
+          - TRANSACTION_ADDED_TO_CASE
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_TransactionWithType:
+      properties:
+        identifier:
+          example: 018d0dd4-9b7c-7537-aaac-13f2f48877af
+          format: uuid
+          type: string
+        type:
+          enum:
+          - BANK_PAYMENT
+          - CARD_PAYMENT
+          - REMITTANCE
+          - CRYPTO
+          example: BANK_PAYMENT
+          type: string
+      required:
+      - identifier
+      - type
+      type: object
+    audit_AccountNameUpdatedDetailV2:
+      properties:
+        account:
+          $ref: '#/components/schemas/audit_AccountReference'
+        name:
+          type: string
+        previous_name:
+          type: string
+      required:
+      - account
+      - name
+      - previous_name
+      type: object
+    audit_CustomerCreatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_CustomerCreatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - CUSTOMER_CREATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_Case:
+      properties:
+        identifier:
+          example: 018d0dd4-9b7c-7537-aaac-13f2f48877af
+          format: uuid
+          type: string
+      required:
+      - identifier
+      type: object
+    audit_AccountDeactivatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_AccountDeactivatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - ACCOUNT_DEACTIVATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_RiskSignalTransitionedDetailV2:
+      properties:
+        account_identifier:
+          format: uuid
+          type: string
+        case:
+          $ref: '#/components/schemas/audit_Case'
+        customer:
+          $ref: '#/components/schemas/audit_CustomerReference'
+        new_profile_hit_state:
+          enum:
+          - NEW
+          - IN_REVIEW
+          - TRUE_POSITIVE
+          - FALSE_POSITIVE
+          - UPDATED
+          type: string
+        risk:
+          $ref: '#/components/schemas/audit_RiskWithType'
+      required:
+      - account_identifier
+      - case
+      - customer
+      - new_profile_hit_state
+      - risk
+      type: object
+    audit_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
+    audit_NoteToCaseAlertLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_NoteToCaseAlertDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - NOTE_TO_CASE_ALERT
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_CustomerReference:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+        version:
+          format: int32
+          type: integer
+      required:
+      - identifier
+      - version
+      type: object
+    audit_RateLimitOverride:
+      properties:
+        endpoints:
+          items:
+            type: string
+          type: array
+        value:
+          type: string
+      required:
+      - endpoints
+      - value
+      type: object
+    audit_RiskCodeMutedForEntityDetailV2:
+      properties:
+        case:
+          allOf:
+          - $ref: '#/components/schemas/audit_Case'
+        entity:
+          $ref: '#/components/schemas/audit_MutedEntity'
+        risk:
+          $ref: '#/components/schemas/audit_RiskWithSourceAndCode'
+      required:
+      - entity
+      - risk
+      type: object
+    audit_AlertUnmutedForRiskLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_AlertMuteForRiskDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - ALERT_UNMUTED_FOR_RISK
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_NoteToCaseObjectDetailV2:
+      properties:
+        case:
+          $ref: '#/components/schemas/audit_Case'
+        note:
+          $ref: '#/components/schemas/audit_Note'
+      required:
+      - case
+      - note
+      type: object
+    audit_UserAccountRemovedDetailV2:
+      properties:
+        account:
+          $ref: '#/components/schemas/audit_AccountReference'
+        user:
+          $ref: '#/components/schemas/audit_UserReference'
+      required:
+      - account
+      - user
+      type: object
+    audit_CaseTransitionedDetailV2:
+      properties:
+        case:
+          $ref: '#/components/schemas/audit_CaseInfoV2'
+        customer:
+          $ref: '#/components/schemas/audit_CustomerReference'
+        previous_stage:
+          $ref: '#/components/schemas/audit_Stage'
+        stage:
+          $ref: '#/components/schemas/audit_Stage'
+      required:
+      - case
+      - customer
+      - previous_stage
+      - stage
+      type: object
+    audit_Risk:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+      required:
+      - identifier
+      type: object
+    audit_UserAccountAssignedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_UserAccountAssignedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - USER_ACCOUNT_ASSIGNED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_UserActivatedDetailV2:
+      properties:
+        user:
+          $ref: '#/components/schemas/audit_UserReference'
+      required:
+      - user
+      type: object
+    audit_NoteToCaseAlertDetailV2:
+      properties:
+        alert:
+          $ref: '#/components/schemas/audit_Alert'
+        case:
+          $ref: '#/components/schemas/audit_Case'
+        note:
+          $ref: '#/components/schemas/audit_Note'
+      required:
+      - alert
+      - case
+      - note
+      type: object
+    audit_AlertAddedToCaseDetailV2:
+      properties:
+        alert_identifiers:
+          items:
+            format: uuid
+            type: string
+          type: array
+          uniqueItems: true
+        case:
+          $ref: '#/components/schemas/audit_Case'
+      required:
+      - alert_identifiers
+      - case
+      type: object
+    audit_ProductDetail:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+        name:
+          type: string
+      required:
+      - identifier
+      - name
+      type: object
+    audit_Screening:
+      properties:
+        configuration_identifier:
+          type:
+          - string
+          - 'null'
+        configuration_version:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        screening_type:
+          enum:
+          - UNSPECIFIED
+          - MONITORING
+          - SCREENING
+          type: string
+      required:
+      - screening_type
+      type: object
+    audit_UserWithNameInfo:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+        name:
+          type: string
+        previous_name:
+          type: string
+      required:
+      - identifier
+      - name
+      - previous_name
+      type: object
+    audit_VersionedTransactionWithType:
+      properties:
+        identifier:
+          example: 018d0dd4-9b7c-7537-aaac-13f2f48877af
+          format: uuid
+          type: string
+        type:
+          enum:
+          - BANK_PAYMENT
+          - CARD_PAYMENT
+          - REMITTANCE
+          - CRYPTO
+          example: BANK_PAYMENT
+          type: string
+        version:
+          example: 1
+          format: int32
+          type: integer
+      required:
+      - identifier
+      - type
+      - version
+      type: object
+    audit_RoleDescriptionUpdatedDetail:
+      allOf:
+      - $ref: '#/components/schemas/audit_RoleAuditLogDetail'
+      - properties:
+          description:
+            type:
+            - string
+            - 'null'
+          previous_description:
+            type:
+            - string
+            - 'null'
+        type: object
+      title: Role description updated
+      type: object
+    audit_RiskModelReference:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+        version:
+          format: int32
+          type: integer
+      required:
+      - identifier
+      - version
+      type: object
+    audit_RateLimitOverrideSnapshot:
+      properties:
+        override:
+          $ref: '#/components/schemas/audit_RateLimitOverride'
+      required:
+      - override
+      type: object
+    audit_RoleCreatedDetail:
+      allOf:
+      - $ref: '#/components/schemas/audit_RoleAuditLogDetail'
+      - properties:
+          description:
+            type:
+            - string
+            - 'null'
+          name:
+            type: string
+        type: object
+      required:
+      - name
+      title: Role created
+      type: object
+    audit_Stage:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+        version:
+          format: int32
+          type: integer
+      required:
+      - identifier
+      - version
+      type: object
+    audit_AlertStateUpdatedDetailV2:
+      properties:
+        alert:
+          $ref: '#/components/schemas/audit_Alert'
+        previous_state:
+          enum:
+          - NOT_STARTED
+          - IN_PROGRESS
+          - POSITIVE_END_STATE
+          - NEGATIVE_END_STATE
+          - UNSPECIFIED
+          type:
+          - string
+          - 'null'
+        state:
+          enum:
+          - NOT_STARTED
+          - IN_PROGRESS
+          - POSITIVE_END_STATE
+          - NEGATIVE_END_STATE
+          - UNSPECIFIED
+          type:
+          - string
+          - 'null'
+      required:
+      - alert
+      type: object
+    audit_RoleAuditLogDetail:
+      type: object
+    audit_AlertMutedForRiskLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_AlertMuteForRiskDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - ALERT_MUTED_FOR_RISK
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_AccountTypeUpdatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_AccountTypeUpdatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - ACCOUNT_TYPE_UPDATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_AccountCreatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_AccountCreatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - ACCOUNT_CREATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_CustomerStatusUpdatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_CustomerStatusUpdatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - CUSTOMER_STATUS_UPDATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_CustomerDeletedDetailV2:
+      properties:
+        customer:
+          $ref: '#/components/schemas/audit_Customer'
+      required:
+      - customer
+      type: object
+    audit_Customer:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+      required:
+      - identifier
+      type: object
+    audit_TransactionAddedToCaseDetailV2:
+      properties:
+        case:
+          $ref: '#/components/schemas/audit_Case'
+        transaction:
+          $ref: '#/components/schemas/audit_TransactionWithType'
+      required:
+      - case
+      - transaction
+      type: object
+    audit_RiskWithSourceAndCode:
+      properties:
+        code:
+          type: string
+        identifier:
+          format: uuid
+          type:
+          - string
+          - 'null'
+        source:
+          enum:
+          - CUSTOMER_SCREENING
+          - KYB
+          - PAYMENT_SCREENING
+          - TRANSACTION_MONITORING
+          type: string
+      required:
+      - code
+      - source
+      type: object
+    audit_CustomerMonitoringConfigurationUpdatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_CustomerConfigurationUpdatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - CUSTOMER_MONITORING_CONFIGURATION_UPDATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_AccountNameUpdatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_AccountNameUpdatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - ACCOUNT_NAME_UPDATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_CustomerMonitoring:
+      properties:
+        configuration_identifier:
+          type:
+          - string
+          - 'null'
+        enabled:
+          type: boolean
+      required:
+      - enabled
+      type: object
+    audit_CustomerAuditLogsPageV2:
+      properties:
+        audit_logs:
+          items:
+            discriminator:
+              mapping:
+                ALERT_MUTED_FOR_RISK: '#/components/schemas/audit_AlertMutedForRiskLogV2'
+                ALERT_UNMUTED_FOR_RISK: '#/components/schemas/audit_AlertUnmutedForRiskLogV2'
+                CASE_CREATED: '#/components/schemas/audit_CaseCreatedLogV2'
+                CASE_STAGE_TRANSITIONED: '#/components/schemas/audit_CaseTransitionedLogV2'
+                CUSTOMER_CREATED: '#/components/schemas/audit_CustomerCreatedLogV2'
+                CUSTOMER_DELETED: '#/components/schemas/audit_CustomerDeletedLogV2'
+                CUSTOMER_INFO_UPDATED: '#/components/schemas/audit_CustomerInfoUpdatedLogV2'
+                CUSTOMER_LABELS_UPDATED: '#/components/schemas/audit_CustomerLabelsUpdatedLogV2'
+                CUSTOMER_MIGRATED: '#/components/schemas/audit_CustomerMigratedLogV2'
+                CUSTOMER_MONITORING_CONFIGURATION_UPDATED: '#/components/schemas/audit_CustomerMonitoringConfigurationUpdatedLogV2'
+                CUSTOMER_PRODUCT_UPDATED: '#/components/schemas/audit_CustomerProductUpdatedLogV2'
+                CUSTOMER_SCREENED: '#/components/schemas/audit_CustomerScreenedLogV2'
+                CUSTOMER_SEGMENTS_UPDATED: '#/components/schemas/audit_CustomerSegmentsUpdatedLogV2'
+                CUSTOMER_STATUS_UPDATED: '#/components/schemas/audit_CustomerStatusUpdatedLogV2'
+                NOTE_CREATED_TO_CUSTOMER: '#/components/schemas/audit_NoteToCustomerLogV2'
+                RISK_SCORE_CALCULATED: '#/components/schemas/audit_RiskScoreAssignedToCustomerLogV2'
+              propertyName: type
+            oneOf:
+            - $ref: '#/components/schemas/audit_CustomerMigratedLogV2'
+            - $ref: '#/components/schemas/audit_CaseCreatedLogV2'
+            - $ref: '#/components/schemas/audit_CaseTransitionedLogV2'
+            - $ref: '#/components/schemas/audit_RiskScoreAssignedToCustomerLogV2'
+            - $ref: '#/components/schemas/audit_CustomerCreatedLogV2'
+            - $ref: '#/components/schemas/audit_CustomerDeletedLogV2'
+            - $ref: '#/components/schemas/audit_CustomerInfoUpdatedLogV2'
+            - $ref: '#/components/schemas/audit_CustomerStatusUpdatedLogV2'
+            - $ref: '#/components/schemas/audit_CustomerProductUpdatedLogV2'
+            - $ref: '#/components/schemas/audit_CustomerMonitoringConfigurationUpdatedLogV2'
+            - $ref: '#/components/schemas/audit_CustomerLabelsUpdatedLogV2'
+            - $ref: '#/components/schemas/audit_CustomerSegmentsUpdatedLogV2'
+            - $ref: '#/components/schemas/audit_CustomerScreenedLogV2'
+            - $ref: '#/components/schemas/audit_AlertMutedForRiskLogV2'
+            - $ref: '#/components/schemas/audit_AlertUnmutedForRiskLogV2'
+            - $ref: '#/components/schemas/audit_NoteToCustomerLogV2'
+            type: object
+          type: array
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - audit_logs
+      - first
+      - self
+      type: object
+    audit_Alert:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+      required:
+      - identifier
+      type: object
+    audit_NoteCreatedToCaseActionLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_NoteToCaseActionDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - NOTE_CREATED_TO_CASE_ACTION
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_SubjectAddedToCaseLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_SubjectAddedToCaseDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - SUBJECT_ADDED_TO_CASE
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_UserDeactivatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_UserDeactivatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - USER_DEACTIVATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_ActionedBy:
+      properties:
+        identifier:
+          format: uuid
+          type:
+          - string
+          - 'null'
+        type:
+          enum:
+          - SYSTEM
+          - USER
+          type: string
+      required:
+      - type
+      type: object
+    audit_RiskSignalTransitionedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_RiskSignalTransitionedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - RISK_STATUS_UPDATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_CustomerSegmentsUpdatedDetailV2:
+      properties:
+        added_segment_identifiers:
+          items:
+            $ref: '#/components/schemas/audit_SegmentIdentifier'
+          type: array
+          uniqueItems: true
+        customer:
+          $ref: '#/components/schemas/audit_CustomerReference'
+        removed_segment_identifiers:
+          items:
+            $ref: '#/components/schemas/audit_SegmentIdentifier'
+          type: array
+          uniqueItems: true
+      required:
+      - added_segment_identifiers
+      - customer
+      - removed_segment_identifiers
+      type: object
+    audit_RolePermissionsUpdatedDetail:
+      allOf:
+      - $ref: '#/components/schemas/audit_RoleAuditLogDetail'
+      - properties:
+          added_permission_identifiers:
+            items:
+              format: int32
+              type: integer
+            type: array
+          removed_permission_identifiers:
+            items:
+              format: int32
+              type: integer
+            type: array
+        type: object
+      required:
+      - added_permission_identifiers
+      - removed_permission_identifiers
+      title: Role permissions updated
+      type: object
+    audit_AccountRateLimitsUpdatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_AccountRateLimitsUpdatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - ACCOUNT_RATE_LIMITS_UPDATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_AccountRateLimitsUpdatedDetailV2:
+      properties:
+        account:
+          $ref: '#/components/schemas/audit_AccountReference'
+        previous_rate_limits:
+          items:
+            $ref: '#/components/schemas/audit_RateLimitOverrideSnapshot'
+          type: array
+        rate_limits:
+          items:
+            $ref: '#/components/schemas/audit_RateLimitOverrideSnapshot'
+          type: array
+      required:
+      - account
+      - previous_rate_limits
+      - rate_limits
+      type: object
+    audit_AccountDeactivatedDetailV2:
+      properties:
+        account:
+          $ref: '#/components/schemas/audit_AccountReference'
+      required:
+      - account
+      type: object
+    audit_AccountIpRestrictionsUpdatedDetailV2:
+      properties:
+        account:
+          $ref: '#/components/schemas/audit_AccountReference'
+        ip_restrictions:
+          items:
+            type: string
+          type: array
+        previous_ip_restrictions:
+          items:
+            type: string
+          type: array
+      required:
+      - account
+      - ip_restrictions
+      - previous_ip_restrictions
+      type: object
+    audit_CustomerLabelsUpdatedDetailV2:
+      properties:
+        added_label_identifiers:
+          items:
+            format: uuid
+            type: string
+          type: array
+          uniqueItems: true
+        customer:
+          $ref: '#/components/schemas/audit_CustomerReference'
+        removed_label_identifiers:
+          items:
+            format: uuid
+            type: string
+          type: array
+          uniqueItems: true
+      required:
+      - added_label_identifiers
+      - customer
+      - removed_label_identifiers
+      type: object
+    audit_CustomerSegmentsUpdatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_CustomerSegmentsUpdatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - CUSTOMER_SEGMENTS_UPDATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_TransactionReleaseDecisionDetailV2:
+      properties:
+        review_decision:
+          enum:
+          - RELEASE
+          - REJECT
+          example: RELEASE
+          type: string
+        transaction:
+          $ref: '#/components/schemas/audit_VersionedTransaction'
+      required:
+      - review_decision
+      - transaction
+      type: object
+    audit_MutedEntity:
+      properties:
+        identifier:
+          type: string
+        type:
+          enum:
+          - CUSTOMER
+          - COUNTERPARTY
+          - AGENT
+          type: string
+      required:
+      - identifier
+      - type
+      type: object
+    audit_CaseAuditLogsPageV2:
+      properties:
+        audit_logs:
+          items:
+            discriminator:
+              mapping:
+                ALERT_ADDED_TO_CASE: '#/components/schemas/audit_AlertAddedToCaseLogV2'
+                ALERT_STATE_UPDATED: '#/components/schemas/audit_AlertStateUpdatedLogV2'
+                CASE_ASSIGNED: '#/components/schemas/audit_CaseAssignedLogV2'
+                CASE_CREATED: '#/components/schemas/audit_CaseCreatedLogV2'
+                CASE_STAGE_TRANSITIONED: '#/components/schemas/audit_CaseTransitionedLogV2'
+                CUSTOMER_SCREENED: '#/components/schemas/audit_CustomerScreenedLogV2'
+                NOTE_CREATED_TO_CASE_ACTION: '#/components/schemas/audit_NoteCreatedToCaseActionLogV2'
+                NOTE_TO_CASE_ALERT: '#/components/schemas/audit_NoteToCaseAlertLogV2'
+                NOTE_TO_CASE_OBJECT: '#/components/schemas/audit_NoteToCaseObjectLogV2'
+                NOTE_TO_RISK: '#/components/schemas/audit_NoteToRiskLogV2'
+                RISK_CODE_UNMUTED_FOR_ENTITY: '#/components/schemas/audit_RiskCodeUnmutedForEntityLogV2'
+                RISK_STATUS_UPDATED: '#/components/schemas/audit_RiskSignalTransitionedLogV2'
+                SUBJECT_ADDED_TO_CASE: '#/components/schemas/audit_SubjectAddedToCaseLogV2'
+              propertyName: type
+            oneOf:
+            - $ref: '#/components/schemas/audit_CaseCreatedLogV2'
+            - $ref: '#/components/schemas/audit_CaseAssignedLogV2'
+            - $ref: '#/components/schemas/audit_CaseTransitionedLogV2'
+            - $ref: '#/components/schemas/audit_SubjectAddedToCaseLogV2'
+            - $ref: '#/components/schemas/audit_RiskSignalTransitionedLogV2'
+            - $ref: '#/components/schemas/audit_CustomerScreenedLogV2'
+            - $ref: '#/components/schemas/audit_NoteToCaseObjectLogV2'
+            - $ref: '#/components/schemas/audit_NoteCreatedToCaseActionLogV2'
+            - $ref: '#/components/schemas/audit_NoteToRiskLogV2'
+            - $ref: '#/components/schemas/audit_NoteToCaseAlertLogV2'
+            - $ref: '#/components/schemas/audit_AlertAddedToCaseLogV2'
+            - $ref: '#/components/schemas/audit_AlertStateUpdatedLogV2'
+            - $ref: '#/components/schemas/audit_RiskCodeMutedForEntityDetailV2'
+            - $ref: '#/components/schemas/audit_RiskCodeUnmutedForEntityLogV2'
+            type: object
+          type: array
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - audit_logs
+      - first
+      - self
+      type: object
+    audit_AlertMuteForRiskDetailV2:
+      properties:
+        case:
+          allOf:
+          - $ref: '#/components/schemas/audit_Case'
+        customer:
+          $ref: '#/components/schemas/audit_Customer'
+        mute_key:
+          type: string
+        risk:
+          $ref: '#/components/schemas/audit_RiskWithSource'
+      required:
+      - customer
+      - mute_key
+      - risk
+      type: object
+    audit_AccountIpRestrictionsUpdatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_AccountIpRestrictionsUpdatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - ACCOUNT_IP_RESTRICTIONS_UPDATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_VersionedTransaction:
+      properties:
+        identifier:
+          example: 018d0dd4-9b7c-7537-aaac-13f2f48877af
+          format: uuid
+          type: string
+        version:
+          example: 1
+          format: int32
+          type: integer
+      required:
+      - identifier
+      - version
+      type: object
+    audit_CaseTransitionedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_CaseTransitionedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - CASE_STAGE_TRANSITIONED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+    audit_AccountPermissionsUpdatedLogV2:
+      properties:
+        actioned_by:
+          $ref: '#/components/schemas/audit_ActionedBy'
+        detail:
+          $ref: '#/components/schemas/audit_AccountPermissionsUpdatedDetailV2'
+        grouping_key:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        type:
+          enum:
+          - ACCOUNT_PERMISSIONS_UPDATED
+          type: string
+      required:
+      - actioned_by
+      - detail
+      - identifier
+      - occurred_at
+      - type
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http

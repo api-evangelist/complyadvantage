@@ -1,0 +1,1484 @@
+openapi: 3.2.0
+info:
+  title: Mesh Enrichment API
+  version: v2.0
+servers:
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
+security:
+- BearerAuth: []
+tags:
+- name: Enrichment
+paths:
+  /v3/enrichment/lookup-lists:
+    get:
+      description: 'Lists all Lookup Lists for an account, returning the latest version of each.
+
+
+        You need the "View lookup lists" permission to use this endpoint.'
+      operationId: meshEnrichmentServiceListLookupLists
+      parameters:
+      - description: 'Sorting criteria. Allowed fields: `name`, `status`, `updated_at`, `updated_by`, `created_at`, `created_by`. Each criterion should be a string in the format: `property_name` for ascending order, or `-property_name` for descending order. For example, to sort by name descending: `-name`. Multiple sort criteria are supported. Provide each as a separate ''sort'' query parameter (e.g., `?sort=-name&sort=status`).'
+        example:
+        - -timestamp
+        in: query
+        name: sort
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 50
+          minimum: 1
+          type: integer
+      - description: Search term to filter lookup lists by name
+        example: example_list
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mes_PaginatedResponseLookupListNoSchemaResponse'
+          description: Lookup Lists found
+      summary: List Lookup Lists for an account
+      tags:
+      - Enrichment
+    post:
+      description: 'Creates a new Lookup List with a schema.
+
+
+        You need the "Create and update lookup lists" permission to use this endpoint.'
+      operationId: meshEnrichmentServiceCreateLookupList
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mes_LookupListCreateRequestBody'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mes_LookupListsResponse'
+          description: Lookup List created
+        '400':
+          content:
+            application/problem+json:
+              examples:
+                Blank lookup list name:
+                  description: Blank lookup list name
+                  value:
+                    detail: 'Validation failed for object=''lookupListCreateRequestBody''. Error count: 1'
+                    errors:
+                      name: Name cannot be blank
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe5
+                    instance: https://api.example.com/v3/lookup-lists
+                    status: 400
+                    timestamp: '2025-11-27T13:00:00.000Z'
+                    title: Validation Error
+                    type: about:blank
+                Blank schema field name:
+                  description: Blank schema field name
+                  value:
+                    detail: 'Validation failed for object=''lookupListCreateRequestBody''. Error count: 1'
+                    errors:
+                      inputSchema[0].name: Schema name cannot be blank
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe6
+                    instance: https://api.example.com/v3/lookup-lists
+                    status: 400
+                    timestamp: '2025-11-27T13:00:00.000Z'
+                    title: Validation Error
+                    type: about:blank
+                Invalid number of input schemas:
+                  description: Invalid number of input schemas
+                  value:
+                    detail: 'Validation failed for object=''lookupListCreateRequestBody''. Error count: 1'
+                    errors:
+                      inputSchema: Exactly one input schema is required
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe3
+                    instance: https://api.example.com/v3/lookup-lists
+                    status: 400
+                    timestamp: '2025-11-27T13:00:00.000Z'
+                    title: Validation Error
+                    type: about:blank
+                Invalid number of output schemas:
+                  description: Invalid number of output schemas
+                  value:
+                    detail: 'Validation failed for object=''lookupListCreateRequestBody''. Error count: 1'
+                    errors:
+                      outputSchema: Exactly one output schema is required
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe4
+                    instance: https://api.example.com/v3/lookup-lists
+                    status: 400
+                    timestamp: '2025-11-27T13:00:00.000Z'
+                    title: Validation Error
+                    type: about:blank
+                Invalid schema type:
+                  description: Invalid schema type
+                  value:
+                    detail: 'JSON parse error: Cannot deserialize value of type com.complyadvantage.meshenrichmentservice.lookuplist.models.requests.SchemaType from String "invalid_type": not one of the values accepted for Enum class: [STRING, NUMBER, DECIMAL]'
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe7
+                    instance: https://api.example.com/v3/lookup-lists
+                    status: 400
+                    timestamp: '2025-11-27T13:00:00.000Z'
+                    title: Bad Request
+                    type: about:blank
+                Multiple validation errors:
+                  description: Multiple validation errors
+                  value:
+                    detail: 'Validation failed for object=''lookupListCreateRequestBody''. Error count: 3'
+                    errors:
+                      inputSchema: Exactly one input schema is required
+                      name: Name cannot be blank
+                      outputSchema: Exactly one output schema is required
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe8
+                    instance: https://api.example.com/v3/lookup-lists
+                    status: 400
+                    timestamp: '2025-11-27T13:00:00.000Z'
+                    title: Validation Error
+                    type: about:blank
+              schema:
+                $ref: '#/components/schemas/mes_ProblemDetailErrorResponse'
+          description: Bad Request - Validation errors
+      summary: Create a new Lookup List
+      tags:
+      - Enrichment
+  /v3/enrichment/lookup-lists/{identifier}:
+    get:
+      description: 'Gets the latest version of a Lookup List by identifier.
+
+
+        You need the "View lookup lists" permission to use this endpoint.'
+      operationId: meshEnrichmentServiceGetLookupList
+      parameters:
+      - description: The identifier of the lookup list that you want to retrieve.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mes_LookupListsResponse'
+          description: Lookup List found
+      summary: Get a Lookup List by identifier
+      tags:
+      - Enrichment
+    patch:
+      description: 'Updates a Lookup List name.
+
+
+        You need the "Create and update lookup lists" permission to use this endpoint.'
+      operationId: meshEnrichmentServiceUpdateLookupList
+      parameters:
+      - description: The identifier of the lookup list that you want to update.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mes_LookupListUpdateRequestBody'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mes_LookupListsResponse'
+          description: Lookup List updated
+      summary: Update lookup list name
+      tags:
+      - Enrichment
+  /v3/enrichment/lookup-lists/{identifier}/draft:
+    delete:
+      description: 'Deletes the latest version of a Lookup List if its status is draft.
+
+
+        You need the "Create and update lookup lists" permission to use this endpoint.'
+      operationId: meshEnrichmentServiceDeleteLookupListVersion
+      parameters:
+      - description: The identifier of the lookup list that you want to delete a DRAFT version.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '204':
+          description: Lookup List draft version deleted
+      summary: Delete a lookup list draft version by identifier
+      tags:
+      - Enrichment
+  /v3/enrichment/lookup-lists/{identifier}/promote-draft:
+    post:
+      description: 'Promotes a version that is in DRAFT, changing it to ACTIVE.
+
+
+        You need the "Create and update lookup lists" permission to use this endpoint.'
+      operationId: meshEnrichmentServicePostPromoteDraft
+      parameters:
+      - description: The identifier of the lookup list that you want to promote the version.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mes_LookupListsResponse'
+          description: Version promoted
+      summary: Promote a DRAFT version to ACTIVE
+      tags:
+      - Enrichment
+  /v3/enrichment/lookup-lists/{identifier}/versions:
+    get:
+      description: 'Returns all versions of a Lookup List in an account, sorted by created date.
+
+
+        You need the "View lookup lists" permission to use this endpoint.'
+      operationId: meshEnrichmentServiceListLookupListVersions
+      parameters:
+      - description: The identifier of the lookup list that you want to retrieve versions.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 50
+          minimum: 1
+          type: integer
+      - description: 'Sorting criteria in the format of: `[-]property` (`-` descending modifier).
+
+
+          * Default sort order is ascending (without `-`).
+
+
+          * Multiple sort criteria are supported.'
+        example:
+        - -timestamp
+        in: query
+        name: sort
+        required: false
+        schema:
+          default: []
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mes_PaginatedResponseLookupListVersionResponse'
+          description: Lookup List versions found
+      summary: List all versions for a Lookup List
+      tags:
+      - Enrichment
+    post:
+      description: 'Creates a new Lookup List version.
+
+
+        You need the "Create and update lookup lists" permission to use this endpoint.'
+      operationId: meshEnrichmentServiceCreateLookupListVersion
+      parameters:
+      - description: The identifier of the lookup list that you want to create a new version.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mes_LookupListVersionResponse'
+          description: Lookup List version created
+      summary: Creates a new lookup list version
+      tags:
+      - Enrichment
+  /v3/enrichment/lookup-lists/{identifier}/versions/{version_identifier}/download:
+    get:
+      description: 'Returns a CSV file containing all items from a lookup list version.
+
+
+        You need the "View lookup lists" permission to use this endpoint.'
+      operationId: meshEnrichmentServiceListLookupListVersionItemsDownload
+      parameters:
+      - description: The identifier of the lookup list that you want to retrieve items.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: The version number of the lookup list that you want to retrieve items.
+        example: 1
+        in: path
+        name: version_identifier
+        required: true
+        schema:
+          format: int32
+          type: integer
+      responses:
+        '200':
+          content:
+            text/csv:
+              schema:
+                type: string
+          description: Lookup List Items found
+      summary: Download a CSV file containing all items for a Lookup List Version
+      tags:
+      - Enrichment
+  /v3/enrichment/lookup-lists/{identifier}/versions/{version_identifier}/items:
+    get:
+      description: 'Returns all items from a Lookup List version.
+
+
+        You need the "View lookup lists" permission to use this endpoint.'
+      operationId: meshEnrichmentServiceListLookupListVersionItems
+      parameters:
+      - description: The identifier of the lookup list that you want to retrieve items.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: The version number of the lookup list that you want to retrieve items.
+        example: 1
+        in: path
+        name: version_identifier
+        required: true
+        schema:
+          format: int32
+          type: integer
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 50
+          minimum: 1
+          type: integer
+      - description: 'Sorting criteria in the format of: `[-]property` (`-` descending modifier).
+
+
+          * Default sort order is ascending (without `-`).
+
+
+          * Multiple sort criteria are supported.'
+        example:
+        - -timestamp
+        in: query
+        name: sort
+        required: false
+        schema:
+          default: []
+          items:
+            type: string
+          type: array
+      - description: Search term to filter items
+        example: example_item
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mes_PaginatedResponseLookupListItemResponse'
+          description: Lookup List Items found
+      summary: List all items for a Lookup List Version
+      tags:
+      - Enrichment
+  /v3/enrichment/transaction/lookup-list-mappings:
+    get:
+      description: 'Returns all Lookup List Mappings for the account, optionally filtered by status and/or lookup list identifier, sorted by created date.
+
+
+        You need the "View lookup lists" permission to use this endpoint.'
+      operationId: meshEnrichmentServiceListLookupListMappings
+      parameters:
+      - description: Optional filter by the status property, to only get ACTIVE or INACTIVE
+        example: ACTIVE
+        in: query
+        name: status
+        required: false
+        schema:
+          type: string
+      - description: Optional filter by lookup list identifier. If provided, only returns mappings associated with this lookup list.
+        example: 00000000-0000-0000-0000-000000000000
+        in: query
+        name: lookup_list_identifier
+        required: false
+        schema:
+          type: string
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 50
+          minimum: 1
+          type: integer
+      - description: 'Sorting criteria in the format of: `[-]property` (`-` descending modifier).
+
+
+          * Default sort order is ascending (without `-`).
+
+
+          * Multiple sort criteria are supported.'
+        example:
+        - -timestamp
+        in: query
+        name: sort
+        required: false
+        schema:
+          default: []
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mes_PaginatedResponseLookupListMappingResponse'
+          description: Lookup List Mappings found
+        '400':
+          content:
+            application/problem+json:
+              examples:
+                Invalid UUID format:
+                  description: Invalid UUID format
+                  value:
+                    detail: Invalid UUID format for lookup_list_identifier parameter
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe3
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: Invalid Request Parameter
+                    type: about:blank
+              schema:
+                $ref: '#/components/schemas/mes_ProblemDetailErrorResponse'
+          description: Bad Request - Invalid status or lookup_list_identifier parameter
+      summary: List all Lookup List Mappings
+      tags:
+      - Enrichment
+    post:
+      description: 'Create a new Lookup List Mapping record associated with a specific Lookup List.
+
+
+        You need the "View lookup lists" and "Create and update lookup lists" permissions to use this endpoint.'
+      operationId: meshEnrichmentServiceCreateLookupListMapping
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mes_LookupListMappingCreateRequestBody'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mes_LookupListMappingResponse'
+          description: Lookup List Mapping created
+        '400':
+          content:
+            application/problem+json:
+              examples:
+                Invalid number of output fields:
+                  description: Invalid number of output fields
+                  value:
+                    detail: Output fields array must contain exactly 1 element
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe6
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: MIN_1_AND_MAX_1_OUTPUT_FIELDS
+                    type: about:blank
+                Invalid number of source fields:
+                  description: Invalid number of source fields
+                  value:
+                    detail: Source fields array must contain exactly 1 element
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe5
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: MIN_1_AND_MAX_1_SOURCE_FIELDS
+                    type: about:blank
+                Invalid source field:
+                  description: Invalid source field
+                  value:
+                    detail: Source field key is not a valid block ID or transaction path
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe4
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: SOURCE_FIELD_DOESNT_BELONG_TO_AVAILABLE_SOURCE_FIELDS
+                    type: about:blank
+                Invalid transaction_output_field_key format:
+                  description: Invalid transaction_output_field_key format
+                  value:
+                    detail: Output field key has invalid format
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe3
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: TRANSACTION_OUTPUT_FIELD_KEY_INVALID_FORMAT
+                    type: about:blank
+                Lookup list identifier not found:
+                  description: Lookup list identifier not found
+                  value:
+                    detail: A lookup list with the identifier could not be found.
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe7
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: LOOKUP_LIST_IDENTIFIER_MUST_EXIST
+                    type: about:blank
+                Output field schema mismatch:
+                  description: Output field schema mismatch
+                  value:
+                    detail: Output field does not match output schema
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe9
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: OUTPUT_FIELD_LOOKUP_LIST_COLUMN_NAME_MUST_MATCH_OUTPUT_FROM_SCHEMA
+                    type: about:blank
+                Source field schema mismatch:
+                  description: Source field schema mismatch
+                  value:
+                    detail: Source field does not match input schema
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe8
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: SOURCE_FIELD_LOOKUP_LIST_COLUMN_NAME_MUST_MATCH_INPUT_FROM_SCHEMA
+                    type: about:blank
+                Source field type mismatch:
+                  description: Source field type mismatch
+                  value:
+                    detail: Source field type does not match the schema type
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe0
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: EXISTING_SOURCE_FIELD_MUST_MATCH_SCHEMA_TYPE
+                    type: about:blank
+              schema:
+                $ref: '#/components/schemas/mes_ProblemDetailErrorResponse'
+          description: Bad Request - Validation errors
+        '409':
+          content:
+            application/problem+json:
+              examples:
+                Maximum mappings reached:
+                  description: Maximum mappings reached
+                  value:
+                    detail: Maximum number of mappings (20) reached for this account
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbf2
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 409
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: MAXIMUM_NUMBER_OF_MAPPINGS_REACHED
+                    type: about:blank
+                Output field already in use:
+                  description: Output field already in use
+                  value:
+                    detail: Output field is already in use by another mapping for this account
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbf1
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 409
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: OUTPUT_FIELD_LOOKUP_ALREADY_IN_USE
+                    type: about:blank
+              schema:
+                $ref: '#/components/schemas/mes_ProblemDetailErrorResponse'
+          description: Conflict - Resource already exists or limit reached
+      summary: Create a new Lookup List Mapping
+      tags:
+      - Enrichment
+  /v3/enrichment/transaction/lookup-list-mappings/available-source-fields:
+    get:
+      description: 'Lists all available Source Fields for Lookup List Mappings, allowing filtering by type. Deliberately not paginated.
+
+
+        You need the "View lookup lists" permission to use this endpoint.'
+      operationId: meshEnrichmentServiceListAllAvailableSourceFields
+      parameters:
+      - description: Type of available source fields to filter by
+        example: string
+        in: query
+        name: type
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mes_AvailableSourceFieldsResponse'
+          description: Available Source Fields for Lookup List Mappings found.
+        '400':
+          content:
+            application/problem+json:
+              examples:
+                Invalid type parameter:
+                  description: Invalid type parameter
+                  value:
+                    detail: Unexpected value type has been provided as request parameter
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe3
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings/available-source-fields
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: Invalid Request Parameter
+                    type: about:blank
+              schema:
+                $ref: '#/components/schemas/mes_ProblemDetailErrorResponse'
+          description: Bad Request - Invalid type parameter
+      summary: Lists all available Source Fields for Lookup List Mappings
+      tags:
+      - Enrichment
+  /v3/enrichment/transaction/lookup-list-mappings/{identifier}:
+    delete:
+      description: 'This deletion will maintain the lookup list mapping record but setting its status to INACTIVE.
+
+
+        You need the "View lookup lists" and "Create and update lookup lists" permissions to use this endpoint.'
+      operationId: meshEnrichmentServiceDeleteLookupListMapping
+      parameters:
+      - description: The identifier of the lookup list mapping that you want to delete.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '204':
+          description: Lookup List Mapping version deleted
+      summary: Delete a Lookup List mapping by identifier
+      tags:
+      - Enrichment
+    get:
+      description: 'Returns a single Lookup List Mapping by its identifier.
+
+
+        You need the "View lookup lists" permission to use this endpoint.'
+      operationId: meshEnrichmentServiceGetLookupListMapping
+      parameters:
+      - description: The identifier of the lookup list mapping to retrieve.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mes_LookupListMappingResponse'
+          description: Lookup List Mapping found
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/mes_ProblemDetailErrorResponse'
+          description: Not Found - Mapping not found
+      summary: Get a single Lookup List Mapping by identifier
+      tags:
+      - Enrichment
+    patch:
+      description: 'Updates a Lookup List Mapping by creating a new record with the updated values, and marking the old one as INACTIVE, so that it is not used anymore, but it''s kept for audit purposes.
+
+
+        You need the "View lookup lists" and "Create and update lookup lists" permissions to use this endpoint.'
+      operationId: meshEnrichmentServiceUpdateLookupListMapping
+      parameters:
+      - description: The identifier of the lookup list mapping to update.
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mes_LookupListMappingPatchRequestBody'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mes_LookupListMappingResponse'
+          description: Lookup List Mapping updated
+        '400':
+          content:
+            application/problem+json:
+              examples:
+                Invalid number of output fields:
+                  description: Invalid number of output fields
+                  value:
+                    detail: Output fields array must contain exactly 1 element
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe6
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: MIN_1_AND_MAX_1_OUTPUT_FIELDS
+                    type: about:blank
+                Invalid number of source fields:
+                  description: Invalid number of source fields
+                  value:
+                    detail: Source fields array must contain exactly 1 element
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe5
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: MIN_1_AND_MAX_1_SOURCE_FIELDS
+                    type: about:blank
+                Invalid source field:
+                  description: Invalid source field
+                  value:
+                    detail: Source field key is not a valid block ID or transaction path
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe4
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: SOURCE_FIELD_DOESNT_BELONG_TO_AVAILABLE_SOURCE_FIELDS
+                    type: about:blank
+                Invalid transaction_output_field_key format:
+                  description: Invalid transaction_output_field_key format
+                  value:
+                    detail: Output field key has invalid format
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe3
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: TRANSACTION_OUTPUT_FIELD_KEY_INVALID_FORMAT
+                    type: about:blank
+                Lookup list identifier cannot be changed:
+                  description: Lookup list identifier cannot be changed
+                  value:
+                    detail: Lookup list identifier cannot be changed in an update operation
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbea
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings/00000000-0000-0000-0000-000000000000
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: LOOKUP_LIST_IDENTIFIER_CANNOT_BE_CHANGED
+                    type: about:blank
+                Lookup list identifier not found:
+                  description: Lookup list identifier not found
+                  value:
+                    detail: A lookup list with the identifier could not be found.
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe7
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: LOOKUP_LIST_IDENTIFIER_MUST_EXIST
+                    type: about:blank
+                No changes detected:
+                  description: No changes detected
+                  value:
+                    detail: No changes detected. At least one field must be modified.
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe1
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings/00000000-0000-0000-0000-000000000000
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: NOTHING_TO_UPDATE
+                    type: about:blank
+                Output field schema mismatch:
+                  description: Output field schema mismatch
+                  value:
+                    detail: Output field does not match output schema
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe9
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: OUTPUT_FIELD_LOOKUP_LIST_COLUMN_NAME_MUST_MATCH_OUTPUT_FROM_SCHEMA
+                    type: about:blank
+                Source field schema mismatch:
+                  description: Source field schema mismatch
+                  value:
+                    detail: Source field does not match input schema
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe8
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: SOURCE_FIELD_LOOKUP_LIST_COLUMN_NAME_MUST_MATCH_INPUT_FROM_SCHEMA
+                    type: about:blank
+                Source field type mismatch:
+                  description: Source field type mismatch
+                  value:
+                    detail: Source field type does not match the schema type
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbe0
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 400
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: EXISTING_SOURCE_FIELD_MUST_MATCH_SCHEMA_TYPE
+                    type: about:blank
+              schema:
+                $ref: '#/components/schemas/mes_ProblemDetailErrorResponse'
+          description: Bad Request - Validation errors or no changes detected
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/mes_ProblemDetailErrorResponse'
+          description: Not Found - Mapping not found
+        '409':
+          content:
+            application/problem+json:
+              examples:
+                Output field already in use:
+                  description: Output field already in use
+                  value:
+                    detail: Output field is already in use by another mapping for this account
+                    identifier: 019a6ffb-f7f1-7025-8ad7-f65076ccdbf1
+                    instance: https://api.example.com/v3/enrichment/transaction/lookup-list-mappings
+                    status: 409
+                    timestamp: '2025-11-10T22:56:15.345Z'
+                    title: OUTPUT_FIELD_LOOKUP_ALREADY_IN_USE
+                    type: about:blank
+              schema:
+                $ref: '#/components/schemas/mes_ProblemDetailErrorResponse'
+          description: Conflict - Output field already in use
+      summary: Update a Lookup List Mapping
+      tags:
+      - Enrichment
+components:
+  schemas:
+    mes_LookupListSchemaCreateRequestBody:
+      properties:
+        name:
+          type: string
+        type:
+          enum:
+          - string
+          - number
+          - decimal
+          type: string
+      required:
+      - name
+      - type
+      type: object
+    mes_AvailableSourceFieldFromPath:
+      properties:
+        key:
+          type: string
+        type:
+          enum:
+          - STRING
+          - NUMBER
+          type: string
+      required:
+      - key
+      - type
+      type: object
+    mes_SourceField:
+      properties:
+        field_key:
+          type: string
+        lookup_list_column_name:
+          type: string
+      required:
+      - field_key
+      - lookup_list_column_name
+      type: object
+    mes_AvailableSourceFieldsResponse:
+      description: List of Available Source Fields
+      properties:
+        blocks:
+          items:
+            $ref: '#/components/schemas/mes_AvailableSourceFieldFromBlock'
+          type: array
+        paths:
+          items:
+            $ref: '#/components/schemas/mes_AvailableSourceFieldFromPath'
+          type: array
+      required:
+      - blocks
+      - paths
+      type: object
+    mes_PaginatedResponseLookupListItemResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        items:
+          items:
+            $ref: '#/components/schemas/mes_LookupListItemResponse'
+          type: array
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - items
+      type: object
+    mes_LookupListsResponse:
+      properties:
+        created_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        created_by:
+          format: uuid
+          type: string
+        identifier:
+          format: uuid
+          type: string
+        input_schema:
+          items:
+            $ref: '#/components/schemas/mes_SchemaResponse'
+          type: array
+        items_count:
+          format: int32
+          type: integer
+        name:
+          type: string
+        output_schema:
+          items:
+            $ref: '#/components/schemas/mes_SchemaResponse'
+          type: array
+        updated_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        updated_by:
+          format: uuid
+          type: string
+        version:
+          $ref: '#/components/schemas/mes_VersionResponse'
+      required:
+      - created_by
+      - identifier
+      - input_schema
+      - items_count
+      - name
+      - output_schema
+      - updated_by
+      type: object
+    mes_LookupListMappingPatchRequestBody:
+      properties:
+        lookup_list_identifier:
+          format: uuid
+          type:
+          - string
+          - 'null'
+        output_fields:
+          items:
+            $ref: '#/components/schemas/mes_OutputField'
+          type:
+          - array
+          - 'null'
+        source_fields:
+          items:
+            $ref: '#/components/schemas/mes_SourceField'
+          type:
+          - array
+          - 'null'
+      type: object
+    mes_PaginatedResponseLookupListNoSchemaResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        lookup_lists:
+          items:
+            $ref: '#/components/schemas/mes_LookupListNoSchemaResponse'
+          type: array
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - lookup_lists
+      type: object
+    mes_LookupListMappingCreateRequestBody:
+      properties:
+        lookup_list_identifier:
+          format: uuid
+          type: string
+        output_fields:
+          items:
+            $ref: '#/components/schemas/mes_OutputField'
+          type: array
+        source_fields:
+          items:
+            $ref: '#/components/schemas/mes_SourceField'
+          type: array
+      required:
+      - lookup_list_identifier
+      - output_fields
+      - source_fields
+      type: object
+    mes_OutputField:
+      properties:
+        field_key:
+          type: string
+        lookup_list_column_name:
+          type: string
+      required:
+      - field_key
+      - lookup_list_column_name
+      type: object
+    mes_AvailableSourceFieldFromBlock:
+      properties:
+        description:
+          type: string
+        identifier:
+          type: string
+        name:
+          type: string
+        type:
+          enum:
+          - STRING
+          - NUMBER
+          type: string
+      required:
+      - description
+      - identifier
+      - name
+      - type
+      type: object
+    mes_LookupListCreateRequestBody:
+      properties:
+        input_schema:
+          items:
+            $ref: '#/components/schemas/mes_LookupListSchemaCreateRequestBody'
+          maxItems: 1
+          minItems: 1
+          type: array
+        name:
+          type: string
+        output_schema:
+          items:
+            $ref: '#/components/schemas/mes_LookupListSchemaCreateRequestBody'
+          maxItems: 1
+          minItems: 1
+          type: array
+      required:
+      - input_schema
+      - name
+      - output_schema
+      type: object
+    mes_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
+    mes_LookupListItemResponse:
+      additionalProperties:
+        oneOf:
+        - type: string
+        - type: number
+      description: Dynamic lookup list item with field-value pairs
+      example:
+        field1: string_value
+        field2: 123
+        field3: 45.67
+      type: object
+    mes_LookupListNoSchemaResponse:
+      properties:
+        created_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        created_by:
+          format: uuid
+          type: string
+        identifier:
+          format: uuid
+          type: string
+        items_count:
+          format: int32
+          type: integer
+        name:
+          type: string
+        updated_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        updated_by:
+          format: uuid
+          type: string
+        version:
+          $ref: '#/components/schemas/mes_VersionResponse'
+      required:
+      - created_by
+      - identifier
+      - items_count
+      - name
+      - updated_by
+      type: object
+    mes_PaginatedResponseLookupListMappingResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        lookup_list_mappings:
+          items:
+            $ref: '#/components/schemas/mes_LookupListMappingResponse'
+          type: array
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - lookup_list_mappings
+      type: object
+    mes_LookupListMappingResponse:
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        created_by:
+          format: uuid
+          type: string
+        identifier:
+          format: uuid
+          type: string
+        lookup_list_identifier:
+          format: uuid
+          type: string
+        output_fields:
+          items:
+            $ref: '#/components/schemas/mes_OutputField'
+          type: array
+        source_fields:
+          items:
+            $ref: '#/components/schemas/mes_SourceField'
+          type: array
+        status:
+          enum:
+          - ACTIVE
+          - INACTIVE
+          type: string
+        updated_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        updated_by:
+          format: uuid
+          type:
+          - string
+          - 'null'
+      required:
+      - created_at
+      - created_by
+      - identifier
+      - lookup_list_identifier
+      - output_fields
+      - source_fields
+      - status
+      type: object
+    mes_SchemaResponse:
+      properties:
+        name:
+          type: string
+        type:
+          enum:
+          - string
+          - number
+          - decimal
+          type: string
+      required:
+      - name
+      - type
+      type: object
+    mes_VersionResponse:
+      properties:
+        number:
+          format: int32
+          type: integer
+        status:
+          enum:
+          - DRAFT
+          - ACTIVE
+          - INACTIVE
+          type: string
+      required:
+      - number
+      - status
+      type: object
+    mes_PaginatedResponseLookupListVersionResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        items:
+          items:
+            $ref: '#/components/schemas/mes_LookupListVersionResponse'
+          type: array
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - items
+      type: object
+    mes_LookupListUpdateRequestBody:
+      properties:
+        name:
+          type: string
+      required:
+      - name
+      type: object
+    mes_LookupListVersionResponse:
+      properties:
+        created_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        created_by:
+          format: uuid
+          type: string
+        number:
+          format: int32
+          type: integer
+        status:
+          enum:
+          - DRAFT
+          - ACTIVE
+          - INACTIVE
+          type: string
+        updated_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        updated_by:
+          format: uuid
+          type: string
+      required:
+      - created_by
+      - number
+      - status
+      - updated_by
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http

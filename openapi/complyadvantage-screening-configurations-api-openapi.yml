@@ -1,0 +1,455 @@
+openapi: 3.2.0
+info:
+  title: Mesh Screening Configurations API
+  version: v2.0
+servers:
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
+security:
+- BearerAuth: []
+tags:
+- name: Screening Configurations
+paths:
+  /v2/entity-screening/configurations:
+    get:
+      description: This endpoint returns a list of configurations with its metadata
+      operationId: entityScreeningGetConfigurations
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sra_ListConfigurationsResponse'
+          description: Configurations successfully retrieved
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sra_ProblemDetailErrorResponse'
+          description: No configurations found
+      summary: Get screening configurations
+      tags:
+      - Screening Configurations
+    post:
+      description: 'This endpoint creates a new screening configuration
+
+
+        You need "Access to base customer screening functionality" enabled and the "Create and update customer screening configurations" permission to use this endpoint.'
+      operationId: entityScreeningCreateConfiguration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/sra_CreateConfigurationRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sra_ScreeningConfiguration'
+          description: Configuration successfully created
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sra_ProblemDetailErrorResponse'
+          description: Bad Request
+      summary: Create screening configuration
+      tags:
+      - Screening Configurations
+  /v2/entity-screening/configurations/{configuration_identifier}:
+    put:
+      description: 'This endpoint updates a screening configuration details
+
+
+        You need "Access to base customer screening functionality" enabled and the "Create and update customer screening configurations" permission to use this endpoint.'
+      operationId: entityScreeningUpdateConfiguration
+      parameters:
+      - description: The unique configuration identifier
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: configuration_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/sra_UpdateConfigurationRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sra_ScreeningConfiguration'
+          description: Configuration successfully updated
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sra_ProblemDetailErrorResponse'
+          description: Bad Request
+      summary: Update screening configuration
+      tags:
+      - Screening Configurations
+  /v2/entity-screening/configurations/{configuration_identifier}/versions:
+    get:
+      description: This endpoint returns all versions of a screening configuration
+      operationId: entityScreeningGetConfigurationVersions
+      parameters:
+      - description: The unique configuration identifier
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: configuration_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sra_ListConfigurationVersionsResponse'
+          description: Configuration versions successfully retrieved
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sra_ProblemDetailErrorResponse'
+          description: No configuration versions found
+      summary: Get screening configuration versions
+      tags:
+      - Screening Configurations
+  /v2/entity-screening/configurations/{configuration_identifier}/versions/{version_identifier}:
+    get:
+      description: This endpoint returns a version of a configuration with its metadata
+      operationId: entityScreeningGetConfigurationVersion
+      parameters:
+      - description: The unique configuration identifier
+        example: 00000000-0000-0000-0000-000000000000
+        in: path
+        name: configuration_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: Configuration version identifier. Setting configuration version to 0 returns the latest version
+        example: 1
+        in: path
+        name: version_identifier
+        required: true
+        schema:
+          format: int32
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sra_ScreeningConfiguration'
+          description: Configuration successfully retrieved
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sra_ProblemDetailErrorResponse'
+          description: No configuration version found
+      summary: Get a screening configuration version
+      tags:
+      - Screening Configurations
+components:
+  schemas:
+    sra_CreateConfigurationRequest:
+      description: Create configuration request containing a change reason and a screening configuration with multiple collections.
+      properties:
+        change_reason:
+          description: The reason for the change/creation. Defaults to "Initial creation"
+          type:
+          - string
+          - 'null'
+        configuration:
+          $ref: '#/components/schemas/sra_Configuration'
+      type: object
+    sra_ScreeningConfigurationVersion:
+      description: The list of configuration versions.
+      properties:
+        change_reason:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type:
+          - string
+          - 'null'
+        created_by:
+          format: uuid
+          type:
+          - string
+          - 'null'
+        name:
+          type:
+          - string
+          - 'null'
+        version:
+          format: int32
+          type:
+          - integer
+          - 'null'
+      type: object
+    sra_UpdateConfigurationRequest:
+      description: Update configuration request containing a change reason and a screening configuration with multiple collections.
+      properties:
+        change_reason:
+          description: The reason for the change.
+          type:
+          - string
+          - 'null'
+        configuration:
+          $ref: '#/components/schemas/sra_Configuration'
+      type: object
+    sra_ListConfigurationVersionsResponse:
+      description: The response object containing a list of configuration versions.
+      properties:
+        versions:
+          description: The list of configuration versions.
+          items:
+            $ref: '#/components/schemas/sra_ScreeningConfigurationVersion'
+          type:
+          - array
+          - 'null'
+      type: object
+    sra_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type:
+          - string
+          - 'null'
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      type: object
+    sra_Configuration:
+      description: Object containing a screening configuration with multiple collections.
+      properties:
+        configuration_options:
+          default: []
+          description: Configurations to be used across all collections, not the same as options inside a collection
+          example:
+          - media_snippet_id
+          items:
+            default: '[]'
+            description: Configurations to be used across all collections, not the same as options inside a collection
+            example: '["media_snippet_id"]'
+            type: string
+          type:
+          - array
+          - 'null'
+        country_filters:
+          default: []
+          description: Country based screening results filtering
+          example:
+          - GB
+          format: ISO 3166-1 Alpha-2
+          items:
+            default: '[]'
+            description: Country based screening results filtering
+            example: '["GB"]'
+            format: ISO 3166-1 Alpha-2
+            type: string
+          type: array
+        description:
+          description: The description of the screening configuration.
+          example: Configuration description
+          type: string
+        is_archived:
+          default: false
+          description: The flag to indicate if the screening configuration is archived.
+          type: boolean
+        name:
+          description: The name and identifier of the screening configuration.
+          example: Configuration Name
+          type: string
+        results_limit:
+          description: The limit of screening results returned
+          enum:
+          - 10
+          - 25
+          - 50
+          - 100
+          - 500
+          format: int32
+          type: integer
+        source_collections:
+          description: The list of collections.
+          items:
+            $ref: '#/components/schemas/sra_Collection'
+          minLength: 1
+          type: array
+      required:
+      - country_filters
+      - description
+      - is_archived
+      - name
+      - results_limit
+      - source_collections
+      type: object
+    sra_ScreeningConfiguration:
+      description: The response schema for a screening configuration.
+      properties:
+        change_reason:
+          description: The reason for the change in the screening configuration.
+          type:
+          - string
+          - 'null'
+        configuration:
+          $ref: '#/components/schemas/sra_Configuration'
+        configuration_identifier:
+          description: The screening configuration identifier.
+          format: uuid
+          type:
+          - string
+          - 'null'
+        created_at:
+          description: Timestamp of when the screening configuration was created.
+          format: date-time
+          type:
+          - string
+          - 'null'
+        created_by:
+          description: The unique identifier of the user who created the screening configuration.
+          format: uuid
+          type:
+          - string
+          - 'null'
+        version:
+          description: The version of the screening configuration.
+          format: int32
+          type:
+          - integer
+          - 'null'
+      type: object
+    sra_Collection:
+      description: Object containing the collection of screening parameters. A collection can either contain ComplyAdvantage sources or custom lists.
+      minLength: 1
+      properties:
+        aml_types:
+          default: []
+          description: The list of available AML types for the collection.
+          example:
+          - pep-class-1
+          - pep-class-2
+          items:
+            default: '[]'
+            description: The list of available AML types for the collection.
+            example: '["pep-class-1","pep-class-2"]'
+            type: string
+          type: array
+        custom_list_identifiers:
+          default: []
+          description: The list of available custom lists for the collection.
+          example:
+          - add73965-d5f1-44ea-857d-1660fb0bdd70
+          - 680ff6c0-c399-4fe5-ac6d-2cd428d836b5
+          items:
+            default: '[]'
+            description: The list of available custom lists for the collection.
+            example: '["add73965-d5f1-44ea-857d-1660fb0bdd70","680ff6c0-c399-4fe5-ac6d-2cd428d836b5"]'
+            type: string
+          type:
+          - array
+          - 'null'
+        description:
+          description: The description of the collection.
+          example: Collection description
+          type: string
+        fuzziness:
+          description: The fuzziness of the collection.
+          example: 0.8
+          format: float
+          maximum: 1
+          minimum: 0
+          type: number
+        name:
+          description: The name and identifier of the collection.
+          example: Collection Name
+          type: string
+        options:
+          default: []
+          description: The list of available options for the collection.
+          example:
+          - sanction_option
+          - pep_option
+          items:
+            default: '[]'
+            description: The list of available options for the collection.
+            example: '["sanction_option","pep_option"]'
+            type: string
+          type: array
+        source_identifiers:
+          default: []
+          description: The list of available sources for the collection.
+          example:
+          - S:ABC123
+          - S:1A2B3C
+          items:
+            default: '[]'
+            description: The list of available sources for the collection.
+            example: '["S:ABC123","S:1A2B3C"]'
+            type: string
+          type: array
+      required:
+      - aml_types
+      - description
+      - fuzziness
+      - name
+      - options
+      - source_identifiers
+      type: object
+    sra_ListConfigurationsResponse:
+      description: The response object containing a list of screening configurations.
+      properties:
+        configurations:
+          description: The list of screening configurations.
+          items:
+            $ref: '#/components/schemas/sra_ScreeningConfiguration'
+          type:
+          - array
+          - 'null'
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http

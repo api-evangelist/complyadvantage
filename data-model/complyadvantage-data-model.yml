@@ -1,0 +1,266 @@
+generated: '2026-08-27'
+method: derived
+source: >-
+  openapi/complyadvantage-mesh-api-openapi.json (123 paths, 163 operations, 945 schemas)
+  and the four refined legacy specs in openapi/; entity names and semantics cross-checked
+  against https://docs.mesh.complyadvantage.com/docs/customers.md,
+  /docs/cases.md and /docs/alerts-and-risks.md
+provider: ComplyAdvantage
+providerId: complyadvantage
+description: >-
+  The Mesh domain is a screening pipeline expressed as an entity graph. A Customer is the
+  root record; screening it produces Alerts, each Alert carries Risks, and Alerts are
+  grouped into Cases that analysts move through a configurable stage machine. A Transaction
+  is the parallel root on the monitoring side and lands in the same Case machine. Everything
+  is UUID-identified and almost everything is also addressable by a caller-supplied
+  external_identifier, which is the single most important integration property in the model:
+  it lets a client keep its own primary keys and never store a ComplyAdvantage id.
+identifier_conventions:
+  primary: >-
+    `identifier` - a UUID minted by ComplyAdvantage. Appears on 213 schemas. There are no
+    prefixed, type-discriminated ids (no cus_ / case_ style prefixes), so an identifier
+    carries no type information on its own.
+  foreign_key_style: >-
+    <entity>_identifier - customer_identifier, case_identifier, alert_identifier,
+    risk_identifier, transaction_identifier, account_identifier, client_identifier,
+    configuration_identifier, workflow_instance_identifier, stage_identifier,
+    lookup_list_identifier, user_identifier, role_identifier.
+  external: >-
+    `external_identifier` (36 schemas) - the caller's own key. Customers and transactions
+    are both directly retrievable by it. GET /v2/customers/external/{external_identifier}
+    answers 308 Permanent Redirect to the canonical customer URL rather than returning the
+    record, which some HTTP clients will not follow automatically.
+  legacy_api: >-
+    The legacy REST API keys searches by a numeric/string `id` plus a client-supplied
+    `ref`, with a separate lookup by reference (POST /searches/references).
+entities:
+- name: Client
+  description: The top of the tenancy tree. A client owns one or more accounts.
+  operations: [identity_v2_clients_me_getMyClient, identity_v2_clients_me_accounts_getMyClientsAccounts, identity_v2_clients_me_users_getClientUsers]
+- name: Account
+  description: The tenant an API credential authenticates into. Multi-account clients can read across accounts with the "View all accounts" permission.
+  operations: [identity_v2_accounts_me_getMyAccount, identity_v2_accounts_me_updateUserAccountMetadata, identity_v2_accounts_me_users_getMyAccountsUsers]
+- name: User
+  description: A human or API user on an account, holding one or more roles.
+- name: Role
+  description: A named permission bundle assigned to users. Archived rather than hard-deleted.
+- name: Permission
+  description: An atomic capability referenced by roles. Enumerable at GET /v3/iam/permissions.
+- name: Customer
+  description: >-
+    The root screening subject - a PERSON, COMPANY, UNDEFINED or empty type, optionally
+    carrying products, labels, custom fields, notes and an acquisition source. Statuses are
+    Processing, Active and Closed.
+  operations: [customerGetCustomersList, customerGetCustomerV2, customerGetCustomerV2WithExternalIdentifier, customerTransitionCustomerStatus, updateCustomer]
+- name: Product
+  description: A product held by a customer. Replacing the products array on an update overwrites the whole list.
+  operations: [customerGetProductsV2]
+- name: RiskScore
+  description: >-
+    A customer's overall score and level plus a per-category breakdown with weights.
+    Overridable to MANUAL, which permanently disables automatic recalculation.
+  operations: [riskScoringManagerServiceAPIGetRiskScore, riskScoringManagerServiceAPIUpdateRiskScore]
+- name: MonitoringConfiguration
+  description: Per-customer ongoing-monitoring settings. Falls back to the initial screening configuration when unset.
+  operations: [customerGetMonitoringConfig, customerUpdateCustomerMonitorConfiguration]
+- name: ScreeningConfiguration
+  description: >-
+    Named, versioned screening settings - which lists, thresholds and fuzziness apply.
+    Referenced by configuration_identifier when creating and screening a customer.
+  operations: [entityScreeningGetConfigurations, entityScreeningCreateConfiguration, entityScreeningUpdateConfiguration, entityScreeningGetConfigurationVersions, entityScreeningGetConfigurationVersion]
+- name: Workflow
+  description: >-
+    A create-and-screen or rescreen orchestration instance with steps and step_details.
+    Statuses NOT-STARTED / IN-PROGRESS / COMPLETED / ERRORED; step statuses add SKIPPED.
+  operations: [createCustomerAndScreenAsync, createCustomerAndScreenSync, getWorkflowState, orchestrationLayerAPIPostV2RescreenCustomerWorkflowsSync]
+- name: Alert
+  description: Raised when screening or monitoring surfaces relevant risk. Transitions through states and carries notes.
+  operations: [alertServiceGetRisks, alertServiceTransitionAlertState]
+- name: Risk
+  description: An individual risk finding inside an alert, each independently decisioned.
+  operations: [alertServiceChangeRiskStatus]
+- name: AlertMute
+  description: Suppression rule keyed to a customer or entity. v2 and v3 surfaces coexist.
+  operations: [alertServiceGetAlertMutes, alertServiceCreateAlertMute, alertServiceDeleteAlertMute, alertServiceGetAlertMutesV3, alertServiceCreateAlertMuteV3, alertServiceDeleteAlertMuteV3]
+- name: Case
+  description: >-
+    The analyst work item. Typed by origin (CUSTOMER_ONBOARDING and others), grouped by
+    subjects, moved through account-configured stages. Bulk assign / note / transition cap
+    at 100 per request and answer 207 Multi-Status.
+  operations: ['casesService/v2/cases.get', 'casesService/v2/cases/case_identifier.get', 'casesService/v2/cases/case_identifier/transition.post', 'casesService/v2/cases/case_identifier/assign.post']
+- name: CaseStage
+  description: A configurable stage with stage_type (INITIAL / DECISION) and decision_type. Supersedes the deprecated case_state enum.
+  operations: ['casesService/v2/cases/states.get']
+- name: CaseWorkflow
+  description: The versioned stage machine a case type follows.
+  operations: ['casesService/v2/cases/workflows.get', 'casesService/v2/cases/workflows/workflow_identifier.put']
+- name: Note
+  description: Free text attached to a case, an alert, or a customer. Never deleted.
+- name: Transaction
+  description: >-
+    The monitoring-side root. Versioned - every change produces a retrievable version -
+    and reviewable, with a terminal RELEASE/reject decision and settable risk types.
+  operations: [meshSearchServiceGetTransactions, activityStoreGetTransactionUsingInternalIdentifier, activityStoreGetTransactionUsingExternalIdentifier, orchestrationLayerAPIPostV3TransactionProcess, activityStorePostTransactionReviewDecision, activityStoreSetTransactionRiskTypes, activityStoreListTransactionVersions]
+- name: CustomList
+  description: Account-defined allow/deny list holding entities and risk words. Members are archived, not deleted.
+  operations: [customListAPIAllCustomLists, customListAPINewCustomList, customListAPINewEntityAddedToList, customListAPIAddRiskWordToList]
+- name: LookupList
+  description: Reference data for transaction enrichment, with draft versions and field mappings.
+- name: CustomField
+  description: Account-defined extension fields, defined separately for customers and transactions.
+- name: Label
+  description: Free-form tags on a customer, replaced wholesale by PUT.
+- name: WebhookConfiguration
+  description: One event-type subscription with a target URL and an is_active flag.
+- name: EmailConfiguration
+  description: Email notification subscription. Unlike webhooks, it has a delete operation.
+- name: Export
+  description: Bulk data extraction, the documented path past the 10,000-customer list cap.
+- name: BatchProcess
+  description: Bulk upload job with a downloadable report.
+- name: AuditEvent
+  description: Append-only audit trail, queryable per account, case, customer, transaction, role and user.
+- name: RegulatoryReportPrefill
+  description: FinCEN CTR transaction locations and SAR financial institutions, maintained in bulk for report prefill.
+- name: ScreeningCertificate
+  description: Generated PDF evidence of a screen, returned as a download URL. 200 means not ready yet, 201 means generated.
+relationships:
+- from: Client
+  to: Account
+  type: has_many
+  via: client_identifier
+- from: Account
+  to: User
+  type: has_many
+  via: account_identifier
+- from: User
+  to: Role
+  type: has_many
+  via: user_role_identifier
+- from: Role
+  to: Permission
+  type: has_many
+- from: Account
+  to: Customer
+  type: has_many
+  via: account_identifier
+- from: Customer
+  to: RiskScore
+  type: has_one
+  via: customer_identifier
+- from: Customer
+  to: MonitoringConfiguration
+  type: has_one
+  via: customer_identifier
+- from: Customer
+  to: Product
+  type: has_many
+  via: customer_identifier
+- from: Customer
+  to: Label
+  type: has_many
+  via: customer_identifier
+- from: Customer
+  to: Note
+  type: has_many
+  via: customer_identifier
+- from: Customer
+  to: Case
+  type: has_many
+  via: customer_identifier
+- from: Customer
+  to: ScreeningCertificate
+  type: has_many
+  via: customer_identifier
+- from: Customer
+  to: ScreeningConfiguration
+  type: belongs_to
+  via: configuration_identifier
+- from: Workflow
+  to: Customer
+  type: has_one
+  via: step_details.customer-creation.step_output.customer_identifier
+- from: Workflow
+  to: Alert
+  type: has_many
+  via: step_details.alerting.step_output.alerts[].identifier
+- from: Case
+  to: Alert
+  type: has_many
+  via: case_identifier
+- from: Alert
+  to: Risk
+  type: has_many
+  via: alert_identifier
+- from: Alert
+  to: Note
+  type: has_many
+  via: alert_identifier
+- from: Case
+  to: Note
+  type: has_many
+  via: case_identifier
+- from: Case
+  to: CaseStage
+  type: belongs_to
+  via: stage_identifier
+- from: Case
+  to: CaseWorkflow
+  type: belongs_to
+  via: workflow_identifier
+- from: Case
+  to: Customer
+  type: has_many
+  via: subjects[] with type CUSTOMER
+- from: Case
+  to: Transaction
+  type: has_many
+  via: subjects[] with type TRANSACTION
+- from: Transaction
+  to: Case
+  type: has_many
+  via: transaction_identifier
+- from: Transaction
+  to: CustomField
+  type: has_many
+- from: AlertMute
+  to: Customer
+  type: belongs_to
+  via: customer_identifier
+- from: CustomList
+  to: Customer
+  type: many_to_many
+  via: ScreeningConfiguration list selection
+- from: LookupList
+  to: Transaction
+  type: many_to_many
+  via: lookup-list-mappings on source fields
+- from: AuditEvent
+  to: Customer
+  type: belongs_to
+  via: customer_identifier
+- from: AuditEvent
+  to: Case
+  type: belongs_to
+  via: case_identifier
+- from: AuditEvent
+  to: Transaction
+  type: belongs_to
+  via: transaction_identifier
+legacy_model:
+  root: Search
+  description: >-
+    The legacy REST API has a much smaller graph. A Search is created against a name and
+    filters, returns Hits (matched entities), can be Monitored for changes, and carries
+    case-management state - assignee, match status, risk level, comments and tags.
+  entities: [Search, Hit, Entity, Monitor, Comment, Tag, User]
+  relationships:
+  - {from: Search, to: Hit, type: has_many, via: search id}
+  - {from: Search, to: Monitor, type: has_one, via: search id}
+  - {from: Search, to: Comment, type: has_many, via: search id}
+  - {from: Search, to: Tag, type: has_many, via: search id}
+  schemas: [SearchRequest, Search, Hit, SearchEnvelope, SearchListEnvelope, MonitorEnvelope]
+notes: >-
+  There is no cross-walk between the two models. A Search on the legacy API and a Customer
+  on Mesh are different records in different systems with different identifiers; the
+  contract offers no migration or lookup path between them.

@@ -1,0 +1,543 @@
+openapi: 3.2.0
+info:
+  title: Mesh Exports API
+  version: v2.0
+servers:
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
+security:
+- BearerAuth: []
+tags:
+- name: Exports
+paths:
+  /v2/exports:
+    get:
+      description: 'Calling this endpoint will return a list of all the exports that the requesting user attempted to create. It will return exports that are pending, successful and failed.
+
+
+        You need the "View and download insights" permission to use this endpoint.'
+      operationId: exportsServiceListExports
+      parameters:
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 25
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/exports_PaginatedResponseExportItem'
+          description: List of exports successfully returned
+        '400':
+          content:
+            application/problem+json:
+              examples:
+                Page number too large:
+                  description: Page number too large
+                  value:
+                    detail: Page number of 55 is greater than max page number of 41
+                    identifier: 018d5563-3da8-794b-8dca-388804d4331f
+                    instance: https://docs.mesh.complyadvantage.com/reference/errors
+                    status: 400
+                    timestamp: '2024-01-29T13:24:35.998Z'
+                    title: Page number too large
+                    type: about:blank
+                Page size too large:
+                  description: Page size too large
+                  value:
+                    detail: Page size of $(MAX_PAGE_SIZE + 1) is greater than max page size of 100
+                    identifier: 018d5563-3da8-794b-8dca-388804d4331f
+                    instance: https://docs.mesh.complyadvantage.com/reference/errors
+                    status: 400
+                    timestamp: '2024-01-29T13:24:35.998Z'
+                    title: Page size too large
+                    type: about:blank
+              schema:
+                $ref: '#/components/schemas/exports_ProblemDetailErrorResponse'
+          description: Bad request
+      summary: Get a list of all exports that the requesting user attempted to create
+      tags:
+      - Exports
+    post:
+      description: 'Create a new export by selecting an export type and a start and end date. The available export names are CUSTOMER_SCREENING, CUSTOMER, SCREENING_AND_MONITORING_CASES, PROFILES, PAYMENT_SCREENING_CASES, TRANSACTION_MONITORING_CASES_AND_ALERTS, TRANSACTIONS.
+
+
+        You need the "View and download insights" permission to use this endpoint.'
+      operationId: exportsServiceCreateExport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/exports_CreateExportPayload'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/exports_ExportItem'
+          description: Export successfully created
+        '400':
+          content:
+            application/json:
+              examples:
+                Invalid export_type_key:
+                  description: Invalid export_type_key
+                  value:
+                    errors:
+                    - field: export_type_key
+                      reasons:
+                      - key: EXPORT_TYPE_INVALID
+                        message: 'export_type_key must be one of the following: CUSTOMER_SCREENING, CUSTOMER, SCREENING_AND_MONITORING_CASES, PROFILES, PAYMENT_SCREENING_CASES, TRANSACTION_MONITORING_CASES_AND_ALERTS, TRANSACTIONS.'
+                        parameters: null
+                      rejected: invalid-export-type-key
+                    identifier: dc9f5c1a-915e-4860-ba57-bed23494a6ee
+                    instance: https://docs.mesh.complyadvantage.com/reference/errors
+                    status: 400
+                    timestamp: '2024-01-30T14:26:25.998Z'
+                    title: Invalid input
+                    type: about:blank
+                export_name cannot be blank:
+                  description: export_name cannot be blank
+                  value:
+                    errors:
+                    - field: export_name
+                      reasons:
+                      - key: EXPORT_NAME_BLANK
+                        message: export_name field must not be blank.
+                        parameters: null
+                      rejected: ''
+                    identifier: dc9f5c1a-915e-4860-ba57-bed23494a6ee
+                    instance: https://docs.mesh.complyadvantage.com/reference/errors
+                    status: 400
+                    timestamp: '2024-01-30T14:26:25.998Z'
+                    title: Invalid input
+                    type: about:blank
+                export_name cannot be over character limit:
+                  description: export_name cannot be over character limit
+                  value:
+                    errors:
+                    - field: export_name
+                      reasons:
+                      - key: EXPORT_NAME_LENGTH
+                        message: export_name field must be a maximum of 50 characters.
+                        parameters: null
+                      rejected: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                    identifier: dc9f5c1a-915e-4860-ba57-bed23494a6ee
+                    instance: https://docs.mesh.complyadvantage.com/reference/errors
+                    status: 400
+                    timestamp: '2024-01-30T14:26:25.998Z'
+                    title: Invalid input
+                    type: about:blank
+                start_date and end_date must be in ISO 8601 format:
+                  description: start_date and end_date must be in ISO 8601 format
+                  value:
+                    errors:
+                    - field: start_date
+                      reasons:
+                      - key: DATE_INVALID
+                        message: Invalid date format, the date format must be ISO 8601.
+                        parameters: null
+                      rejected: 01-11-2023
+                    identifier: dc9f5c1a-915e-4860-ba57-bed23494a6ee
+                    instance: https://docs.mesh.complyadvantage.com/reference/errors
+                    status: 400
+                    timestamp: '2024-01-30T14:26:25.998Z'
+                    title: Invalid input
+                    type: about:blank
+                start_date cannot be after end_date:
+                  description: start_date cannot be after end_date
+                  value:
+                    errors:
+                    - field: start_date
+                      reasons:
+                      - key: START_DATE_AFTER_END_DATE
+                        message: start_date must be before end_date.
+                        parameters: null
+                      rejected: ''
+                    identifier: dc9f5c1a-915e-4860-ba57-bed23494a6ee
+                    instance: https://docs.mesh.complyadvantage.com/reference/errors
+                    status: 400
+                    timestamp: '2024-01-30T14:26:25.998Z'
+                    title: Invalid input
+                    type: about:blank
+                start_date cannot be in the future:
+                  description: start_date cannot be in the future
+                  value:
+                    errors:
+                    - field: start_date
+                      reasons:
+                      - key: START_DATE_IN_THE_FUTURE
+                        message: start_date cannot be in the future.
+                        parameters: null
+                      rejected: '2030-01-01T00:00:00.000Z'
+                    identifier: dc9f5c1a-915e-4860-ba57-bed23494a6ee
+                    instance: https://docs.mesh.complyadvantage.com/reference/errors
+                    status: 400
+                    timestamp: '2030-01-30T14:26:25.998Z'
+                    title: Invalid input
+                    type: about:blank
+                start_date cannot be over a year ago:
+                  description: start_date cannot be over a year ago
+                  value:
+                    errors:
+                    - field: start_date
+                      reasons:
+                      - key: START_DATE_MORE_THAN_ONE_YEAR_AGO
+                        message: start_date cannot be more than one year ago.
+                        parameters: null
+                      rejected: '2021-01-01T00:00:00.000Z'
+                    identifier: dc9f5c1a-915e-4860-ba57-bed23494a6ee
+                    instance: https://docs.mesh.complyadvantage.com/reference/errors
+                    status: 400
+                    timestamp: '2024-01-30T14:26:25.998Z'
+                    title: Invalid input
+                    type: about:blank
+              schema:
+                $ref: '#/components/schemas/exports_ProblemDetailErrorResponse'
+          description: Bad request
+      summary: Create a new export
+      tags:
+      - Exports
+  /v2/exports/export-types:
+    get:
+      description: 'This endpoint will return a paginated list of available exports, along with details about the data contained within each and how it can be used for analytical and reporting purposes.
+
+
+        You need the "View and download insights" permission to use this endpoint.'
+      operationId: exportsServiceGetExportTypes
+      parameters:
+      - description: One-based page index (1..N)
+        example: 1
+        in: query
+        name: page_number
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+      - description: The size of the page to be returned
+        example: 20
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 25
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/exports_PaginatedResponseExportTypeKeys'
+          description: List of exports successfully returned
+      summary: Get a list of export types
+      tags:
+      - Exports
+  /v2/exports/{export_identifier}/download:
+    get:
+      description: 'This endpoint will return the download url for the requested export. For security reasons, the returned download URL is valid for only 5 seconds (TTL) from the moment it is issued, so the download must be started immediately or a new URL requested via this endpoint.
+
+
+        You need the "View and download insights" permission to use this endpoint.'
+      operationId: exportsServiceGetExportDownloadUrl
+      parameters:
+      - description: The `uuid` of the `Export`.
+        example: 01566c37-576b-7677-b41a-9c6fdbd3abc9
+        in: path
+        name: export_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/exports_DownloadExportResponseBody'
+          description: Download url for the export successfully returned.
+        '404':
+          content:
+            application/json:
+              examples:
+                Export generation has failed:
+                  description: Export generation has failed
+                  value:
+                    detail: Export with ID of 550e8400-e29b-41d4-a716-446655440000 generation has failed.
+                    identifier: 018d5563-3da8-794b-8dca-388804d4331f
+                    instance: https://docs.mesh.complyadvantage.com/reference/errors
+                    status: 404
+                    timestamp: '2024-01-29T13:24:35.998Z'
+                    title: Export generation has failed.
+                    type: about:blank
+                Export generation is still pending:
+                  description: Export generation is still pending
+                  value:
+                    detail: Export with ID of 550e8400-e29b-41d4-a716-446655440000 generation is still pending.
+                    identifier: 018d5563-3da8-794b-8dca-388804d4331f
+                    instance: https://docs.mesh.complyadvantage.com/reference/errors
+                    status: 404
+                    timestamp: '2024-01-29T13:24:35.998Z'
+                    title: Export generation is still pending.
+                    type: about:blank
+                Export object does not exist:
+                  description: Export object does not exist
+                  value:
+                    detail: Export with ID of 550e8400-e29b-41d4-a716-446655440000 identifier does not exist.
+                    identifier: 018d5563-3da8-794b-8dca-388804d4331f
+                    instance: https://docs.mesh.complyadvantage.com/reference/errors
+                    status: 404
+                    timestamp: '2024-01-29T13:24:35.998Z'
+                    title: Export object does not exist.
+                    type: about:blank
+              schema:
+                $ref: '#/components/schemas/exports_ProblemDetailErrorResponse'
+          description: Export not found.
+        '503':
+          content:
+            application/json:
+              examples:
+                Generating presigned url failed:
+                  description: Generating presigned url failed
+                  value:
+                    detail: Generating presigned url for Export with ID of 450e8400-e29b-41d4-a716-446655440000 failed.
+                    identifier: dc9f5c1a-915e-4860-ba57-bed23494a6ee
+                    instance: https://docs.mesh.complyadvantage.com/reference/errors/503
+                    status: 503
+                    timestamp: '2024-01-30T14:26:25.998Z'
+                    title: Generating presigned url failed.
+                    type: about:blank
+              schema:
+                $ref: '#/components/schemas/exports_ProblemDetailErrorResponse'
+          description: Service unavailable due to problems encountered while generating the presigned url.
+      summary: Get a download url for a given export
+      tags:
+      - Exports
+components:
+  schemas:
+    exports_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
+    exports_DownloadExportResponseBody:
+      properties:
+        download_url:
+          description: Download url
+          example: s3://export.csv
+          type: string
+      required:
+      - download_url
+      type: object
+    exports_PaginatedResponseExportItem:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        items:
+          items:
+            $ref: '#/components/schemas/exports_ExportItem'
+          type: array
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - items
+      type: object
+    exports_CreateExportPayload:
+      properties:
+        end_date:
+          description: Export data end date
+          example: '2023-11-05T21:00:00.000Z'
+          format: date-time
+          type:
+          - string
+          - 'null'
+        export_name:
+          description: Export name, created by customer
+          example: profiles-2023-q1-exports
+          maxLength: 50
+          minLength: 0
+          type: string
+        export_type_key:
+          description: Export type key
+          example: CUSTOMER_SCREENING
+          minLength: 1
+          type: string
+        start_date:
+          description: Export data start date
+          example: '2023-11-01T21:00:00.000Z'
+          format: date-time
+          type:
+          - string
+          - 'null'
+      required:
+      - export_name
+      - export_type_key
+      type: object
+    exports_ExportTypeKeys:
+      properties:
+        key:
+          type: string
+      required:
+      - key
+      type: object
+    exports_ExportItem:
+      properties:
+        created_at:
+          description: Export creation time
+          example: '2023-12-11T09:30:03.975Z'
+          format: date-time
+          type: string
+        export_name:
+          description: Export name, created by customer
+          example: profiles-2023-q1-exports
+          type: string
+        export_type_key:
+          description: Export type key
+          example: CUSTOMER_SCREENING
+          type: string
+        identifier:
+          description: Export type id
+          example: 550e8400-e29b-41d4-a716-446655440000
+          format: uuid
+          type: string
+        status:
+          description: Export status
+          example: PENDING
+          type: string
+        window_end_time:
+          description: Export data end date
+          example: '2023-04-01T00:00:00.000Z'
+          format: date-time
+          type:
+          - string
+          - 'null'
+        window_start_time:
+          description: Export data start date
+          example: '2023-01-01T00:00:00.000Z'
+          format: date-time
+          type:
+          - string
+          - 'null'
+      required:
+      - created_at
+      - export_name
+      - export_type_key
+      - identifier
+      - status
+      type: object
+    exports_PaginatedResponseExportTypeKeys:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        items:
+          items:
+            $ref: '#/components/schemas/exports_ExportTypeKeys'
+          type: array
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - items
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http

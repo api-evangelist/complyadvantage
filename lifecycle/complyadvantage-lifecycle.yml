@@ -1,0 +1,119 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  https://docs.mesh.complyadvantage.com/docs/versioning.md,
+  https://docs.mesh.complyadvantage.com/llms.txt,
+  https://docs.complyadvantage.com/api-docs; derived from
+  openapi/complyadvantage-mesh-api-openapi.json
+provider: ComplyAdvantage
+providerId: complyadvantage
+description: >-
+  ComplyAdvantage publishes a versioning policy and marks deprecated endpoints, fields and
+  webhook types inline, but publishes no sunset dates, no Deprecation/Sunset headers, no
+  status page and no SLA. Deprecation here is a documentation convention, not a machine
+  signal: nothing in the OpenAPI carries `deprecated: true`, so an agent reading the
+  contract alone cannot tell that POST /v2/token is on the way out.
+versioning:
+  scheme: path-prefix (v2, v3)
+  current: v2 and v3 operations coexist in the same Mesh contract; info.version is "v2.0"
+  policy_published: true
+  policy_url: https://docs.mesh.complyadvantage.com/docs/versioning
+  policy: >-
+    A new version of an endpoint is released whenever a backwards-incompatible change
+    ships. Explicitly backwards-compatible and therefore NOT versioned: new endpoints,
+    adding a response body where none existed, adding optional or read-only
+    fields/properties, rearranging fields in the JSON structure, new HTTP headers, adding
+    new values to an enum, and adding HTTP methods to existing resources.
+  legacy_api_version: '1.0'
+deprecation:
+  policy_published: false
+  sunset_dates_published: false
+  sunset_header: not implemented
+  deprecation_header: not implemented
+  rfc8594: false
+  machine_readable_in_spec: false
+  note: >-
+    Zero operations in openapi/complyadvantage-mesh-api-openapi.json carry OpenAPI's
+    `deprecated: true` flag, even the ones the prose calls deprecated. The deprecation
+    signal exists only in human-readable descriptions.
+  deprecated_operations:
+  - id: createToken
+    path: POST /v2/token
+    api: Mesh
+    replacement: POST /v3/token (createTokenV3)
+    evidence: >-
+      Reference title reads "Create an access token with username/password (deprecated)";
+      body says "If you are setting up a new API integration, use API credentials and the
+      /v3/token endpoint instead of this one."
+    sunset: not published
+  - id: identity_v2_iam_permissions_listPermissions
+    path: GET /v2/iam/permissions
+    api: Mesh
+    replacement: GET /v3/iam/permissions
+    evidence: 'Reference description: "List permissions. DEPRECATED: Please use GET /v3/iam/permissions instead."'
+    sunset: not published
+  - id: GET /entity/{entity_id}
+    api: legacy REST
+    replacement: not stated
+    evidence: Listed under "Deprecated Endpoints" at https://docs.complyadvantage.com/api-docs
+    sunset: not published
+  - id: POST /entity/search
+    api: legacy REST
+    replacement: POST /searches
+    evidence: Listed under "Deprecated Endpoints" at https://docs.complyadvantage.com/api-docs
+    sunset: not published
+  - id: PATCH /searches/{id}/entity/{eid}
+    api: legacy REST
+    replacement: PATCH /searches/{id}/entities
+    evidence: Listed under "Deprecated Endpoints" at https://docs.complyadvantage.com/api-docs
+    sunset: not published
+  deprecated_fields:
+  - field: case_state
+    scope: case objects and the CASE_CREATED / CASE_TRANSITIONED webhook payloads
+    replacement: case_stage
+    note: >-
+      "case_state is deprecated. Please use case_stage instead. For those already
+      integrated using case_state, if any new case stages are added the case state
+      response for these will be returned as USER_DEFINED."
+  deprecated_events:
+  - event: CASE_STATE_UPDATED
+    replacement: CASE_TRANSITIONED
+    note: >-
+      Still an accepted value in the webhook-configuration enum. "Replaces webhook type
+      CASE_STATE_UPDATED (deprecated) - existing deprecated subscriptions continue to be
+      functional." No cutoff date.
+  webhook_payload_versioning: >-
+    Webhook payloads carry their own api_version member (v1/v2/v3) independent of the URL
+    path version. CASE_CREATED and CASE_TRANSITIONED each emit both a v1 and a v2 payload;
+    the docs direct new integrations to v2 because only it carries case_stage and the
+    customer external_identifier.
+status_page:
+  published: false
+  probed:
+  - url: https://status.complyadvantage.com
+    status: <no response - DNS/connection failed>
+  - url: https://trust.complyadvantage.com
+    status: <no response - DNS/connection failed>
+  note: >-
+    No status page found. https://complyadvantage.statuspage.io redirects to Atlassian's
+    own product page (HTTP 200 on atlassian.com), which is the classic unclaimed-subdomain
+    false positive, not a ComplyAdvantage status page.
+sla:
+  published: false
+  note: >-
+    No public SLA. The Terms and Conditions at https://complyadvantage.com/terms-and-conditions/
+    govern the commercial relationship; availability commitments are in the order form.
+changelog:
+  published: false
+  probed:
+  - url: https://docs.mesh.complyadvantage.com/changelog
+    status: 404
+  - url: https://docs.mesh.complyadvantage.com/changelog/
+    status: 404
+  - url: https://docs.mesh.complyadvantage.com/updates
+    status: 404
+  note: >-
+    The ReadMe-hosted Mesh docs expose no changelog surface. Individual reference pages
+    carry an `updatedAt` timestamp in their markdown frontmatter (the webhooks page reads
+    2026-08-26), which is the only dated change signal available - it is per-page revision
+    metadata, not a release log.

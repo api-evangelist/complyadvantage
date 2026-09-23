@@ -1,0 +1,46 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enrichment overlay for ComplyAdvantage Case Management API
+  version: 1.0.0
+extends: openapi/complyadvantage-case-management-api-openapi.yml
+x-generated: '2026-08-27'
+x-method: generated
+x-source: 'openapi/complyadvantage-case-management-api-openapi.yml plus repo artifacts: conventions/,
+  errors/, lifecycle/, scopes/, authentication/, rate-limits/, asyncapi/, mcp/'
+actions:
+- target: $.info
+  description: Attach API Evangelist provenance and the repo artifacts that describe this contract.
+  update:
+    x-apievangelist:
+      provider: ComplyAdvantage
+      providerId: complyadvantage
+      catalog: https://apis.io/provider/complyadvantage/
+      artifacts:
+        conventions: conventions/complyadvantage-conventions.yml
+        errors: errors/complyadvantage-problem-types.yml
+        lifecycle: lifecycle/complyadvantage-lifecycle.yml
+        authentication: authentication/complyadvantage-authentication.yml
+        rate_limits: rate-limits/complyadvantage-rate-limits.yml
+        conformance: conformance/complyadvantage-conformance.yml
+        data_model: data-model/complyadvantage-data-model.yml
+        webhooks: asyncapi/complyadvantage-webhooks.yml
+- target: $.info
+  description: Record that this document was modeled from the public Slate reference, not published by
+    the provider.
+  update:
+    x-provenance:
+      origin: modeled by API Evangelist from https://docs.complyadvantage.com/api-docs
+      provider_published_spec: false
+      note: ComplyAdvantage publishes a machine-readable OpenAPI for the Mesh platform only (openapi/complyadvantage-mesh-api-openapi.json).
+        The legacy REST API has HTML documentation and no spec.
+- target: $.info
+  description: Attach the published rate limits, which the legacy API signals with no response headers.
+  update:
+    x-rate-limits:
+      standard: 600 requests/minute
+      sandbox: 300 requests/minute
+      status: 429
+      body: empty
+      headers: none published
+      backoff: exponential from 2s, doubling, capped at a maximum_backoff typically 60s
+      source: https://docs.complyadvantage.com/api-docs

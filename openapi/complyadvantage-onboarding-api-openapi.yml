@@ -1,0 +1,3994 @@
+openapi: 3.2.0
+info:
+  title: Mesh Onboarding API
+  version: v2.0
+servers:
+- description: ComplyAdvantage Mesh API
+  url: https://api.mesh.complyadvantage.com
+security:
+- BearerAuth: []
+tags:
+- name: Onboarding
+paths:
+  /v2/workflows/create-and-screen:
+    post:
+      description: 'This endpoint initiates the ''create and screen'' workflow for your customer in **asynchronous mode**. The workflow consists of five steps:
+
+        1. **Customer Record Creation:** The Customer Record is created in Mesh.
+
+        2. **Risk Scoring:** An initial Risk Score is calculated for the Customer.
+
+        3. **Customer Screening:** The Customer is screened using settings based on the Calculated Risk Score.
+
+        4. **Alerts:** Alerts associated with the screened customer are generated based on the risk analysis.
+
+        5. **Case Creation:** Create cases based on the result of customer screening and alerts, for an analyst to review. Each customer must have a unique customer external identifier specified as part of the request. This identifier is used to find the customer within Mesh and link back to your own internal systems. The customer can be one of: `PERSON`, `COMPANY`, `` or `UNDEFINED` and can optionally have multiple `products`. Following risk scoring, the customer will be screened using ComplyAdvantage''s AML database. You can specify the screening profile used for initial screening and subsequent ongoing monitoring within the `configuration` object. The value for `screening_profile_identifier` can be found in the settings section of the Mesh application. The workflow will execute asynchronously. The initial POST returns a ''workflow-instance-identifier'' and you can be notified of completion by: * either polling the GET `/workflows/` endpoint with the `workflow_identifier` returned when starting the workflow * or, setting up a `WORKFLOW_COMPLETED` webhook that will fire when your workflow completes. You need "Access to base customer screening functionality" enabled and the "Create and screen customers" permission to use this endpoint.'
+      operationId: createCustomerAndScreenAsync
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ol_CreateAndScreenCustomerRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                Async workflow created:
+                  description: Async workflow created, workflow instance identified returned.
+                  value:
+                    workflow_instance_identifier: 018d30ec-9485-7146-9444-e52486fae1bb
+              schema:
+                $ref: '#/components/schemas/ol_AsyncWorkflowResponse'
+          description: Workflow executed
+        '400':
+          content:
+            application/json:
+              examples:
+                Validation error:
+                  description: Validation error
+                  value:
+                    detail: Customer object is missing from request
+                    identifier: 018e1971-1c6f-761f-a510-43540727ff48
+                    instance: https://example/v2/workflows/create-and-screen
+                    properties:
+                      errors: []
+                    status: 400
+                    timestamp: '2024-03-07T15:03:47.055Z'
+                    title: Invalid JSON Request
+                    type: about:blank
+              schema:
+                $ref: '#/components/schemas/ol_ProblemDetailErrorResponse'
+          description: Bad request
+      summary: Create and Screen a Customer asynchronously
+      tags:
+      - Onboarding
+  /v2/workflows/sync/create-and-screen:
+    post:
+      description: 'This endpoint initiates the ''create and screen'' workflow for your customer in **synchronous mode**. The workflow consists of five steps:
+
+        1. **Customer Record Creation:** The Customer Record is created in Mesh.
+
+        2. **Risk Scoring:** An initial Risk Score is calculated for the Customer.
+
+        3. **Customer Screening:** The Customer is screened using settings based on the Calculated Risk Score.
+
+        4. **Alerts:** Alerts associated with the screened customer are generated based on the risk analysis.
+
+        5. **Case Creation:** Create cases based on the result of customer screening and alerts, for an analyst to review. Each customer must have a unique customer external identifier specified as part of the request. This identifier is used to find the customer within Mesh and link back to your own internal systems. The customer can be one of: `PERSON`, `COMPANY`, `` or `UNDEFINED` and can optionally have multiple `products`. Following risk scoring, the customer will be screened using ComplyAdvantage''s AML database. You can specify the screening profile used for initial screening and subsequent ongoing monitoring within the `configuration` object. The value for `screening_profile_identifier` can be found in the settings section of the Mesh application. The workflow executes synchronously up to customer screening, returning the workflow status. This end-point is currently idempotent: in case of downstream error you can re-send the exact same request, and the workflow will be retried. To screen an entity:
+
+        - Exactly one of `full_name` or `last_name` must be provided (not both, not neither).
+
+        - When using `last_name`: `title`, `first_name`, `middle_name`, `last_name`, `fathers_name`, `mothers_name`, and `suffix` are optional.
+
+        - When using `full_name`: `title`, `first_name`, `middle_name`, `last_name`, `fathers_name`, `mothers_name`, and `suffix` must all be omitted. By default, the screen customer request is done synchronously only until the screening workflow step and returns hit/no hits in `step_details.customer-screening.step_output.screening_result`. `last_sync_step` query parameter can be set to `ALERTING` to additionally wait for the alerting workflow step. The advantage of this option is that alert identifiers are included in the response in `step_details.alerting.step_output.alerts[].identifier`. You need "Access to base customer screening functionality" enabled and the "Create and screen customers" permission to use this endpoint.'
+      operationId: createCustomerAndScreenSync
+      parameters:
+      - description: '- SCREENING (default): faster response, synchronous execution stops after screening; response only reflects hit/no-hit status — alert_identifiers will not be present in the response.
+
+          - ALERTING: slower response, synchronous execution continues through the alerting step; required to receive alert_identifiers in the response. Remaining steps (case-creation) continue asynchronously after the response is returned.'
+        example: ALERTING
+        in: query
+        name: last_sync_step
+        required: false
+        schema:
+          default: SCREENING
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ol_CreateAndScreenCustomerRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                WORKFLOW COMPLETED:
+                  description: Once all step workflows are marked as COMPLETED then the workflow status will be marked as COMPLETED. If the screening result is returned as HAS_PROFILES then remediation is required on the ComplyAdvantage application. If the screening results return NO_PROFILES then no remediation is required. The full customer record can be retrieved by calling GET /v1/customer/ using the identifier from customer-creation step with step_details.
+                  value:
+                    status: COMPLETED
+                    step_details:
+                      alerting:
+                        identifier: null
+                        status: COMPLETED
+                        step_output:
+                          alerts:
+                          - identifier: 019c7636-6f05-7d5a-8b75-12e99e209a01
+                      case-creation:
+                        identifier: 019c7636-6fa7-795e-89db-769bf399baa2
+                        status: COMPLETED
+                        step_output:
+                          case_identifier: 019c7636-6fa7-795e-89db-769bf399baa2
+                      customer-creation:
+                        identifier: 019c7636-61ea-79f0-b4c1-f61edb37ff2a
+                        status: COMPLETED
+                        step_output:
+                          customer_identifier: 019c7636-621d-72b7-9bea-a18c12f945ee
+                          external_identifier: sample-ext-identifier
+                      customer-screening:
+                        identifier: 019c7636-626a-7129-8d7f-d2e010a9d0a9
+                        status: COMPLETED
+                        step_output:
+                          aml_types:
+                          - ADVERSE_MEDIA
+                          - ADVERSE_MEDIA_V2_CYBERCRIME
+                          - ADVERSE_MEDIA_V2_FRAUD_LINKED
+                          - ADVERSE_MEDIA_V2_GENERAL_AML_CFT
+                          - ADVERSE_MEDIA_V2_NARCOTICS_AML_CFT
+                          - ADVERSE_MEDIA_V2_OTHER_FINANCIAL
+                          - ADVERSE_MEDIA_V2_OTHER_MINOR
+                          - ADVERSE_MEDIA_V2_OTHER_SERIOUS
+                          - ADVERSE_MEDIA_V2_PROPERTY
+                          - ADVERSE_MEDIA_V2_REGULATORY
+                          - ADVERSE_MEDIA_V2_TERRORISM
+                          - ADVERSE_MEDIA_V2_VIOLENCE_AML_CFT
+                          - ADVERSE_MEDIA_V2_VIOLENCE_NON_AML_CFT
+                          screening_result: HAS_PROFILES
+                      initial-risk-scoring:
+                        identifier: 019c7636-6251-7b33-a4b5-973c718b80b9
+                        status: COMPLETED
+                        step_output:
+                          overall_level: SKIPPED
+                          overall_value: 0
+                    steps:
+                    - customer-creation
+                    - initial-risk-scoring
+                    - customer-screening
+                    - alerting
+                    - case-creation
+                    workflow_instance_identifier: 019c7636-61cd-7e25-80cd-c7a6660f2349
+                    workflow_type: create-and-screen
+                WORKFLOW COMPLETED (NO PROFILES FOUND):
+                  description: When no screening profiles are found, the case-creation step is skipped as there are no hits to review.
+                  value:
+                    status: COMPLETED
+                    step_details:
+                      alerting:
+                        identifier: null
+                        status: COMPLETED
+                        step_output:
+                          alerts: []
+                      case-creation:
+                        identifier: null
+                        status: SKIPPED
+                        step_output: {}
+                      customer-creation:
+                        identifier: 019a1655-7740-73d9-95b9-ff5bdb8a2560
+                        status: COMPLETED
+                        step_output:
+                          customer_identifier: 019a1655-79b2-718c-b762-8ba568d8e733
+                          external_identifier: f2ca0b1f-c0b6-480e-8ee6-dc5e61e03ed2
+                      customer-screening:
+                        identifier: 019a1655-7e6d-7bd7-91f1-dbe1801cd7d1
+                        status: COMPLETED
+                        step_output:
+                          screening_result: NO_PROFILES
+                      initial-risk-scoring:
+                        identifier: 019a1655-81aa-70c4-a04e-ef2d2e27a155
+                        status: COMPLETED
+                        step_output:
+                          overall_level: LOW-RISK
+                          overall_value: 0
+                    steps:
+                    - customer-creation
+                    - initial-risk-scoring
+                    - customer-screening
+                    - alerting
+                    - case-creation
+                    workflow_instance_identifier: 019a1655-760f-74e6-a431-d49c9f913d15
+                    workflow_type: create-and-screen
+                WORKFLOW COMPLETED (WITH SKIPPED STEPS):
+                  description: 'Steps may be skipped in the following scenarios:
+
+                    1. **No hits found:** When customer-screening returns NO_PROFILES, the case-creation step is skipped because the case would be empty.
+
+                    2. **Prohibitive risk:** When using a risk model and the entity risk reaches the prohibitive level, the entity is automatically marked as prohibitive and customer-screening, alerting, and case-creation are all skipped.
+
+                    3. **Customer Creation Errored:** When customer creation fails, (or any other step) the following steps are skipped. Note: The customer-creation step is never skipped.'
+                  value:
+                    status: COMPLETED
+                    step_details:
+                      alerting:
+                        identifier: null
+                        status: SKIPPED
+                        step_output: {}
+                      case-creation:
+                        identifier: null
+                        status: SKIPPED
+                        step_output: {}
+                      customer-creation:
+                        identifier: 019c7aac-4590-7aef-ae7f-729c8ac9d611
+                        status: COMPLETED
+                        step_output:
+                          customer_identifier: 019c7aac-45c8-77f9-85a6-1adf014edf51
+                          external_identifier: sample-ext-identifier
+                      customer-screening:
+                        identifier: null
+                        status: SKIPPED
+                        step_output: {}
+                      initial-risk-scoring:
+                        identifier: 019c7aac-45fc-7cfb-a0a1-cd2cd60eb047
+                        status: COMPLETED
+                        step_output:
+                          overall_level: PROHIBITED
+                          overall_value: 80
+                    steps:
+                    - customer-creation
+                    - initial-risk-scoring
+                    - customer-screening
+                    - alerting
+                    - case-creation
+                    workflow_instance_identifier: 019c7aac-4579-7649-9023-5882966cd22f
+                    workflow_type: create-and-screen
+                WORKFLOW ERRORED:
+                  description: If any of the step workflows returns an ERRORED state then it will be required to contact support to resolve the issue.
+                  value:
+                    status: ERRORED
+                    step_details:
+                      alerting:
+                        identifier: null
+                        status: SKIPPED
+                        step_output: {}
+                      case-creation:
+                        identifier: null
+                        status: SKIPPED
+                        step_output: {}
+                      customer-creation:
+                        error_message: external identifier 018c3ff4-7979-7f95-98be-886116e3315c in use and belongs to the customer identifier 018c4013-fc8e-7db1-a30e-590fb36c4870
+                        identifier: 018c4014-1de6-7d9d-ae92-eeacf245a259
+                        status: ERRORED
+                        step_output:
+                          customer_identifier: 018c4013-fc8e-7db1-a30e-590fb36c4870
+                          external_identifier: abcd-1234
+                      customer-screening:
+                        identifier: null
+                        status: SKIPPED
+                        step_output: {}
+                      initial-risk-scoring:
+                        identifier: null
+                        status: SKIPPED
+                        step_output: {}
+                    steps:
+                    - customer-creation
+                    - initial-risk-scoring
+                    - customer-screening
+                    - alerting
+                    - case-creation
+                    workflow_instance_identifier: 018c4014-1c51-7b7d-a97c-044b5b624916
+                    workflow_type: create-and-screen
+                WORKFLOW IN PROGRESS (ALERTING):
+                  description: If any step workflow is still IN PROGRESS then the following response will be provided. Further checks will be required to receive the latest status. This example uses the ALERTING query parameter and returns the workflow steps from customer_creation to alerting.
+                  value:
+                    status: IN-PROGRESS
+                    step_details:
+                      alerting:
+                        identifier: null
+                        status: COMPLETED
+                        step_output:
+                          alerts:
+                          - identifier: 019c7636-6f05-7d5a-8b75-12e99e209a01
+                      case-creation:
+                        identifier: null
+                        status: NOT-STARTED
+                        step_output: {}
+                      customer-creation:
+                        identifier: 019c7636-61ea-79f0-b4c1-f61edb37ff2a
+                        status: COMPLETED
+                        step_output:
+                          customer_identifier: 019c7636-621d-72b7-9bea-a18c12f945ee
+                          external_identifier: sample_ext_identifier
+                      customer-screening:
+                        identifier: 019c7636-626a-7129-8d7f-d2e010a9d0a9
+                        status: COMPLETED
+                        step_output:
+                          aml_types:
+                          - ADVERSE_MEDIA
+                          - ADVERSE_MEDIA_V2_CYBERCRIME
+                          - ADVERSE_MEDIA_V2_FRAUD_LINKED
+                          - ADVERSE_MEDIA_V2_GENERAL_AML_CFT
+                          - ADVERSE_MEDIA_V2_NARCOTICS_AML_CFT
+                          - ADVERSE_MEDIA_V2_OTHER_FINANCIAL
+                          - ADVERSE_MEDIA_V2_OTHER_MINOR
+                          - ADVERSE_MEDIA_V2_OTHER_SERIOUS
+                          - ADVERSE_MEDIA_V2_PROPERTY
+                          - ADVERSE_MEDIA_V2_REGULATORY
+                          - ADVERSE_MEDIA_V2_TERRORISM
+                          - ADVERSE_MEDIA_V2_VIOLENCE_AML_CFT
+                          - ADVERSE_MEDIA_V2_VIOLENCE_NON_AML_CFT
+                          screening_result: HAS_PROFILES
+                      initial-risk-scoring:
+                        identifier: 019c7636-6251-7b33-a4b5-973c718b80b9
+                        status: COMPLETED
+                        step_output:
+                          overall_level: LOW-RISK
+                          overall_value: 0
+                    steps:
+                    - customer-creation
+                    - initial-risk-scoring
+                    - customer-screening
+                    - alerting
+                    - case-creation
+                    workflow_instance_identifier: 019c7636-61cd-7e25-80cd-c7a6660f2349
+                    workflow_type: create-and-screen
+                WORKFLOW IN PROGRESS (SCREENING):
+                  description: If any step workflow is still IN PROGRESS then the following response will be provided. Further checks will be required to receive the latest status. This example uses the SCREENING query parameter and returns the workflow steps from customer_creation to customer_screening.
+                  value:
+                    status: IN-PROGRESS
+                    step_details:
+                      alerting:
+                        identifier: null
+                        status: IN-PROGRESS
+                        step_output: {}
+                      case-creation:
+                        identifier: null
+                        status: NOT-STARTED
+                        step_output: {}
+                      customer-creation:
+                        identifier: 019c761e-3123-75dc-952c-f5be747584ce
+                        status: COMPLETED
+                        step_output:
+                          customer_identifier: 019c761e-3166-7e33-938a-888a87818b77
+                          external_identifier: sample-ext-identifier
+                      customer-screening:
+                        identifier: 019c761e-31ae-73a0-89c4-5a9a149e127e
+                        status: COMPLETED
+                        step_output:
+                          aml_types:
+                          - ADVERSE_MEDIA
+                          - ADVERSE_MEDIA_V2_CYBERCRIME
+                          - ADVERSE_MEDIA_V2_FRAUD_LINKED
+                          - ADVERSE_MEDIA_V2_GENERAL_AML_CFT
+                          - ADVERSE_MEDIA_V2_NARCOTICS_AML_CFT
+                          - ADVERSE_MEDIA_V2_OTHER_FINANCIAL
+                          - ADVERSE_MEDIA_V2_OTHER_MINOR
+                          - ADVERSE_MEDIA_V2_OTHER_SERIOUS
+                          - ADVERSE_MEDIA_V2_PROPERTY
+                          - ADVERSE_MEDIA_V2_REGULATORY
+                          - ADVERSE_MEDIA_V2_TERRORISM
+                          - ADVERSE_MEDIA_V2_VIOLENCE_AML_CFT
+                          - ADVERSE_MEDIA_V2_VIOLENCE_NON_AML_CFT
+                          screening_result: HAS_PROFILES
+                      initial-risk-scoring:
+                        identifier: 019c761e-3199-7b46-9f24-b545a44f1f9d
+                        status: COMPLETED
+                        step_output:
+                          overall_level: LOW-RISK
+                          overall_value: 0
+                    steps:
+                    - customer-creation
+                    - initial-risk-scoring
+                    - customer-screening
+                    - alerting
+                    - case-creation
+                    workflow_instance_identifier: 019c7617-4d8c-7e46-aa23-0a219129b244
+                    workflow_type: create-and-screen
+              schema:
+                $ref: '#/components/schemas/ol_WorkflowState'
+          description: Sync workflow executed
+        '400':
+          content:
+            application/json:
+              examples:
+                Invalid workflow_type:
+                  description: Invalid workflow_type
+                  value:
+                    identifier: 018c3ff3-7099-7090-a15b-8daee4cb81df
+                    status: 400
+                    timestamp: '2023-12-11T09:30:03.975Z'
+                    title: 'Invalid workflow_type: Invalid'
+                Validation Failed:
+                  description: If the request provided fails semantic checks then return a Semantic Validation Failed response
+                  value:
+                    detail: The request provided failed semantic checks
+                    identifier: 019c762e-c1bd-7671-b020-3fb251edc16d
+                    instance: https://example/v2/workflows/sync/create-and-screen
+                    properties:
+                      errors:
+                      - field: customer.person.last_name
+                        reasons:
+                        - key: ''
+                          message: Either customer.person.last_name or customer.person.full_name must not be null or contain only whitespace characters.
+                          parameters: null
+                        rejected: null
+                      - field: customer.person.full_name
+                        reasons:
+                        - key: ''
+                          message: Either customer.person.full_name or customer.person.last_name must not be null or contain only whitespace characters.
+                          parameters: null
+                        rejected: null
+                    status: 400
+                    timestamp: '2026-02-19T13:55:01.693Z'
+                    title: Semantic Validation Failed
+                    type: about:blank
+                Validation error:
+                  description: Validation error
+                  value:
+                    identifier: 018c3ff3-7099-7090-a15b-8daee4cb81df
+                    status: 400
+                    timestamp: '2023-12-11T09:30:03.975Z'
+                    title: Validation error
+              schema:
+                $ref: '#/components/schemas/ol_ProblemDetailErrorResponse'
+          description: Bad request
+        '409':
+          content:
+            application/json:
+              examples:
+                Conflict error:
+                  description: Conflict error
+                  value:
+                    detail: A workflow with id 018d3157-0ec8-73ba-a684-865e5e2ff1ed already exists for this customer.
+                    identifier: 018e1971-1c6f-761f-a510-43540727ff48
+                    instance: https://example/v2/workflows/sync/create-and-screen
+                    properties: {}
+                    status: 409
+                    timestamp: '2024-01-22T13:23:25.512Z'
+                    title: Conflict
+                    type: about:blank
+              schema:
+                $ref: '#/components/schemas/ol_ProblemDetailErrorResponse'
+          description: Conflict
+      summary: Create and Screen a Customer synchronously
+      tags:
+      - Onboarding
+  /v2/workflows/{workflow_instance_identifier}:
+    get:
+      description: '## Overall workflow status
+
+
+        This endpoint will return the status and eventual end result of the specified workflow. Once a workflow has been initiated, it can be periodically polled to receive the status using the workflow-instance-identifier provided in the response of the POST `v2/workflows/create-and-screen`
+
+
+        The response comprises the status of the overall workflow. One of
+
+        - `NOT-STARTED` - The workflow is queued but has not yet begun
+
+        - `IN-PROGRESS` - The workflow is executing but not yet completed. The step details should be checked to ascertain progress
+
+        - `COMPLETED` - The workflow has completed execution without errors. The step details should be checked to ascertain the end results
+
+        - `ERRORED` - The workflow has completed with errors.
+
+
+        In addition to the status, the workflow endpoint returns:
+
+
+        - `steps` - an array of the step keys within the workflow
+
+        - `step_details` - an object containing the status and return values for each of steps within the workflow (see following section)
+
+
+        ## Workflow steps
+
+
+        The workflow response contains a `step_details` object, which contains the status and returned values from each step in the workflow. Each step object within the step_details contains a status field that can be one of the following values:
+
+
+        - `NOT-STARTED` - The step has not yet been executed
+
+        - `IN-PROGRESS` - The step is executing
+
+        - `COMPLETED` - The step has completed and the step_output object can be checked for output
+
+        - `SKIPPED` - The step has been skipped because it did not meet the criteria for execution. In the case of the “create and screen" workflow, this applies to the screening step when the customer risk is prohibited
+
+        - `ERRORED` - The step has completed but returned errors
+
+
+        In addition to the status, the step detail contains:
+
+
+        - `identifier` - a unique identifier for the step
+
+        - `step_output` - an object containing the return values for the step'
+      operationId: getWorkflowState
+      parameters:
+      - example: 95913b76-050c-40f3-9075-25f0737ac7d3
+        in: path
+        name: workflow_instance_identifier
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                WORKFLOW COMPLETED:
+                  description: Once all step workflows are marked as COMPLETED then the workflow status will be marked as COMPLETED. If the screening result is returned as HAS_PROFILES then remediation is required on the ComplyAdvantage application. If the screening results return NO_PROFILES then no remediation is required. The full customer record can be retrieved by calling GET /v1/customer/ using the identifier from customer-creation step with step_details.
+                  value:
+                    status: COMPLETED
+                    step_details:
+                      alerting:
+                        identifier: null
+                        status: COMPLETED
+                        step_output:
+                          alerts:
+                          - identifier: 019c7636-6f05-7d5a-8b75-12e99e209a01
+                      case-creation:
+                        identifier: 019c7636-6fa7-795e-89db-769bf399baa2
+                        status: COMPLETED
+                        step_output:
+                          case_identifier: 019c7636-6fa7-795e-89db-769bf399baa2
+                      customer-creation:
+                        identifier: 019c7636-61ea-79f0-b4c1-f61edb37ff2a
+                        status: COMPLETED
+                        step_output:
+                          customer_identifier: 019c7636-621d-72b7-9bea-a18c12f945ee
+                          external_identifier: sample-ext-identifier
+                      customer-screening:
+                        identifier: 019c7636-626a-7129-8d7f-d2e010a9d0a9
+                        status: COMPLETED
+                        step_output:
+                          aml_types:
+                          - ADVERSE_MEDIA
+                          - ADVERSE_MEDIA_V2_CYBERCRIME
+                          - ADVERSE_MEDIA_V2_FRAUD_LINKED
+                          - ADVERSE_MEDIA_V2_GENERAL_AML_CFT
+                          - ADVERSE_MEDIA_V2_NARCOTICS_AML_CFT
+                          - ADVERSE_MEDIA_V2_OTHER_FINANCIAL
+                          - ADVERSE_MEDIA_V2_OTHER_MINOR
+                          - ADVERSE_MEDIA_V2_OTHER_SERIOUS
+                          - ADVERSE_MEDIA_V2_PROPERTY
+                          - ADVERSE_MEDIA_V2_REGULATORY
+                          - ADVERSE_MEDIA_V2_TERRORISM
+                          - ADVERSE_MEDIA_V2_VIOLENCE_AML_CFT
+                          - ADVERSE_MEDIA_V2_VIOLENCE_NON_AML_CFT
+                          screening_result: HAS_PROFILES
+                      initial-risk-scoring:
+                        identifier: 019c7636-6251-7b33-a4b5-973c718b80b9
+                        status: COMPLETED
+                        step_output:
+                          overall_level: SKIPPED
+                          overall_value: 0
+                    steps:
+                    - customer-creation
+                    - initial-risk-scoring
+                    - customer-screening
+                    - alerting
+                    - case-creation
+                    workflow_instance_identifier: 019c7636-61cd-7e25-80cd-c7a6660f2349
+                    workflow_type: create-and-screen
+                WORKFLOW COMPLETED(WITH SKIPPED STEPS):
+                  description: It is possible for the workflow to be marked as COMPLETED when initial-risk-scoring returns a PROHIBITED status and customer-screening as SKIPPED depending on the search configuration that has been set. In this scenario there will be no further updates to the risk score after this step.
+                  value:
+                    status: COMPLETED
+                    step_details:
+                      alerting:
+                        identifier: null
+                        status: SKIPPED
+                        step_output: {}
+                      case-creation:
+                        identifier: null
+                        status: SKIPPED
+                        step_output: {}
+                      customer-creation:
+                        identifier: 019c7aac-4590-7aef-ae7f-729c8ac9d611
+                        status: COMPLETED
+                        step_output:
+                          customer_identifier: 019c7aac-45c8-77f9-85a6-1adf014edf51
+                          external_identifier: sample-ext-identifier
+                      customer-screening:
+                        identifier: null
+                        status: SKIPPED
+                        step_output: {}
+                      initial-risk-scoring:
+                        identifier: 019c7aac-45fc-7cfb-a0a1-cd2cd60eb047
+                        status: COMPLETED
+                        step_output:
+                          overall_level: PROHIBITED
+                          overall_value: 80
+                    steps:
+                    - customer-creation
+                    - initial-risk-scoring
+                    - customer-screening
+                    - alerting
+                    - case-creation
+                    workflow_instance_identifier: 019c7aac-4579-7649-9023-5882966cd22f
+                    workflow_type: create-and-screen
+                WORKFLOW ERRORED:
+                  description: If any of the step workflows returns an ERRORED state then it will be required to contact support to resolve the issue.
+                  value:
+                    status: ERRORED
+                    step_details:
+                      alerting:
+                        identifier: null
+                        status: SKIPPED
+                        step_output: {}
+                      case-creation:
+                        identifier: null
+                        status: SKIPPED
+                        step_output: {}
+                      customer-creation:
+                        error_message: external identifier 018c3ff4-7979-7f95-98be-886116e3315c in use and belongs to the customer identifier 018c4013-fc8e-7db1-a30e-590fb36c4870
+                        identifier: 018c4014-1de6-7d9d-ae92-eeacf245a259
+                        status: ERRORED
+                        step_output:
+                          customer_identifier: 018c4013-fc8e-7db1-a30e-590fb36c4870
+                          external_identifier: abcd-1234
+                      customer-screening:
+                        identifier: null
+                        status: SKIPPED
+                        step_output: {}
+                      initial-risk-scoring:
+                        identifier: null
+                        status: SKIPPED
+                        step_output: {}
+                    steps:
+                    - customer-creation
+                    - initial-risk-scoring
+                    - customer-screening
+                    - alerting
+                    - case-creation
+                    workflow_instance_identifier: 018c4014-1c51-7b7d-a97c-044b5b624916
+                    workflow_type: create-and-screen
+                WORKFLOW IN PROGRESS:
+                  description: If any step workflow is still IN PROGRESS then the following response will be provided. Further checks will be required to receive the latest status.
+                  value:
+                    status: IN-PROGRESS
+                    step_details:
+                      alerting:
+                        identifier: null
+                        status: IN-PROGRESS
+                        step_output: {}
+                      case-creation:
+                        identifier: null
+                        status: NOT-STARTED
+                        step_output: {}
+                      customer-creation:
+                        identifier: 019c761e-3123-75dc-952c-f5be747584ce
+                        status: COMPLETED
+                        step_output:
+                          customer_identifier: 019c761e-3166-7e33-938a-888a87818b77
+                          external_identifier: sample-ext-identifier
+                      customer-screening:
+                        identifier: 019c761e-31ae-73a0-89c4-5a9a149e127e
+                        status: COMPLETED
+                        step_output:
+                          aml_types:
+                          - ADVERSE_MEDIA
+                          - ADVERSE_MEDIA_V2_CYBERCRIME
+                          - ADVERSE_MEDIA_V2_FRAUD_LINKED
+                          - ADVERSE_MEDIA_V2_GENERAL_AML_CFT
+                          - ADVERSE_MEDIA_V2_NARCOTICS_AML_CFT
+                          - ADVERSE_MEDIA_V2_OTHER_FINANCIAL
+                          - ADVERSE_MEDIA_V2_OTHER_MINOR
+                          - ADVERSE_MEDIA_V2_OTHER_SERIOUS
+                          - ADVERSE_MEDIA_V2_PROPERTY
+                          - ADVERSE_MEDIA_V2_REGULATORY
+                          - ADVERSE_MEDIA_V2_TERRORISM
+                          - ADVERSE_MEDIA_V2_VIOLENCE_AML_CFT
+                          - ADVERSE_MEDIA_V2_VIOLENCE_NON_AML_CFT
+                          screening_result: HAS_PROFILES
+                      initial-risk-scoring:
+                        identifier: 019c761e-3199-7b46-9f24-b545a44f1f9d
+                        status: COMPLETED
+                        step_output:
+                          overall_level: LOW-RISK
+                          overall_value: 0
+                    steps:
+                    - customer-creation
+                    - initial-risk-scoring
+                    - customer-screening
+                    - alerting
+                    - case-creation
+                    workflow_instance_identifier: 019c7617-4d8c-7e46-aa23-0a219129b244
+                    workflow_type: create-and-screen
+              schema:
+                $ref: '#/components/schemas/ol_WorkflowState'
+          description: Workflow state
+        '404':
+          content:
+            application/json:
+              examples:
+                Not Found:
+                  description: Not Found
+                  value:
+                    identifier: 018c3ff3-7099-7090-a15b-8daee4cb81df
+                    status: 404
+                    timestamp: '2023-12-11T09:30:03.975Z'
+                    title: Not found
+              schema:
+                $ref: '#/components/schemas/ol_ProblemDetailErrorResponse'
+          description: Not found
+      summary: Get status and result of onboarding
+      tags:
+      - Onboarding
+components:
+  schemas:
+    ol_Person:
+      properties:
+        address:
+          items:
+            $ref: '#/components/schemas/ol_Address'
+          type:
+          - array
+          - 'null'
+        contact_information:
+          $ref: '#/components/schemas/ol_ContactInformation'
+        country_of_birth:
+          enum:
+          - AF
+          - AX
+          - AL
+          - AN
+          - DZ
+          - AS
+          - AD
+          - AO
+          - AI
+          - AQ
+          - AG
+          - AR
+          - AM
+          - AW
+          - AU
+          - AT
+          - AZ
+          - BS
+          - BH
+          - BD
+          - BB
+          - BY
+          - BE
+          - BZ
+          - BJ
+          - BM
+          - BT
+          - BO
+          - BQ
+          - BA
+          - BW
+          - BV
+          - BR
+          - IO
+          - BN
+          - BG
+          - BF
+          - BI
+          - CV
+          - KH
+          - CM
+          - CA
+          - KY
+          - CF
+          - TD
+          - CL
+          - CN
+          - CX
+          - CC
+          - CO
+          - KM
+          - CG
+          - CD
+          - CK
+          - CR
+          - CI
+          - HR
+          - CU
+          - CW
+          - CY
+          - CZ
+          - DK
+          - DJ
+          - DM
+          - DO
+          - EC
+          - EG
+          - SV
+          - GQ
+          - ER
+          - EE
+          - SZ
+          - ET
+          - FK
+          - FO
+          - FJ
+          - FI
+          - FR
+          - GF
+          - PF
+          - TF
+          - GA
+          - GM
+          - GE
+          - DE
+          - GH
+          - GI
+          - GR
+          - GL
+          - GD
+          - GP
+          - GU
+          - GT
+          - GG
+          - GN
+          - GW
+          - GY
+          - HT
+          - HM
+          - VA
+          - HN
+          - HK
+          - HU
+          - IS
+          - IN
+          - ID
+          - IR
+          - IQ
+          - IE
+          - IM
+          - IL
+          - IT
+          - JM
+          - JP
+          - JE
+          - JO
+          - KZ
+          - KE
+          - KI
+          - KP
+          - KR
+          - KW
+          - KG
+          - LA
+          - LV
+          - LB
+          - LS
+          - LR
+          - LY
+          - LI
+          - LT
+          - LU
+          - MO
+          - MG
+          - MW
+          - MY
+          - MV
+          - ML
+          - MT
+          - MH
+          - MQ
+          - MR
+          - MU
+          - YT
+          - MX
+          - FM
+          - MD
+          - MC
+          - MN
+          - ME
+          - MS
+          - MA
+          - MZ
+          - MM
+          - NA
+          - NR
+          - NP
+          - NL
+          - NC
+          - NZ
+          - NI
+          - NE
+          - NG
+          - NU
+          - NF
+          - MP
+          - 'NO'
+          - OM
+          - PK
+          - PW
+          - PS
+          - PA
+          - PG
+          - PY
+          - PE
+          - PH
+          - PN
+          - PL
+          - PT
+          - PR
+          - QA
+          - MK
+          - RO
+          - RU
+          - RW
+          - RE
+          - BL
+          - SH
+          - KN
+          - LC
+          - MF
+          - PM
+          - VC
+          - WS
+          - SM
+          - ST
+          - SA
+          - SN
+          - RS
+          - SC
+          - SL
+          - SG
+          - SX
+          - SK
+          - SI
+          - SB
+          - SO
+          - ZA
+          - GS
+          - SS
+          - ES
+          - LK
+          - SD
+          - SR
+          - SJ
+          - SE
+          - CH
+          - SY
+          - TW
+          - TJ
+          - TZ
+          - TH
+          - TL
+          - TG
+          - TK
+          - TO
+          - TT
+          - TN
+          - TR
+          - TM
+          - TC
+          - TV
+          - UG
+          - UA
+          - AE
+          - GB
+          - UM
+          - US
+          - UY
+          - UZ
+          - VU
+          - VE
+          - VN
+          - VG
+          - VI
+          - WF
+          - EH
+          - XK
+          - XT
+          - XX
+          - YE
+          - ZM
+          - ZW
+          format: iso-3166-alpha-2
+          type:
+          - string
+          - 'null'
+        custom_fields:
+          items:
+            $ref: '#/components/schemas/ol_CustomFieldInstance'
+          type:
+          - array
+          - 'null'
+        date_of_birth:
+          $ref: '#/components/schemas/ol_Date'
+        fathers_name:
+          description: Field to capture the patronymic name of the customer
+          maxLength: 50
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        first_name:
+          maxLength: 100
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        full_name:
+          maxLength: 256
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        gender:
+          enum:
+          - MALE
+          - FEMALE
+          - NOT_KNOWN
+          - OTHER
+          type:
+          - string
+          - 'null'
+        industry:
+          maxLength: 256
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        last_name:
+          maxLength: 100
+          minLength: 0
+          type: string
+        middle_name:
+          maxLength: 50
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        mothers_name:
+          description: Field to capture the matronymic name of the customer
+          maxLength: 50
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        nationality:
+          format: iso-3166-alpha-2
+          items:
+            enum:
+            - AF
+            - AX
+            - AL
+            - AN
+            - DZ
+            - AS
+            - AD
+            - AO
+            - AI
+            - AQ
+            - AG
+            - AR
+            - AM
+            - AW
+            - AU
+            - AT
+            - AZ
+            - BS
+            - BH
+            - BD
+            - BB
+            - BY
+            - BE
+            - BZ
+            - BJ
+            - BM
+            - BT
+            - BO
+            - BQ
+            - BA
+            - BW
+            - BV
+            - BR
+            - IO
+            - BN
+            - BG
+            - BF
+            - BI
+            - CV
+            - KH
+            - CM
+            - CA
+            - KY
+            - CF
+            - TD
+            - CL
+            - CN
+            - CX
+            - CC
+            - CO
+            - KM
+            - CG
+            - CD
+            - CK
+            - CR
+            - CI
+            - HR
+            - CU
+            - CW
+            - CY
+            - CZ
+            - DK
+            - DJ
+            - DM
+            - DO
+            - EC
+            - EG
+            - SV
+            - GQ
+            - ER
+            - EE
+            - SZ
+            - ET
+            - FK
+            - FO
+            - FJ
+            - FI
+            - FR
+            - GF
+            - PF
+            - TF
+            - GA
+            - GM
+            - GE
+            - DE
+            - GH
+            - GI
+            - GR
+            - GL
+            - GD
+            - GP
+            - GU
+            - GT
+            - GG
+            - GN
+            - GW
+            - GY
+            - HT
+            - HM
+            - VA
+            - HN
+            - HK
+            - HU
+            - IS
+            - IN
+            - ID
+            - IR
+            - IQ
+            - IE
+            - IM
+            - IL
+            - IT
+            - JM
+            - JP
+            - JE
+            - JO
+            - KZ
+            - KE
+            - KI
+            - KP
+            - KR
+            - KW
+            - KG
+            - LA
+            - LV
+            - LB
+            - LS
+            - LR
+            - LY
+            - LI
+            - LT
+            - LU
+            - MO
+            - MG
+            - MW
+            - MY
+            - MV
+            - ML
+            - MT
+            - MH
+            - MQ
+            - MR
+            - MU
+            - YT
+            - MX
+            - FM
+            - MD
+            - MC
+            - MN
+            - ME
+            - MS
+            - MA
+            - MZ
+            - MM
+            - NA
+            - NR
+            - NP
+            - NL
+            - NC
+            - NZ
+            - NI
+            - NE
+            - NG
+            - NU
+            - NF
+            - MP
+            - 'NO'
+            - OM
+            - PK
+            - PW
+            - PS
+            - PA
+            - PG
+            - PY
+            - PE
+            - PH
+            - PN
+            - PL
+            - PT
+            - PR
+            - QA
+            - MK
+            - RO
+            - RU
+            - RW
+            - RE
+            - BL
+            - SH
+            - KN
+            - LC
+            - MF
+            - PM
+            - VC
+            - WS
+            - SM
+            - ST
+            - SA
+            - SN
+            - RS
+            - SC
+            - SL
+            - SG
+            - SX
+            - SK
+            - SI
+            - SB
+            - SO
+            - ZA
+            - GS
+            - SS
+            - ES
+            - LK
+            - SD
+            - SR
+            - SJ
+            - SE
+            - CH
+            - SY
+            - TW
+            - TJ
+            - TZ
+            - TH
+            - TL
+            - TG
+            - TK
+            - TO
+            - TT
+            - TN
+            - TR
+            - TM
+            - TC
+            - TV
+            - UG
+            - UA
+            - AE
+            - GB
+            - UM
+            - US
+            - UY
+            - UZ
+            - VU
+            - VE
+            - VN
+            - VG
+            - VI
+            - WF
+            - EH
+            - XK
+            - XT
+            - XX
+            - YE
+            - ZM
+            - ZW
+            format: iso-3166-alpha-2
+            type: string
+          type:
+          - array
+          - 'null'
+        net_worth:
+          $ref: '#/components/schemas/ol_NetWorth'
+        personal_identification:
+          items:
+            $ref: '#/components/schemas/ol_PersonalIdentification'
+          type:
+          - array
+          - 'null'
+        profession:
+          items:
+            type: string
+          type:
+          - array
+          - 'null'
+        residential_information:
+          items:
+            $ref: '#/components/schemas/ol_ResidentialInformation'
+          type:
+          - array
+          - 'null'
+        salary:
+          $ref: '#/components/schemas/ol_Salary'
+        source_of_income:
+          maxLength: 50
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        source_of_wealth:
+          maxLength: 50
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        suffix:
+          maxLength: 50
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        title:
+          maxLength: 50
+          minLength: 0
+          type:
+          - string
+          - 'null'
+      required:
+      - last_name
+      type: object
+    ol_NetWorth:
+      properties:
+        amount:
+          format: int64
+          type:
+          - integer
+          - 'null'
+        currency:
+          enum:
+          - AFN
+          - EUR
+          - ALL
+          - DZD
+          - USD
+          - AOA
+          - XCD
+          - XXX
+          - ARS
+          - AMD
+          - AWG
+          - AUD
+          - AZN
+          - BSD
+          - BHD
+          - BDT
+          - BBD
+          - BYN
+          - BZD
+          - XOF
+          - BMD
+          - INR
+          - BTN
+          - BOB
+          - BOV
+          - BAM
+          - BWP
+          - NOK
+          - BRL
+          - BND
+          - BGN
+          - BIF
+          - CVE
+          - KHR
+          - XAF
+          - CAD
+          - KYD
+          - CLP
+          - CLF
+          - CNY
+          - COP
+          - COU
+          - KMF
+          - CDF
+          - NZD
+          - CRC
+          - CUP
+          - CUC
+          - ANG
+          - CZK
+          - DKK
+          - DJF
+          - DOP
+          - EGP
+          - SVC
+          - ERN
+          - SZL
+          - ETB
+          - FKP
+          - FJD
+          - XPF
+          - GMD
+          - GEL
+          - GHS
+          - GIP
+          - GTQ
+          - GBP
+          - GNF
+          - GYD
+          - HTG
+          - HNL
+          - HKD
+          - HUF
+          - ISK
+          - IDR
+          - XDR
+          - IRR
+          - IQD
+          - ILS
+          - JMD
+          - JPY
+          - JOD
+          - KZT
+          - KES
+          - KPW
+          - KRW
+          - KWD
+          - KGS
+          - LAK
+          - LBP
+          - LSL
+          - ZAR
+          - LRD
+          - LYD
+          - CHF
+          - MOP
+          - MKD
+          - MGA
+          - MWK
+          - MYR
+          - MVR
+          - MRU
+          - MUR
+          - XUA
+          - MXN
+          - MXV
+          - MDL
+          - MNT
+          - MAD
+          - MZN
+          - MMK
+          - NAD
+          - NPR
+          - NIO
+          - NGN
+          - OMR
+          - PKR
+          - PAB
+          - PGK
+          - PYG
+          - PEN
+          - PHP
+          - PLN
+          - QAR
+          - RON
+          - RUB
+          - RWF
+          - SHP
+          - WST
+          - STN
+          - SAR
+          - RSD
+          - SCR
+          - SLL
+          - SLE
+          - SGD
+          - XSU
+          - SBD
+          - SOS
+          - SSP
+          - LKR
+          - SDG
+          - SRD
+          - SEK
+          - CHE
+          - CHW
+          - SYP
+          - TWD
+          - TJS
+          - TZS
+          - THB
+          - TOP
+          - TTD
+          - TND
+          - TRY
+          - TMT
+          - UGX
+          - UAH
+          - AED
+          - USN
+          - UYU
+          - UYI
+          - UYW
+          - UZS
+          - VUV
+          - VES
+          - VED
+          - VND
+          - YER
+          - ZMW
+          - ZWL
+          - XBA
+          - XBB
+          - XBC
+          - XBD
+          - XTS
+          - XAU
+          - XPD
+          - XPT
+          - XAG
+          format: iso-4217
+          type:
+          - string
+          - 'null'
+      type: object
+    ol_EnrichmentStepOutput:
+      properties:
+        enrichments:
+          items:
+            $ref: '#/components/schemas/ol_EnrichmentV3'
+          type: array
+      required:
+      - enrichments
+      type: object
+    ol_DateValue:
+      allOf:
+      - $ref: '#/components/schemas/ol_CustomFieldValue'
+      - properties:
+          date:
+            description: The date content.
+            example: '2022-09-27T00:00:00.000Z'
+            format: date
+            type: string
+        type: object
+      description: Date representation of the custom field value.
+      required:
+      - data_type
+      - date
+      type: object
+    ol_ProductApi:
+      description: Represents a list of products to update if present will update the customer with this object if not present will not update the customer products. They can be either a bank account or a crypto wallet.
+      properties:
+        bank_account:
+          $ref: '#/components/schemas/ol_BankAccount'
+        crypto_wallet:
+          $ref: '#/components/schemas/ol_CryptoWallet'
+        currency:
+          enum:
+          - AFN
+          - EUR
+          - ALL
+          - DZD
+          - USD
+          - AOA
+          - XCD
+          - XXX
+          - ARS
+          - AMD
+          - AWG
+          - AUD
+          - AZN
+          - BSD
+          - BHD
+          - BDT
+          - BBD
+          - BYN
+          - BZD
+          - XOF
+          - BMD
+          - INR
+          - BTN
+          - BOB
+          - BOV
+          - BAM
+          - BWP
+          - NOK
+          - BRL
+          - BND
+          - BGN
+          - BIF
+          - CVE
+          - KHR
+          - XAF
+          - CAD
+          - KYD
+          - CLP
+          - CLF
+          - CNY
+          - COP
+          - COU
+          - KMF
+          - CDF
+          - NZD
+          - CRC
+          - CUP
+          - CUC
+          - ANG
+          - CZK
+          - DKK
+          - DJF
+          - DOP
+          - EGP
+          - SVC
+          - ERN
+          - SZL
+          - ETB
+          - FKP
+          - FJD
+          - XPF
+          - GMD
+          - GEL
+          - GHS
+          - GIP
+          - GTQ
+          - GBP
+          - GNF
+          - GYD
+          - HTG
+          - HNL
+          - HKD
+          - HUF
+          - ISK
+          - IDR
+          - XDR
+          - IRR
+          - IQD
+          - ILS
+          - JMD
+          - JPY
+          - JOD
+          - KZT
+          - KES
+          - KPW
+          - KRW
+          - KWD
+          - KGS
+          - LAK
+          - LBP
+          - LSL
+          - ZAR
+          - LRD
+          - LYD
+          - CHF
+          - MOP
+          - MKD
+          - MGA
+          - MWK
+          - MYR
+          - MVR
+          - MRU
+          - MUR
+          - XUA
+          - MXN
+          - MXV
+          - MDL
+          - MNT
+          - MAD
+          - MZN
+          - MMK
+          - NAD
+          - NPR
+          - NIO
+          - NGN
+          - OMR
+          - PKR
+          - PAB
+          - PGK
+          - PYG
+          - PEN
+          - PHP
+          - PLN
+          - QAR
+          - RON
+          - RUB
+          - RWF
+          - SHP
+          - WST
+          - STN
+          - SAR
+          - RSD
+          - SCR
+          - SLL
+          - SLE
+          - SGD
+          - XSU
+          - SBD
+          - SOS
+          - SSP
+          - LKR
+          - SDG
+          - SRD
+          - SEK
+          - CHE
+          - CHW
+          - SYP
+          - TWD
+          - TJS
+          - TZS
+          - THB
+          - TOP
+          - TTD
+          - TND
+          - TRY
+          - TMT
+          - UGX
+          - UAH
+          - AED
+          - USN
+          - UYU
+          - UYI
+          - UYW
+          - UZS
+          - VUV
+          - VES
+          - VED
+          - VND
+          - YER
+          - ZMW
+          - ZWL
+          - XBA
+          - XBB
+          - XBC
+          - XBD
+          - XTS
+          - XAU
+          - XPD
+          - XPT
+          - XAG
+          format: iso-4217
+          type:
+          - string
+          - 'null'
+        monthly_payment_amount:
+          format: double
+          type:
+          - number
+          - 'null'
+        monthly_received_amount:
+          format: double
+          type:
+          - number
+          - 'null'
+        monthly_transaction_count:
+          format: int64
+          type:
+          - integer
+          - 'null'
+        name:
+          maxLength: 50
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        onboarding_channel:
+          $ref: '#/components/schemas/ol_OnboardingChannelApi'
+        purpose:
+          maxLength: 256
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        status:
+          maxLength: 50
+          minLength: 0
+          type:
+          - string
+          - 'null'
+      type: object
+    ol_Address:
+      properties:
+        address_line1:
+          maxLength: 150
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        address_line2:
+          maxLength: 150
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        country:
+          enum:
+          - AF
+          - AX
+          - AL
+          - AN
+          - DZ
+          - AS
+          - AD
+          - AO
+          - AI
+          - AQ
+          - AG
+          - AR
+          - AM
+          - AW
+          - AU
+          - AT
+          - AZ
+          - BS
+          - BH
+          - BD
+          - BB
+          - BY
+          - BE
+          - BZ
+          - BJ
+          - BM
+          - BT
+          - BO
+          - BQ
+          - BA
+          - BW
+          - BV
+          - BR
+          - IO
+          - BN
+          - BG
+          - BF
+          - BI
+          - CV
+          - KH
+          - CM
+          - CA
+          - KY
+          - CF
+          - TD
+          - CL
+          - CN
+          - CX
+          - CC
+          - CO
+          - KM
+          - CG
+          - CD
+          - CK
+          - CR
+          - CI
+          - HR
+          - CU
+          - CW
+          - CY
+          - CZ
+          - DK
+          - DJ
+          - DM
+          - DO
+          - EC
+          - EG
+          - SV
+          - GQ
+          - ER
+          - EE
+          - SZ
+          - ET
+          - FK
+          - FO
+          - FJ
+          - FI
+          - FR
+          - GF
+          - PF
+          - TF
+          - GA
+          - GM
+          - GE
+          - DE
+          - GH
+          - GI
+          - GR
+          - GL
+          - GD
+          - GP
+          - GU
+          - GT
+          - GG
+          - GN
+          - GW
+          - GY
+          - HT
+          - HM
+          - VA
+          - HN
+          - HK
+          - HU
+          - IS
+          - IN
+          - ID
+          - IR
+          - IQ
+          - IE
+          - IM
+          - IL
+          - IT
+          - JM
+          - JP
+          - JE
+          - JO
+          - KZ
+          - KE
+          - KI
+          - KP
+          - KR
+          - KW
+          - KG
+          - LA
+          - LV
+          - LB
+          - LS
+          - LR
+          - LY
+          - LI
+          - LT
+          - LU
+          - MO
+          - MG
+          - MW
+          - MY
+          - MV
+          - ML
+          - MT
+          - MH
+          - MQ
+          - MR
+          - MU
+          - YT
+          - MX
+          - FM
+          - MD
+          - MC
+          - MN
+          - ME
+          - MS
+          - MA
+          - MZ
+          - MM
+          - NA
+          - NR
+          - NP
+          - NL
+          - NC
+          - NZ
+          - NI
+          - NE
+          - NG
+          - NU
+          - NF
+          - MP
+          - 'NO'
+          - OM
+          - PK
+          - PW
+          - PS
+          - PA
+          - PG
+          - PY
+          - PE
+          - PH
+          - PN
+          - PL
+          - PT
+          - PR
+          - QA
+          - MK
+          - RO
+          - RU
+          - RW
+          - RE
+          - BL
+          - SH
+          - KN
+          - LC
+          - MF
+          - PM
+          - VC
+          - WS
+          - SM
+          - ST
+          - SA
+          - SN
+          - RS
+          - SC
+          - SL
+          - SG
+          - SX
+          - SK
+          - SI
+          - SB
+          - SO
+          - ZA
+          - GS
+          - SS
+          - ES
+          - LK
+          - SD
+          - SR
+          - SJ
+          - SE
+          - CH
+          - SY
+          - TW
+          - TJ
+          - TZ
+          - TH
+          - TL
+          - TG
+          - TK
+          - TO
+          - TT
+          - TN
+          - TR
+          - TM
+          - TC
+          - TV
+          - UG
+          - UA
+          - AE
+          - GB
+          - UM
+          - US
+          - UY
+          - UZ
+          - VU
+          - VE
+          - VN
+          - VG
+          - VI
+          - WF
+          - EH
+          - XK
+          - XT
+          - XX
+          - YE
+          - ZM
+          - ZW
+          format: iso-3166-alpha-2
+          type:
+          - string
+          - 'null'
+        country_subdivision:
+          maxLength: 100
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        postal_code:
+          maxLength: 50
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        town_name:
+          maxLength: 100
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        type:
+          enum:
+          - RESIDENTIAL_ADDRESS
+          - MAILING_ADDRESS
+          - OPERATING_ADDRESS
+          - REGISTRATION_ADDRESS
+          - BILLING_ADDRESS
+          type:
+          - string
+          - 'null'
+      type: object
+    ol_Date:
+      properties:
+        day:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        month:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        year:
+          format: int32
+          type:
+          - integer
+          - 'null'
+      type: object
+    ol_IndustryCode:
+      properties:
+        code:
+          description: The alphanumeric value of the industry code, aligning to the Industry Code Type
+          maxLength: 10
+          minLength: 0
+          type: string
+        description:
+          description: The description of the industry code
+          maxLength: 256
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        is_primary:
+          description: Flag to indicate if this code is the customer's main line of business
+          type: boolean
+        type:
+          description: The standard being used i.e. NAICS, SIC, SIC2007_1, NACE, etc.
+          maxLength: 10
+          minLength: 0
+          type: string
+      required:
+      - code
+      - is_primary
+      - type
+      type: object
+    ol_StepDetails:
+      properties:
+        error_message:
+          type:
+          - string
+          - 'null'
+        identifier:
+          description: '- For the alerting step, this field is always null at the step level.
+
+            - Actual alert identifiers are nested within step_output.alerts[].identifier.'
+          format: uuid
+          type:
+          - string
+          - 'null'
+        status:
+          enum:
+          - NOT-STARTED
+          - IN-PROGRESS
+          - COMPLETED
+          - SKIPPED
+          - ERRORED
+          type: string
+        step_output:
+          $ref: '#/components/schemas/ol_StepOutput'
+      required:
+      - status
+      type: object
+    ol_EnrichmentTypeV3:
+      description: The type of enrichment source.
+      enum:
+      - LOOKUP_LIST
+      - REGEX_BOOLEAN
+      example: LOOKUP_LIST
+      type: string
+    ol_EmptyStepOutput:
+      type: object
+    ol_LongRange:
+      properties:
+        high:
+          format: int64
+          type: integer
+        low:
+          format: int64
+          type: integer
+      required:
+      - high
+      - low
+      type: object
+    ol_InBranch:
+      properties:
+        branch_identifier:
+          maxLength: 256
+          minLength: 0
+          type:
+          - string
+          - 'null'
+      type: object
+    ol_CustomFieldDataType:
+      description: The type of data stored in a custom field.
+      enum:
+      - TEXT
+      - INTEGER
+      - DECIMAL
+      - DATE
+      - DATETIME
+      type: string
+    ol_EnrichmentValueV3:
+      description: The value of the enrichment.
+      discriminator:
+        propertyName: data_type
+      properties:
+        data_type:
+          $ref: '#/components/schemas/ol_EnrichmentDataTypeV3'
+      required:
+      - data_type
+      type: object
+    ol_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
+    ol_CreateAndScreenCustomerRequest:
+      description: Create and screen
+      properties:
+        configuration:
+          $ref: '#/components/schemas/ol_CustomerConfigData'
+        customer:
+          $ref: '#/components/schemas/ol_CustomerApi'
+        monitoring:
+          $ref: '#/components/schemas/ol_CustomerMonitoringData'
+        product:
+          description: Represents a list of products. They can be either a bank account or a crypto wallet.
+          items:
+            $ref: '#/components/schemas/ol_ProductApi'
+          type:
+          - array
+          - 'null'
+      required:
+      - customer
+      type: object
+    ol_TextValue:
+      allOf:
+      - $ref: '#/components/schemas/ol_CustomFieldValue'
+      - properties:
+          text:
+            description: The text content.
+            example: Text Field Value
+            maxLength: 256
+            minLength: 0
+            type: string
+        type: object
+      description: Text representation of the custom field value.
+      required:
+      - data_type
+      - text
+      type: object
+    ol_InitialRiskScoringStepOutput:
+      properties:
+        overall_level:
+          enum:
+          - UNSPECIFIED-RISK
+          - LOW-RISK
+          - MEDIUM-RISK
+          - HIGH-RISK
+          - PROHIBITED
+          - SKIPPED
+          type: string
+        overall_value:
+          format: double
+          type: number
+      required:
+      - overall_level
+      - overall_value
+      type: object
+    ol_CustomerCreationStepOutput:
+      properties:
+        customer_identifier:
+          format: uuid
+          type: string
+        external_identifier:
+          type: string
+      required:
+      - customer_identifier
+      - external_identifier
+      type: object
+    ol_CustomFieldInstance:
+      description: The instance of a custom field as it relates to a specific customer.
+      properties:
+        key:
+          description: The key of the custom field.
+          example: field_key
+          type: string
+        value:
+          oneOf:
+          - $ref: '#/components/schemas/ol_DateValue'
+          - $ref: '#/components/schemas/ol_DatetimeValue'
+          - $ref: '#/components/schemas/ol_DecimalValue'
+          - $ref: '#/components/schemas/ol_IntegerValue'
+          - $ref: '#/components/schemas/ol_TextValue'
+      required:
+      - key
+      - value
+      type: object
+    ol_CustomerConfigData:
+      description: Represents monitoring and screening configurations.
+      properties:
+        screening_configuration_identifier:
+          description: The identifier of the screening configuration
+          example: 0f17930c-a4e6-4fef-b913-6a12ad5afd12
+          format: uuid
+          type:
+          - string
+          - 'null'
+      type: object
+    ol_ResidentialInformation:
+      properties:
+        country_of_residence:
+          enum:
+          - AF
+          - AX
+          - AL
+          - AN
+          - DZ
+          - AS
+          - AD
+          - AO
+          - AI
+          - AQ
+          - AG
+          - AR
+          - AM
+          - AW
+          - AU
+          - AT
+          - AZ
+          - BS
+          - BH
+          - BD
+          - BB
+          - BY
+          - BE
+          - BZ
+          - BJ
+          - BM
+          - BT
+          - BO
+          - BQ
+          - BA
+          - BW
+          - BV
+          - BR
+          - IO
+          - BN
+          - BG
+          - BF
+          - BI
+          - CV
+          - KH
+          - CM
+          - CA
+          - KY
+          - CF
+          - TD
+          - CL
+          - CN
+          - CX
+          - CC
+          - CO
+          - KM
+          - CG
+          - CD
+          - CK
+          - CR
+          - CI
+          - HR
+          - CU
+          - CW
+          - CY
+          - CZ
+          - DK
+          - DJ
+          - DM
+          - DO
+          - EC
+          - EG
+          - SV
+          - GQ
+          - ER
+          - EE
+          - SZ
+          - ET
+          - FK
+          - FO
+          - FJ
+          - FI
+          - FR
+          - GF
+          - PF
+          - TF
+          - GA
+          - GM
+          - GE
+          - DE
+          - GH
+          - GI
+          - GR
+          - GL
+          - GD
+          - GP
+          - GU
+          - GT
+          - GG
+          - GN
+          - GW
+          - GY
+          - HT
+          - HM
+          - VA
+          - HN
+          - HK
+          - HU
+          - IS
+          - IN
+          - ID
+          - IR
+          - IQ
+          - IE
+          - IM
+          - IL
+          - IT
+          - JM
+          - JP
+          - JE
+          - JO
+          - KZ
+          - KE
+          - KI
+          - KP
+          - KR
+          - KW
+          - KG
+          - LA
+          - LV
+          - LB
+          - LS
+          - LR
+          - LY
+          - LI
+          - LT
+          - LU
+          - MO
+          - MG
+          - MW
+          - MY
+          - MV
+          - ML
+          - MT
+          - MH
+          - MQ
+          - MR
+          - MU
+          - YT
+          - MX
+          - FM
+          - MD
+          - MC
+          - MN
+          - ME
+          - MS
+          - MA
+          - MZ
+          - MM
+          - NA
+          - NR
+          - NP
+          - NL
+          - NC
+          - NZ
+          - NI
+          - NE
+          - NG
+          - NU
+          - NF
+          - MP
+          - 'NO'
+          - OM
+          - PK
+          - PW
+          - PS
+          - PA
+          - PG
+          - PY
+          - PE
+          - PH
+          - PN
+          - PL
+          - PT
+          - PR
+          - QA
+          - MK
+          - RO
+          - RU
+          - RW
+          - RE
+          - BL
+          - SH
+          - KN
+          - LC
+          - MF
+          - PM
+          - VC
+          - WS
+          - SM
+          - ST
+          - SA
+          - SN
+          - RS
+          - SC
+          - SL
+          - SG
+          - SX
+          - SK
+          - SI
+          - SB
+          - SO
+          - ZA
+          - GS
+          - SS
+          - ES
+          - LK
+          - SD
+          - SR
+          - SJ
+          - SE
+          - CH
+          - SY
+          - TW
+          - TJ
+          - TZ
+          - TH
+          - TL
+          - TG
+          - TK
+          - TO
+          - TT
+          - TN
+          - TR
+          - TM
+          - TC
+          - TV
+          - UG
+          - UA
+          - AE
+          - GB
+          - UM
+          - US
+          - UY
+          - UZ
+          - VU
+          - VE
+          - VN
+          - VG
+          - VI
+          - WF
+          - EH
+          - XK
+          - XT
+          - XX
+          - YE
+          - ZM
+          - ZW
+          format: iso-3166-alpha-2
+          type:
+          - string
+          - 'null'
+        residential_status:
+          enum:
+          - RESIDENT
+          - PERMANENT_RESIDENT
+          - NON_RESIDENT
+          - TAX_RESIDENT
+          type:
+          - string
+          - 'null'
+      type: object
+    ol_DecimalEnrichmentValueV3:
+      allOf:
+      - $ref: '#/components/schemas/ol_EnrichmentValueV3'
+      - properties:
+          decimal:
+            description: The decimal value
+            example: 98.33
+            type: number
+        type: object
+      description: Decimal representation of the enrichment value.
+      required:
+      - data_type
+      - decimal
+      title: Decimal Value
+      type: object
+    ol_AlertingStepOutput:
+      properties:
+        alerts:
+          items:
+            $ref: '#/components/schemas/ol_AlertStep'
+          type: array
+      required:
+      - alerts
+      type: object
+    ol_StoredActivityStepOutput:
+      properties:
+        activity_identifier:
+          format: uuid
+          type: string
+      required:
+      - activity_identifier
+      type: object
+    ol_DecimalValue:
+      allOf:
+      - $ref: '#/components/schemas/ol_CustomFieldValue'
+      - properties:
+          decimal:
+            description: The decimal value
+            example: 10.02
+            type: number
+        type: object
+      description: Decimal representation of the custom field value.
+      required:
+      - data_type
+      - decimal
+      type: object
+    ol_TextEnrichmentValueV3:
+      allOf:
+      - $ref: '#/components/schemas/ol_EnrichmentValueV3'
+      - properties:
+          text:
+            description: The text content.
+            example: HIGH
+            maxLength: 256
+            minLength: 0
+            type: string
+        type: object
+      description: String representation of the enrichment value.
+      required:
+      - data_type
+      - text
+      title: Text Value
+      type: object
+    ol_DecisionStepOutput:
+      properties:
+        decision:
+          enum:
+          - UNKNOWN
+          - PROCESS
+          - HOLD
+          - REJECT
+          type: string
+      required:
+      - decision
+      type: object
+    ol_PersonalIdentification:
+      properties:
+        date_of_expiry:
+          $ref: '#/components/schemas/ol_Date'
+        date_of_issue:
+          $ref: '#/components/schemas/ol_Date'
+        issuing_country:
+          enum:
+          - AF
+          - AX
+          - AL
+          - AN
+          - DZ
+          - AS
+          - AD
+          - AO
+          - AI
+          - AQ
+          - AG
+          - AR
+          - AM
+          - AW
+          - AU
+          - AT
+          - AZ
+          - BS
+          - BH
+          - BD
+          - BB
+          - BY
+          - BE
+          - BZ
+          - BJ
+          - BM
+          - BT
+          - BO
+          - BQ
+          - BA
+          - BW
+          - BV
+          - BR
+          - IO
+          - BN
+          - BG
+          - BF
+          - BI
+          - CV
+          - KH
+          - CM
+          - CA
+          - KY
+          - CF
+          - TD
+          - CL
+          - CN
+          - CX
+          - CC
+          - CO
+          - KM
+          - CG
+          - CD
+          - CK
+          - CR
+          - CI
+          - HR
+          - CU
+          - CW
+          - CY
+          - CZ
+          - DK
+          - DJ
+          - DM
+          - DO
+          - EC
+          - EG
+          - SV
+          - GQ
+          - ER
+          - EE
+          - SZ
+          - ET
+          - FK
+          - FO
+          - FJ
+          - FI
+          - FR
+          - GF
+          - PF
+          - TF
+          - GA
+          - GM
+          - GE
+          - DE
+          - GH
+          - GI
+          - GR
+          - GL
+          - GD
+          - GP
+          - GU
+          - GT
+          - GG
+          - GN
+          - GW
+          - GY
+          - HT
+          - HM
+          - VA
+          - HN
+          - HK
+          - HU
+          - IS
+          - IN
+          - ID
+          - IR
+          - IQ
+          - IE
+          - IM
+          - IL
+          - IT
+          - JM
+          - JP
+          - JE
+          - JO
+          - KZ
+          - KE
+          - KI
+          - KP
+          - KR
+          - KW
+          - KG
+          - LA
+          - LV
+          - LB
+          - LS
+          - LR
+          - LY
+          - LI
+          - LT
+          - LU
+          - MO
+          - MG
+          - MW
+          - MY
+          - MV
+          - ML
+          - MT
+          - MH
+          - MQ
+          - MR
+          - MU
+          - YT
+          - MX
+          - FM
+          - MD
+          - MC
+          - MN
+          - ME
+          - MS
+          - MA
+          - MZ
+          - MM
+          - NA
+          - NR
+          - NP
+          - NL
+          - NC
+          - NZ
+          - NI
+          - NE
+          - NG
+          - NU
+          - NF
+          - MP
+          - 'NO'
+          - OM
+          - PK
+          - PW
+          - PS
+          - PA
+          - PG
+          - PY
+          - PE
+          - PH
+          - PN
+          - PL
+          - PT
+          - PR
+          - QA
+          - MK
+          - RO
+          - RU
+          - RW
+          - RE
+          - BL
+          - SH
+          - KN
+          - LC
+          - MF
+          - PM
+          - VC
+          - WS
+          - SM
+          - ST
+          - SA
+          - SN
+          - RS
+          - SC
+          - SL
+          - SG
+          - SX
+          - SK
+          - SI
+          - SB
+          - SO
+          - ZA
+          - GS
+          - SS
+          - ES
+          - LK
+          - SD
+          - SR
+          - SJ
+          - SE
+          - CH
+          - SY
+          - TW
+          - TJ
+          - TZ
+          - TH
+          - TL
+          - TG
+          - TK
+          - TO
+          - TT
+          - TN
+          - TR
+          - TM
+          - TC
+          - TV
+          - UG
+          - UA
+          - AE
+          - GB
+          - UM
+          - US
+          - UY
+          - UZ
+          - VU
+          - VE
+          - VN
+          - VG
+          - VI
+          - WF
+          - EH
+          - XK
+          - XT
+          - XX
+          - YE
+          - ZM
+          - ZW
+          format: iso-3166-alpha-2
+          type:
+          - string
+          - 'null'
+        number:
+          maxLength: 50
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        type:
+          enum:
+          - SOCIAL_SECURITY_NUMBER
+          - DRIVING_LICENCE
+          - PASSPORT
+          - IDENTITY_CARD
+          - TAX_REGISTRATION
+          - ALIEN_IDENTIFICATION
+          - EMPLOYER_IDENTIFICATION
+          - OTHER
+          type:
+          - string
+          - 'null'
+      type: object
+    ol_EnrichmentV3:
+      description: A representation of a transaction enrichment.
+      properties:
+        key:
+          description: The key of the enrichment.
+          example: debtors_country_risk
+          type: string
+        type:
+          $ref: '#/components/schemas/ol_EnrichmentTypeV3'
+        value:
+          discriminator:
+            mapping:
+              BOOLEAN: '#/components/schemas/ol_BooleanEnrichmentValueV3'
+              DECIMAL: '#/components/schemas/ol_DecimalEnrichmentValueV3'
+              TEXT: '#/components/schemas/ol_TextEnrichmentValueV3'
+            propertyName: data_type
+          oneOf:
+          - $ref: '#/components/schemas/ol_BooleanEnrichmentValueV3'
+          - $ref: '#/components/schemas/ol_DecimalEnrichmentValueV3'
+          - $ref: '#/components/schemas/ol_TextEnrichmentValueV3'
+      required:
+      - key
+      - type
+      - value
+      type: object
+    ol_ScreeningResult:
+      oneOf:
+      - enum:
+        - HAS-HITS
+        - NO-HITS
+        type: string
+      - enum:
+        - HAS_PROFILES
+        - NO_PROFILES
+        type: string
+      type: object
+    ol_BooleanEnrichmentValueV3:
+      allOf:
+      - $ref: '#/components/schemas/ol_EnrichmentValueV3'
+      - properties:
+          boolean:
+            description: The boolean value
+            example: true
+            type: boolean
+        type: object
+      description: Boolean representation of the enrichment value.
+      required:
+      - boolean
+      - data_type
+      title: Boolean Value
+      type: object
+    ol_CaseCreationStepOutput:
+      properties:
+        case_identifier:
+          format: uuid
+          type: string
+      required:
+      - case_identifier
+      type: object
+    ol_ContactInformation:
+      properties:
+        email_address:
+          description: 'Valid email format: local-part@domain.tld (e.g., ''user@example.com''). TLD must be 2+ letters.'
+          format: email
+          items:
+            description: 'Valid email format: local-part@domain.tld (e.g., ''user@example.com''). TLD must be 2+ letters.'
+            format: email
+            pattern: ^(?!\.)(?!.*\.{2})[A-Za-z0-9._%+-]+(?<!\.)@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$
+            type: string
+          pattern: ^(?!\.)(?!.*\.{2})[A-Za-z0-9._%+-]+(?<!\.)@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$
+          type:
+          - array
+          - 'null'
+        fax_number:
+          items:
+            type: string
+          type:
+          - array
+          - 'null'
+        phone_number:
+          items:
+            type: string
+          type:
+          - array
+          - 'null'
+        url:
+          description: 'Max 256 characters. Protocol (http/https) is optional. Must have a valid domain with 2+ character TLD. Allowed path characters: letters, numbers, hyphens, dots, slashes. Allowed query param characters: letters, numbers, hyphens, ''='', ''&'', ''%''.'
+          format: uri
+          items:
+            description: 'Max 256 characters. Protocol (http/https) is optional. Must have a valid domain with 2+ character TLD. Allowed path characters: letters, numbers, hyphens, dots, slashes. Allowed query param characters: letters, numbers, hyphens, ''='', ''&'', ''%''.'
+            format: uri
+            pattern: ^(https?://)?((\w-+\.)+\w-{2,})(/[\w\-./]*)?(\?[\w\-=&%]*)?$
+            type: string
+          pattern: ^(https?://)?((\w-+\.)+\w-{2,})(/[\w\-./]*)?(\?[\w\-=&%]*)?$
+          type:
+          - array
+          - 'null'
+      type: object
+    ol_CustomerApi:
+      description: Customer to be created and screened. It can be either a person, a company, a vessel or undefined.
+      properties:
+        acquisition_source:
+          maxLength: 256
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        company:
+          $ref: '#/components/schemas/ol_Company'
+        customer_since:
+          $ref: '#/components/schemas/ol_Date'
+        external_identifier:
+          maxLength: 256
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        person:
+          $ref: '#/components/schemas/ol_Person'
+        undefined:
+          $ref: '#/components/schemas/ol_CustomerTypeUndefined'
+      type: object
+    ol_DatetimeValue:
+      allOf:
+      - $ref: '#/components/schemas/ol_CustomFieldValue'
+      - properties:
+          datetime:
+            description: The datetime content.
+            example: '2022-09-27T18:00:00.000Z'
+            format: date-time
+            type: string
+        type: object
+      description: Datetime representation of the custom field value.
+      required:
+      - data_type
+      - datetime
+      type: object
+    ol_CustomerMonitoringData:
+      description: Represents monitoring configuration.
+      properties:
+        entity_screening:
+          $ref: '#/components/schemas/ol_CustomerEntityScreeningMonitoring'
+      type: object
+    ol_Online:
+      properties:
+        device_identifier:
+          maxLength: 256
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        device_type:
+          maxLength: 50
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        ip_address:
+          type:
+          - string
+          - 'null'
+        ip_format:
+          enum:
+          - IPV4
+          - IPV6
+          type:
+          - string
+          - 'null'
+      type: object
+    ol_BankAccount:
+      properties:
+        account_number:
+          maxLength: 34
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        bank:
+          $ref: '#/components/schemas/ol_Bank'
+        bban:
+          maxLength: 30
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        iban:
+          type:
+          - string
+          - 'null'
+        sort_code:
+          maxLength: 11
+          minLength: 0
+          type:
+          - string
+          - 'null'
+      type: object
+    ol_FullRiskScoringStepOutput:
+      properties:
+        overall_level:
+          enum:
+          - UNSPECIFIED-RISK
+          - LOW-RISK
+          - MEDIUM-RISK
+          - HIGH-RISK
+          - PROHIBITED
+          - SKIPPED
+          type: string
+        overall_value:
+          format: double
+          type: number
+      required:
+      - overall_level
+      - overall_value
+      type: object
+    ol_WorkflowState:
+      properties:
+        status:
+          enum:
+          - NOT-STARTED
+          - IN-PROGRESS
+          - COMPLETED
+          - SKIPPED
+          - ERRORED
+          type: string
+        step_details:
+          additionalProperties:
+            $ref: '#/components/schemas/ol_StepDetails'
+          type: object
+        steps:
+          items:
+            enum:
+            - customer-creation
+            - initial-risk-scoring
+            - customer-screening
+            - customer-rescreening
+            - case-creation
+            - alerting
+            - customer-update
+            - risk-scoring
+            - payment-screening
+            - store-transaction
+            - transaction-monitoring
+            type: string
+          type: array
+        workflow_instance_identifier:
+          format: uuid
+          type: string
+        workflow_type:
+          enum:
+          - create-and-screen
+          - update-and-rescore
+          - rescreen-customer
+          type: string
+      required:
+      - status
+      - step_details
+      - steps
+      - workflow_instance_identifier
+      - workflow_type
+      type: object
+    ol_CustomerEntityScreeningMonitoring:
+      properties:
+        configuration_identifier:
+          description: The identifier of the screening monitor configuration
+          example: 0f17930c-a4e6-4fef-b913-6a12ad5afd12
+          format: uuid
+          type:
+          - string
+          - 'null'
+        enabled:
+          type: boolean
+      required:
+      - enabled
+      type: object
+    ol_OnboardingChannelApi:
+      properties:
+        in_branch:
+          $ref: '#/components/schemas/ol_InBranch'
+        online:
+          $ref: '#/components/schemas/ol_Online'
+      type: object
+    ol_CustomerScreeningStepOutput:
+      properties:
+        aml_types:
+          items:
+            enum:
+            - UNSPECIFIED
+            - ADVERSE_MEDIA
+            - ADVERSE_MEDIA_GENERAL
+            - ADVERSE_MEDIA_V2_OTHER_MINOR
+            - ADVERSE_MEDIA_V2_EU_AML_DIRECTIVE
+            - ADVERSE_MEDIA_V1_HIGH_RISK
+            - ADVERSE_MEDIA_VIOLENT_CRIME
+            - ADVERSE_MEDIA_V2_VIOLENCE_AML_CFT
+            - ADVERSE_MEDIA_V2_VIOLENCE_NON_AML_CFT
+            - ADVERSE_MEDIA_FINANCIAL_CRIME
+            - WARNING
+            - PEP
+            - ADVERSE_MEDIA_V2_PROPERTY
+            - PEP_CLASS_1_TO_3
+            - ADVERSE_MEDIA_NARCOTICS
+            - ADVERSE_MEDIA_V2_NARCOTICS_AML_CFT
+            - FITNESS_PROBITY
+            - ADVERSE_MEDIA_FRAUD
+            - ADVERSE_MEDIA_V2_FRAUD_LINKED
+            - PEP_CLASS_2
+            - ADVERSE_MEDIA_V2_REGULATORY
+            - PEP_CLASS_1
+            - ADVERSE_MEDIA_V2_GENERAL_AML_CFT
+            - ADVERSE_MEDIA_V2_OTHER_SERIOUS
+            - ADVERSE_MEDIA_TERRORISM
+            - ADVERSE_MEDIA_V2_FINANCIAL_AML_CFT
+            - ADVERSE_MEDIA_V2_FINANCIAL_DIFFICULTY
+            - PEP_CLASS_4
+            - ADVERSE_MEDIA_V2_TERRORISM
+            - ADVERSE_MEDIA_SEXUAL_CRIME
+            - PEP_CLASS_3
+            - ADVERSE_MEDIA_V2_CYBERCRIME
+            - SANCTION
+            - ADVERSE_MEDIA_V2_OTHER_FINANCIAL
+            - SANCTION_RELATED
+            - CUSTOM
+            type: string
+          type:
+          - array
+          - 'null'
+        screening_result:
+          $ref: '#/components/schemas/ol_ScreeningResult'
+      required:
+      - screening_result
+      type: object
+    ol_Salary:
+      properties:
+        amount:
+          $ref: '#/components/schemas/ol_LongRange'
+        currency:
+          enum:
+          - AFN
+          - EUR
+          - ALL
+          - DZD
+          - USD
+          - AOA
+          - XCD
+          - XXX
+          - ARS
+          - AMD
+          - AWG
+          - AUD
+          - AZN
+          - BSD
+          - BHD
+          - BDT
+          - BBD
+          - BYN
+          - BZD
+          - XOF
+          - BMD
+          - INR
+          - BTN
+          - BOB
+          - BOV
+          - BAM
+          - BWP
+          - NOK
+          - BRL
+          - BND
+          - BGN
+          - BIF
+          - CVE
+          - KHR
+          - XAF
+          - CAD
+          - KYD
+          - CLP
+          - CLF
+          - CNY
+          - COP
+          - COU
+          - KMF
+          - CDF
+          - NZD
+          - CRC
+          - CUP
+          - CUC
+          - ANG
+          - CZK
+          - DKK
+          - DJF
+          - DOP
+          - EGP
+          - SVC
+          - ERN
+          - SZL
+          - ETB
+          - FKP
+          - FJD
+          - XPF
+          - GMD
+          - GEL
+          - GHS
+          - GIP
+          - GTQ
+          - GBP
+          - GNF
+          - GYD
+          - HTG
+          - HNL
+          - HKD
+          - HUF
+          - ISK
+          - IDR
+          - XDR
+          - IRR
+          - IQD
+          - ILS
+          - JMD
+          - JPY
+          - JOD
+          - KZT
+          - KES
+          - KPW
+          - KRW
+          - KWD
+          - KGS
+          - LAK
+          - LBP
+          - LSL
+          - ZAR
+          - LRD
+          - LYD
+          - CHF
+          - MOP
+          - MKD
+          - MGA
+          - MWK
+          - MYR
+          - MVR
+          - MRU
+          - MUR
+          - XUA
+          - MXN
+          - MXV
+          - MDL
+          - MNT
+          - MAD
+          - MZN
+          - MMK
+          - NAD
+          - NPR
+          - NIO
+          - NGN
+          - OMR
+          - PKR
+          - PAB
+          - PGK
+          - PYG
+          - PEN
+          - PHP
+          - PLN
+          - QAR
+          - RON
+          - RUB
+          - RWF
+          - SHP
+          - WST
+          - STN
+          - SAR
+          - RSD
+          - SCR
+          - SLL
+          - SLE
+          - SGD
+          - XSU
+          - SBD
+          - SOS
+          - SSP
+          - LKR
+          - SDG
+          - SRD
+          - SEK
+          - CHE
+          - CHW
+          - SYP
+          - TWD
+          - TJS
+          - TZS
+          - THB
+          - TOP
+          - TTD
+          - TND
+          - TRY
+          - TMT
+          - UGX
+          - UAH
+          - AED
+          - USN
+          - UYU
+          - UYI
+          - UYW
+          - UZS
+          - VUV
+          - VES
+          - VED
+          - VND
+          - YER
+          - ZMW
+          - ZWL
+          - XBA
+          - XBB
+          - XBC
+          - XBD
+          - XTS
+          - XAU
+          - XPD
+          - XPT
+          - XAG
+          format: iso-4217
+          type:
+          - string
+          - 'null'
+      type: object
+    ol_Company:
+      properties:
+        address:
+          items:
+            $ref: '#/components/schemas/ol_Address'
+          type:
+          - array
+          - 'null'
+        alias:
+          items:
+            type: string
+          type:
+          - array
+          - 'null'
+        company_type:
+          maxLength: 50
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        custom_fields:
+          items:
+            $ref: '#/components/schemas/ol_CustomFieldInstance'
+          type:
+          - array
+          - 'null'
+        incorporation_date:
+          $ref: '#/components/schemas/ol_Date'
+        industry:
+          maxLength: 256
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        industry_codes:
+          items:
+            $ref: '#/components/schemas/ol_IndustryCode'
+          maxItems: 25
+          minItems: 0
+          type:
+          - array
+          - 'null'
+        legal_name:
+          maxLength: 256
+          minLength: 0
+          type: string
+        place_of_registration:
+          format: iso-3166-2
+          maxLength: 6
+          minLength: 2
+          type:
+          - string
+          - 'null'
+        registration_authority_identification:
+          maxLength: 256
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        source_of_income:
+          maxLength: 150
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        status_summary:
+          enum:
+          - UNKNOWN
+          - ACTIVE
+          - INACTIVE
+          type:
+          - string
+          - 'null'
+      required:
+      - legal_name
+      type: object
+    ol_CustomFieldValue:
+      description: The value of the custom field.
+      discriminator:
+        mapping:
+          DATE: '#/components/schemas/ol_DateValue'
+          DATETIME: '#/components/schemas/ol_DatetimeValue'
+          DECIMAL: '#/components/schemas/ol_DecimalValue'
+          INTEGER: '#/components/schemas/ol_IntegerValue'
+          TEXT: '#/components/schemas/ol_TextValue'
+        propertyName: data_type
+      properties:
+        data_type:
+          $ref: '#/components/schemas/ol_CustomFieldDataType'
+      required:
+      - data_type
+      type: object
+    ol_AsyncWorkflowResponse:
+      properties:
+        workflow_instance_identifier:
+          format: uuid
+          type:
+          - string
+          - 'null'
+      type: object
+    ol_StepOutput:
+      anyOf:
+      - $ref: '#/components/schemas/ol_EmptyStepOutput'
+      - $ref: '#/components/schemas/ol_CustomerCreationStepOutput'
+      - $ref: '#/components/schemas/ol_InitialRiskScoringStepOutput'
+      - $ref: '#/components/schemas/ol_CustomerScreeningStepOutput'
+      - $ref: '#/components/schemas/ol_CaseCreationStepOutput'
+      - $ref: '#/components/schemas/ol_AlertingStepOutput'
+      - $ref: '#/components/schemas/ol_StoredActivityStepOutput'
+      - $ref: '#/components/schemas/ol_DecisionStepOutput'
+      - $ref: '#/components/schemas/ol_CustomerUpdateStepOutput'
+      - $ref: '#/components/schemas/ol_FullRiskScoringStepOutput'
+      - $ref: '#/components/schemas/ol_EnrichmentStepOutput'
+      type:
+      - object
+      - 'null'
+    ol_IntegerValue:
+      allOf:
+      - $ref: '#/components/schemas/ol_CustomFieldValue'
+      - properties:
+          integer:
+            description: The integer content.
+            example: 30
+            format: int64
+            type: integer
+        type: object
+      description: Integer representation of the custom field value.
+      required:
+      - data_type
+      - integer
+      type: object
+    ol_EnrichmentDataTypeV3:
+      description: The type of data stored in an enrichment value.
+      enum:
+      - TEXT
+      - DECIMAL
+      - BOOLEAN
+      type: string
+    ol_Bank:
+      properties:
+        bic:
+          maxLength: 11
+          minLength: 0
+          type:
+          - string
+          - 'null'
+      type: object
+    ol_CryptoWallet:
+      properties:
+        managing_exchange:
+          maxLength: 50
+          minLength: 0
+          type:
+          - string
+          - 'null'
+        wallet_identifier:
+          maxLength: 256
+          minLength: 0
+          type:
+          - string
+          - 'null'
+      type: object
+    ol_CustomerUpdateStepOutput:
+      properties:
+        customer_identifier:
+          format: uuid
+          type: string
+        customer_version:
+          format: int32
+          type: integer
+        external_identifier:
+          type: string
+      required:
+      - customer_identifier
+      - customer_version
+      - external_identifier
+      type: object
+    ol_CustomerTypeUndefined:
+      properties:
+        birth_year:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        country:
+          format: iso-3166-alpha-2
+          items:
+            enum:
+            - AF
+            - AX
+            - AL
+            - AN
+            - DZ
+            - AS
+            - AD
+            - AO
+            - AI
+            - AQ
+            - AG
+            - AR
+            - AM
+            - AW
+            - AU
+            - AT
+            - AZ
+            - BS
+            - BH
+            - BD
+            - BB
+            - BY
+            - BE
+            - BZ
+            - BJ
+            - BM
+            - BT
+            - BO
+            - BQ
+            - BA
+            - BW
+            - BV
+            - BR
+            - IO
+            - BN
+            - BG
+            - BF
+            - BI
+            - CV
+            - KH
+            - CM
+            - CA
+            - KY
+            - CF
+            - TD
+            - CL
+            - CN
+            - CX
+            - CC
+            - CO
+            - KM
+            - CG
+            - CD
+            - CK
+            - CR
+            - CI
+            - HR
+            - CU
+            - CW
+            - CY
+            - CZ
+            - DK
+            - DJ
+            - DM
+            - DO
+            - EC
+            - EG
+            - SV
+            - GQ
+            - ER
+            - EE
+            - SZ
+            - ET
+            - FK
+            - FO
+            - FJ
+            - FI
+            - FR
+            - GF
+            - PF
+            - TF
+            - GA
+            - GM
+            - GE
+            - DE
+            - GH
+            - GI
+            - GR
+            - GL
+            - GD
+            - GP
+            - GU
+            - GT
+            - GG
+            - GN
+            - GW
+            - GY
+            - HT
+            - HM
+            - VA
+            - HN
+            - HK
+            - HU
+            - IS
+            - IN
+            - ID
+            - IR
+            - IQ
+            - IE
+            - IM
+            - IL
+            - IT
+            - JM
+            - JP
+            - JE
+            - JO
+            - KZ
+            - KE
+            - KI
+            - KP
+            - KR
+            - KW
+            - KG
+            - LA
+            - LV
+            - LB
+            - LS
+            - LR
+            - LY
+            - LI
+            - LT
+            - LU
+            - MO
+            - MG
+            - MW
+            - MY
+            - MV
+            - ML
+            - MT
+            - MH
+            - MQ
+            - MR
+            - MU
+            - YT
+            - MX
+            - FM
+            - MD
+            - MC
+            - MN
+            - ME
+            - MS
+            - MA
+            - MZ
+            - MM
+            - NA
+            - NR
+            - NP
+            - NL
+            - NC
+            - NZ
+            - NI
+            - NE
+            - NG
+            - NU
+            - NF
+            - MP
+            - 'NO'
+            - OM
+            - PK
+            - PW
+            - PS
+            - PA
+            - PG
+            - PY
+            - PE
+            - PH
+            - PN
+            - PL
+            - PT
+            - PR
+            - QA
+            - MK
+            - RO
+            - RU
+            - RW
+            - RE
+            - BL
+            - SH
+            - KN
+            - LC
+            - MF
+            - PM
+            - VC
+            - WS
+            - SM
+            - ST
+            - SA
+            - SN
+            - RS
+            - SC
+            - SL
+            - SG
+            - SX
+            - SK
+            - SI
+            - SB
+            - SO
+            - ZA
+            - GS
+            - SS
+            - ES
+            - LK
+            - SD
+            - SR
+            - SJ
+            - SE
+            - CH
+            - SY
+            - TW
+            - TJ
+            - TZ
+            - TH
+            - TL
+            - TG
+            - TK
+            - TO
+            - TT
+            - TN
+            - TR
+            - TM
+            - TC
+            - TV
+            - UG
+            - UA
+            - AE
+            - GB
+            - UM
+            - US
+            - UY
+            - UZ
+            - VU
+            - VE
+            - VN
+            - VG
+            - VI
+            - WF
+            - EH
+            - XK
+            - XT
+            - XX
+            - YE
+            - ZM
+            - ZW
+            format: iso-3166-alpha-2
+            type: string
+          type:
+          - array
+          - 'null'
+        custom_fields:
+          items:
+            $ref: '#/components/schemas/ol_CustomFieldInstance'
+          type:
+          - array
+          - 'null'
+        name:
+          maxLength: 256
+          minLength: 0
+          type: string
+      required:
+      - name
+      type: object
+    ol_AlertStep:
+      properties:
+        alert_skipped_code:
+          enum:
+          - ALERT_SKIPPED_CODE_UNSPECIFIED
+          - ALERT_SKIPPED_CODE_NO_ALERT_REQUIRED
+          - ALERT_SKIPPED_CODE_MANUAL_SUPPRESSION
+          - ALERT_SKIPPED_CODE_FROM_SOURCE
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+      required:
+      - identifier
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: HTTP Bearer Token Authentication
+      scheme: bearer
+      type: http

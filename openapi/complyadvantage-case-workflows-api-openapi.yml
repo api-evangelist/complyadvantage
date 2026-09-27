@@ -234,6 +234,123 @@ paths:
       - Case Workflows
 components:
   schemas:
+    case-management_Stage:
+      description: Stage
+      properties:
+        decision_type:
+          description: The decision type of the stage (decision stages only).
+          enum:
+          - POSITIVE
+          - NEGATIVE
+          - PARTIAL_POSITIVE
+          type:
+          - string
+          - 'null'
+        display_name:
+          description: The display name of the stage.
+          maxLength: 30
+          minLength: 3
+          type: string
+        display_order:
+          description: The display order of the stage.
+          format: int32
+          minimum: 1
+          type: integer
+        identifier:
+          description: Stage unique identifier.
+          format: uuid
+          type: string
+        stage_type:
+          description: The type of the stage.
+          enum:
+          - INITIAL
+          - REVIEW
+          - DECISION
+          type: string
+      required:
+      - display_name
+      - display_order
+      - identifier
+      - stage_type
+      type: object
+    case-management_NewStage:
+      additionalProperties: false
+      description: The stage to be created
+      properties:
+        decision_type:
+          description: The decision type of the stage (decision stages only).
+          enum:
+          - POSITIVE
+          - NEGATIVE
+          - PARTIAL_POSITIVE
+          type:
+          - string
+          - 'null'
+        display_name:
+          description: The display name of the stage.
+          maxLength: 30
+          minLength: 3
+          type: string
+        display_order:
+          description: The display order of the stage.
+          format: int32
+          minimum: 1
+          type: integer
+        stage_type:
+          description: The type of the stage.
+          enum:
+          - INITIAL
+          - REVIEW
+          - DECISION
+          type: string
+      required:
+      - display_name
+      - display_order
+      - stage_type
+      type: object
+    case-management_StageData:
+      oneOf:
+      - $ref: '#/components/schemas/case-management_ExistingStage'
+      - $ref: '#/components/schemas/case-management_NewStage'
+      type: object
+    case-management_PaginatedResponseWorkflowResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+        workflows:
+          items:
+            $ref: '#/components/schemas/case-management_WorkflowResponse'
+          type: array
+      required:
+      - first
+      - self
+      - workflows
+      type: object
     case-management_WorkflowResponse:
       description: Workflow
       properties:
@@ -279,41 +396,6 @@ components:
       - stages
       - version
       type: object
-    case-management_NewStage:
-      additionalProperties: false
-      description: The stage to be created
-      properties:
-        decision_type:
-          description: The decision type of the stage (decision stages only).
-          enum:
-          - POSITIVE
-          - NEGATIVE
-          - PARTIAL_POSITIVE
-          type:
-          - string
-          - 'null'
-        display_name:
-          description: The display name of the stage.
-          maxLength: 30
-          minLength: 3
-          type: string
-        display_order:
-          description: The display order of the stage.
-          format: int32
-          minimum: 1
-          type: integer
-        stage_type:
-          description: The type of the stage.
-          enum:
-          - INITIAL
-          - REVIEW
-          - DECISION
-          type: string
-      required:
-      - display_name
-      - display_order
-      - stage_type
-      type: object
     case-management_UpdateWorkflowRequest:
       properties:
         alert_grouping_enabled:
@@ -327,45 +409,6 @@ components:
           type: array
       required:
       - stages
-      type: object
-    case-management_Stage:
-      description: Stage
-      properties:
-        decision_type:
-          description: The decision type of the stage (decision stages only).
-          enum:
-          - POSITIVE
-          - NEGATIVE
-          - PARTIAL_POSITIVE
-          type:
-          - string
-          - 'null'
-        display_name:
-          description: The display name of the stage.
-          maxLength: 30
-          minLength: 3
-          type: string
-        display_order:
-          description: The display order of the stage.
-          format: int32
-          minimum: 1
-          type: integer
-        identifier:
-          description: Stage unique identifier.
-          format: uuid
-          type: string
-        stage_type:
-          description: The type of the stage.
-          enum:
-          - INITIAL
-          - REVIEW
-          - DECISION
-          type: string
-      required:
-      - display_name
-      - display_order
-      - identifier
-      - stage_type
       type: object
     case-management_ExistingStage:
       description: The existing Stage to be updated or remain unchanged
@@ -405,49 +448,6 @@ components:
       - display_order
       - identifier
       - stage_type
-      type: object
-    case-management_StageData:
-      oneOf:
-      - $ref: '#/components/schemas/case-management_ExistingStage'
-      - $ref: '#/components/schemas/case-management_NewStage'
-      type: object
-    case-management_PaginatedResponseWorkflowResponse:
-      properties:
-        first:
-          description: The URL path to the first page.
-          example: /v1/resource?page_number=1
-          type: string
-        next:
-          description: The URL path to the next page.
-          example: /v1/resource?page_number=4
-          type:
-          - string
-          - 'null'
-        prev:
-          description: The URL path to the previous page.
-          example: /v1/resource?page_number=2
-          type:
-          - string
-          - 'null'
-        self:
-          description: The URL path to the current page.
-          example: /v1/resource?page_number=3
-          type: string
-        total_count:
-          description: Total number of items.
-          example: 60
-          format: int64
-          type:
-          - integer
-          - 'null'
-        workflows:
-          items:
-            $ref: '#/components/schemas/case-management_WorkflowResponse'
-          type: array
-      required:
-      - first
-      - self
-      - workflows
       type: object
   securitySchemes:
     BearerAuth:

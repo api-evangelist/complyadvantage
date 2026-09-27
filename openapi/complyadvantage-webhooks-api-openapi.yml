@@ -392,47 +392,87 @@ paths:
       - Webhooks
 components:
   schemas:
-    ns_CustomerCreationStep:
+    ns_CustomerCreationOutput:
       properties:
-        error_message:
-          type:
-          - string
-          - 'null'
-        identifier:
+        customer_identifier:
           example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
           type:
           - string
           - 'null'
-        status:
-          type: string
-        step_output:
-          $ref: '#/components/schemas/ns_CustomerCreationOutput'
-      required:
-      - status
-      - step_output
-      type: object
-    ns_Subject:
-      properties:
         external_identifier:
-          example: your unique subject identifier
+          example: your unique customer identifier
           type:
           - string
           - 'null'
-        identifier:
-          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+      type: object
+    ns_InitialRiskScoringOutput:
+      properties:
+        overall_level:
+          example: LOW-RISK
           type:
           - string
           - 'null'
-        type:
-          example: CUSTOMER
+        overall_value:
+          example: 0
+          format: double
+          type:
+          - number
+          - 'null'
+      type: object
+    ns_ScenarioEvaluationV2JsonPayload:
+      properties:
+        evaluation_results:
+          items:
+            $ref: '#/components/schemas/ns_EvaluationResultV2JsonPayload'
+          type: array
+        scenario_configuration_id:
+          format: uuid
           type: string
-        version:
-          example: '1'
-          type:
-          - string
-          - 'null'
       required:
-      - type
+      - evaluation_results
+      - scenario_configuration_id
+      type: object
+    ns_WorkflowCompletedV2JsonPayload:
+      properties:
+        account_identifier:
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          type: string
+        api_version:
+          example: v2
+          type: string
+        status:
+          example: COMPLETED
+          type: string
+        step_details:
+          $ref: '#/components/schemas/ns_WorkflowStepDetails'
+        steps:
+          example:
+          - customer-creation
+          - initial-risk-scoring
+          - customer-screening
+          - alerting
+          items:
+            example: '["customer-creation","initial-risk-scoring","customer-screening","alerting"]'
+            type: string
+          type: array
+        webhook_type:
+          example: WORKFLOW_COMPLETED
+          type: string
+        workflow_instance_identifier:
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          type: string
+        workflow_type:
+          example: create-and-screen
+          type: string
+      required:
+      - account_identifier
+      - api_version
+      - status
+      - step_details
+      - steps
+      - webhook_type
+      - workflow_instance_identifier
+      - workflow_type
       type: object
     ns_UpdateWebhookPayload:
       properties:
@@ -461,6 +501,208 @@ components:
           type:
           - string
           - 'null'
+      type: object
+    ns_TransactionReviewedV3JsonPayload:
+      properties:
+        account_identifier:
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          type: string
+        api_version:
+          example: v3
+          type: string
+        evaluation_outcome:
+          example: HOLD
+          type: string
+        review_decision:
+          example: RELEASE
+          type: string
+        transaction_external_identifier:
+          example: your unique transaction identifier
+          type: string
+        transaction_identifier:
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          type: string
+        webhook_type:
+          example: TRANSACTION_REVIEWED
+          type: string
+      required:
+      - account_identifier
+      - api_version
+      - evaluation_outcome
+      - review_decision
+      - transaction_external_identifier
+      - transaction_identifier
+      - webhook_type
+      type: object
+    ns_Customer:
+      properties:
+        external_identifier:
+          example: your unique customer identifier
+          type:
+          - string
+          - 'null'
+        identifier:
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          type:
+          - string
+          - 'null'
+        version:
+          example: 1
+          format: int32
+          type:
+          - integer
+          - 'null'
+      type: object
+    ns_CaseNote:
+      properties:
+        contents:
+          type: string
+      required:
+      - contents
+      type: object
+    ns_RiskCategory:
+      properties:
+        category_type:
+          enum:
+          - BASIC_INFORMATION
+          - AML
+          - COUNTRY
+          - PRODUCT
+          - CHANNEL
+          - NGD_RISK
+          - CUSTOM_FIELDS
+          type: string
+        level:
+          enum:
+          - LOW
+          - MEDIUM
+          - HIGH
+          - PROHIBITED
+          - SKIPPED
+          example: MEDIUM
+          type: string
+        risk_attributes:
+          items:
+            $ref: '#/components/schemas/ns_RiskAttribute'
+          type: array
+        score:
+          example: 30
+          format: double
+          type: number
+        weight:
+          example: 0.5
+          format: double
+          type: number
+      required:
+      - category_type
+      - level
+      - risk_attributes
+      - score
+      - weight
+      type: object
+    ns_WorkflowAlert:
+      properties:
+        identifier:
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          type: string
+      required:
+      - identifier
+      type: object
+    ns_CustomerCreationStep:
+      properties:
+        error_message:
+          type:
+          - string
+          - 'null'
+        identifier:
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          type:
+          - string
+          - 'null'
+        status:
+          type: string
+        step_output:
+          $ref: '#/components/schemas/ns_CustomerCreationOutput'
+      required:
+      - status
+      - step_output
+      type: object
+    ns_AlertingStep:
+      properties:
+        error_message:
+          type:
+          - string
+          - 'null'
+        identifier:
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          type:
+          - string
+          - 'null'
+        status:
+          example: COMPLETED
+          type: string
+        step_output:
+          $ref: '#/components/schemas/ns_AlertingOutput'
+      required:
+      - status
+      - step_output
+      type: object
+    ns_Subject:
+      properties:
+        external_identifier:
+          example: your unique subject identifier
+          type:
+          - string
+          - 'null'
+        identifier:
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          type:
+          - string
+          - 'null'
+        type:
+          example: CUSTOMER
+          type: string
+        version:
+          example: '1'
+          type:
+          - string
+          - 'null'
+      required:
+      - type
+      type: object
+    ns_TestResult:
+      properties:
+        response_type:
+          description: Server response type
+          enum:
+          - SUCCESS
+          - REDIRECTION
+          - CLIENT_REQUEST_ERROR
+          - SERVER_ERROR
+          - NO_RESPONSE
+          - OAUTH_CLIENT_REQUEST_ERROR
+          - OAUTH_SERVER_ERROR
+          - OAUTH_NO_RESPONSE
+          type: string
+        server_response_code:
+          description: Server response code
+          format: int32
+          type: integer
+      required:
+      - response_type
+      - server_response_code
+      type: object
+    ns_ScenarioIdentifierV2JsonPayload:
+      properties:
+        scenario_id:
+          format: uuid
+          type: string
+        version:
+          format: int64
+          type: integer
+      required:
+      - scenario_id
+      - version
       type: object
     ns_TransactionMonitoredV2JsonPayload:
       properties:
@@ -500,29 +742,63 @@ components:
       - webhook_id
       - webhook_type
       type: object
-    ns_RiskAttribute:
+    ns_CustomerScreeningStep:
       properties:
-        fields:
-          items:
-            $ref: '#/components/schemas/ns_RiskAttribute'
-          type:
-          - array
-          - 'null'
-        name:
-          example: country_of_residence
-          type: string
-        parameter:
-          example: PT
+        error_message:
           type:
           - string
           - 'null'
-        score:
-          example: 30
-          format: double
-          type: number
+        identifier:
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          type:
+          - string
+          - 'null'
+        status:
+          example: COMPLETED
+          type: string
+        step_output:
+          $ref: '#/components/schemas/ns_CustomerScreeningOutput'
       required:
-      - name
-      - score
+      - status
+      - step_output
+      type: object
+    ns_CaseCreatedJsonPayloadV2:
+      properties:
+        account_identifier:
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          type: string
+        api_version:
+          example: v2
+          type: string
+        case_identifier:
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          type: string
+        case_stage:
+          $ref: '#/components/schemas/ns_CaseStage'
+        case_state:
+          example: ONBOARDING_NOT_STARTED
+          type: string
+        case_type:
+          example: CUSTOMER_ONBOARDING
+          type: string
+        customer:
+          $ref: '#/components/schemas/ns_Customer'
+        subjects:
+          items:
+            $ref: '#/components/schemas/ns_Subject'
+          type: array
+        webhook_type:
+          example: CASE_CREATED
+          type: string
+      required:
+      - account_identifier
+      - api_version
+      - case_identifier
+      - case_stage
+      - case_state
+      - case_type
+      - subjects
+      - webhook_type
       type: object
     ns_UpdatedWebhookConfigurationResponse:
       properties:
@@ -534,27 +810,34 @@ components:
       required:
       - identifier
       type: object
-    ns_TestResult:
+    ns_RiskScorePayload:
       properties:
-        response_type:
-          description: Server response type
+        categories_scores:
+          items:
+            $ref: '#/components/schemas/ns_RiskCategory'
+          type:
+          - array
+          - 'null'
+        level:
           enum:
-          - SUCCESS
-          - REDIRECTION
-          - CLIENT_REQUEST_ERROR
-          - SERVER_ERROR
-          - NO_RESPONSE
-          - OAUTH_CLIENT_REQUEST_ERROR
-          - OAUTH_SERVER_ERROR
-          - OAUTH_NO_RESPONSE
+          - LOW
+          - MEDIUM
+          - HIGH
+          - PROHIBITED
+          - SKIPPED
+          example: HIGH
           type: string
-        server_response_code:
-          description: Server response code
-          format: int32
-          type: integer
+        manual_override:
+          example: false
+          type: boolean
+        score:
+          example: 75
+          format: double
+          type: number
       required:
-      - response_type
-      - server_response_code
+      - level
+      - manual_override
+      - score
       type: object
     ns_CustomerScreeningOutput:
       properties:
@@ -570,35 +853,143 @@ components:
           - string
           - 'null'
       type: object
-    ns_CustomerCreationOutput:
+    ns_EvaluationResultV2JsonPayload:
       properties:
-        customer_identifier:
-          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        priority:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        scenario_identifier:
+          $ref: '#/components/schemas/ns_ScenarioIdentifierV2JsonPayload'
+        scenario_name:
           type:
           - string
           - 'null'
-        external_identifier:
-          example: your unique customer identifier
-          type:
-          - string
-          - 'null'
-      type: object
-    ns_WorkflowAlert:
-      properties:
-        identifier:
-          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        scenario_outcome:
+          example: HOLD
           type: string
       required:
-      - identifier
+      - scenario_identifier
+      - scenario_outcome
       type: object
-    ns_AlertingOutput:
+    ns_WebhookConfigurationLog:
       properties:
-        alerts:
-          items:
-            $ref: '#/components/schemas/ns_WorkflowAlert'
+        created_at:
+          description: The datetime that the webook notification configuration was created
+          example: '2022-01-31T14:27:24.000Z'
+          format: date-time
+          type: string
+        created_by:
+          description: The user who created the webhook notification configuration
+          example: 6de244da-11f8-479d-aec7-c4d2126b092e
+          format: uuid
+          type: string
+        identifier:
+          description: Identifier of the webhook notification configuration object
+          example: 6de244da-11f8-479d-aec7-c4d2126b092e
+          format: uuid
+          type: string
+        is_active:
+          description: The flag to make webhooks active or inactive
+          example: true
+          type: boolean
+        name:
+          description: The client provided name for the webhook configration
+          example: example name
+          type: string
+        type:
+          description: 'The type of webhook notification configuration being created.
+
+
+            CASE_STATE_UPDATED is deprecated (replaced by CASE_TRANSITIONED)'
+          enum:
+          - CASE_CREATED
+          - CASE_STATE_UPDATED
+          - CASE_TRANSITIONED
+          - WORKFLOW_COMPLETED
+          - CASE_ALERT_LIST_UPDATED
+          - CSOM_EMULATION_MATCH_STATUS_UPDATED
+          - CSOM_EMULATION_SEARCH_STATUS_UPDATED
+          - CSOM_EMULATION_MONITORED_SEARCH_UPDATED
+          - TRANSACTION_REVIEWED
+          - TRANSACTION_MONITORING_ASYNC_COMPLETED
+          - CUSTOMER_RISK_SCORE_CHANGED
+          - CUSTOMER_RISK_LEVEL_INCREASED
+          - CUSTOMER_RISK_LEVEL_DECREASED
+          example: CASE_CREATED
+          type: string
+        updated_at:
+          description: The datetime that the webhook notification configuration was last updated
+          example: '2022-01-31T14:27:24.000Z'
+          format: date-time
+          type: string
+        url:
+          description: The client side URL to send the webhooks to
+          example: https://www.example.org/hooks
+          format: url
+          type: string
+      required:
+      - created_at
+      - created_by
+      - identifier
+      - is_active
+      - name
+      - type
+      - updated_at
+      - url
+      type: object
+    ns_InitialRiskScoringStep:
+      properties:
+        error_message:
           type:
-          - array
+          - string
           - 'null'
+        identifier:
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          type:
+          - string
+          - 'null'
+        status:
+          example: COMPLETED
+          type: string
+        step_output:
+          $ref: '#/components/schemas/ns_InitialRiskScoringOutput'
+      required:
+      - status
+      - step_output
+      type: object
+    ns_CaseCreationStep:
+      properties:
+        error_message:
+          type:
+          - string
+          - 'null'
+        identifier:
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          type:
+          - string
+          - 'null'
+        status:
+          example: COMPLETED
+          type: string
+        step_output:
+          $ref: '#/components/schemas/ns_CaseCreationOutput'
+      required:
+      - status
+      - step_output
+      type: object
+    ns_TestWebhookResponse:
+      properties:
+        identifier:
+          description: Test webhook unique identifier
+          format: uuid
+          type: string
+        test_result:
+          $ref: '#/components/schemas/ns_TestResult'
+      required:
+      - identifier
+      - test_result
       type: object
     ns_CaseAlertListUpdatedV2JsonPayload:
       properties:
@@ -673,201 +1064,83 @@ components:
       - self
       - webhook_notification_configurations
       type: object
-    ns_Customer:
+    ns_WebhookTestPayload:
       properties:
-        external_identifier:
-          example: your unique customer identifier
-          type:
-          - string
-          - 'null'
-        identifier:
-          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-          type:
-          - string
-          - 'null'
-        version:
-          example: 1
-          format: int32
-          type:
-          - integer
-          - 'null'
-      type: object
-    ns_WebhookConfigurationLog:
-      properties:
-        created_at:
-          description: The datetime that the webook notification configuration was created
-          example: '2022-01-31T14:27:24.000Z'
-          format: date-time
-          type: string
-        created_by:
-          description: The user who created the webhook notification configuration
-          example: 6de244da-11f8-479d-aec7-c4d2126b092e
-          format: uuid
-          type: string
-        identifier:
-          description: Identifier of the webhook notification configuration object
-          example: 6de244da-11f8-479d-aec7-c4d2126b092e
-          format: uuid
-          type: string
-        is_active:
-          description: The flag to make webhooks active or inactive
-          example: true
-          type: boolean
-        name:
-          description: The client provided name for the webhook configration
-          example: example name
-          type: string
-        type:
-          description: 'The type of webhook notification configuration being created.
-
-
-            CASE_STATE_UPDATED is deprecated (replaced by CASE_TRANSITIONED)'
-          enum:
-          - CASE_CREATED
-          - CASE_STATE_UPDATED
-          - CASE_TRANSITIONED
-          - WORKFLOW_COMPLETED
-          - CASE_ALERT_LIST_UPDATED
-          - CSOM_EMULATION_MATCH_STATUS_UPDATED
-          - CSOM_EMULATION_SEARCH_STATUS_UPDATED
-          - CSOM_EMULATION_MONITORED_SEARCH_UPDATED
-          - TRANSACTION_REVIEWED
-          - TRANSACTION_MONITORING_ASYNC_COMPLETED
-          - CUSTOMER_RISK_SCORE_CHANGED
-          - CUSTOMER_RISK_LEVEL_INCREASED
-          - CUSTOMER_RISK_LEVEL_DECREASED
-          example: CASE_CREATED
-          type: string
-        updated_at:
-          description: The datetime that the webhook notification configuration was last updated
-          example: '2022-01-31T14:27:24.000Z'
-          format: date-time
-          type: string
         url:
-          description: The client side URL to send the webhooks to
-          example: https://www.example.org/hooks
-          format: url
+          description: The URL you want the example payload sent to.
+          example: https://example.com/webhook-receive
           type: string
       required:
-      - created_at
-      - created_by
-      - identifier
-      - is_active
-      - name
-      - type
-      - updated_at
       - url
       type: object
-    ns_CustomerScreeningStep:
-      properties:
-        error_message:
-          type:
-          - string
-          - 'null'
-        identifier:
-          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-          type:
-          - string
-          - 'null'
-        status:
-          example: COMPLETED
-          type: string
-        step_output:
-          $ref: '#/components/schemas/ns_CustomerScreeningOutput'
-      required:
-      - status
-      - step_output
-      type: object
-    ns_CaseCreatedJsonPayloadV2:
+    ns_CustomerRiskScoreDataUpdateV3JsonPayload:
       properties:
         account_identifier:
           example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
           type: string
         api_version:
-          example: v2
+          example: v3
           type: string
-        case_identifier:
+        customer_external_identifier:
           example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
           type: string
-        case_stage:
-          $ref: '#/components/schemas/ns_CaseStage'
-        case_state:
-          example: ONBOARDING_NOT_STARTED
-          type: string
-        case_type:
-          example: CUSTOMER_ONBOARDING
-          type: string
-        customer:
-          $ref: '#/components/schemas/ns_Customer'
-        subjects:
-          items:
-            $ref: '#/components/schemas/ns_Subject'
-          type: array
+        previous_risk_score:
+          $ref: '#/components/schemas/ns_RiskScorePayload'
+        risk_score:
+          $ref: '#/components/schemas/ns_RiskScorePayload'
         webhook_type:
-          example: CASE_CREATED
+          example: CUSTOMER_RISK_SCORE_CHANGED
           type: string
       required:
       - account_identifier
       - api_version
-      - case_identifier
-      - case_stage
-      - case_state
-      - case_type
-      - subjects
+      - customer_external_identifier
+      - risk_score
       - webhook_type
       type: object
-    ns_RiskCategory:
+    ns_ProblemDetailErrorResponse:
+      additionalProperties: true
       properties:
-        category_type:
-          enum:
-          - BASIC_INFORMATION
-          - AML
-          - COUNTRY
-          - PRODUCT
-          - CHANNEL
-          - NGD_RISK
-          - CUSTOM_FIELDS
-          type: string
-        level:
-          enum:
-          - LOW
-          - MEDIUM
-          - HIGH
-          - PROHIBITED
-          - SKIPPED
-          example: MEDIUM
-          type: string
-        risk_attributes:
-          items:
-            $ref: '#/components/schemas/ns_RiskAttribute'
-          type: array
-        score:
-          example: 30
-          format: double
-          type: number
-        weight:
-          example: 0.5
-          format: double
-          type: number
-      required:
-      - category_type
-      - level
-      - risk_attributes
-      - score
-      - weight
-      type: object
-    ns_InitialRiskScoringOutput:
-      properties:
-        overall_level:
-          example: LOW-RISK
+        detail:
           type:
           - string
           - 'null'
-        overall_value:
-          example: 0
-          format: double
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
           type:
-          - number
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
+    ns_AlertingOutput:
+      properties:
+        alerts:
+          items:
+            $ref: '#/components/schemas/ns_WorkflowAlert'
+          type:
+          - array
           - 'null'
       type: object
     ns_CaseTransitionedV2JsonPayload:
@@ -910,287 +1183,29 @@ components:
       - subjects
       - webhook_type
       type: object
-    ns_WorkflowStepDetails:
+    ns_RiskAttribute:
       properties:
-        alerting:
-          $ref: '#/components/schemas/ns_AlertingStep'
-        case-creation:
-          $ref: '#/components/schemas/ns_CaseCreationStep'
-        customer-creation:
-          $ref: '#/components/schemas/ns_CustomerCreationStep'
-        customer-screening:
-          $ref: '#/components/schemas/ns_CustomerScreeningStep'
-        initial-risk-scoring:
-          $ref: '#/components/schemas/ns_InitialRiskScoringStep'
-      type: object
-    ns_CaseCreationStep:
-      properties:
-        error_message:
-          type:
-          - string
-          - 'null'
-        identifier:
-          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-          type:
-          - string
-          - 'null'
-        status:
-          example: COMPLETED
-          type: string
-        step_output:
-          $ref: '#/components/schemas/ns_CaseCreationOutput'
-      required:
-      - status
-      - step_output
-      type: object
-    ns_TestWebhookResponse:
-      properties:
-        identifier:
-          description: Test webhook unique identifier
-          format: uuid
-          type: string
-        test_result:
-          $ref: '#/components/schemas/ns_TestResult'
-      required:
-      - identifier
-      - test_result
-      type: object
-    ns_ScenarioEvaluationV2JsonPayload:
-      properties:
-        evaluation_results:
+        fields:
           items:
-            $ref: '#/components/schemas/ns_EvaluationResultV2JsonPayload'
-          type: array
-        scenario_configuration_id:
-          format: uuid
-          type: string
-      required:
-      - evaluation_results
-      - scenario_configuration_id
-      type: object
-    ns_CaseStage:
-      properties:
-        decision_type:
-          example: POSITIVE
-          type:
-          - string
-          - 'null'
-        display_name:
-          example: Not Started
-          type: string
-        display_order:
-          example: 1
-          format: int32
-          type: integer
-        identifier:
-          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-          type: string
-        stage_type:
-          example: INITIAL
-          type: string
-      required:
-      - display_name
-      - display_order
-      - identifier
-      - stage_type
-      type: object
-    ns_CustomerRiskScoreDataUpdateV3JsonPayload:
-      properties:
-        account_identifier:
-          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-          type: string
-        api_version:
-          example: v3
-          type: string
-        customer_external_identifier:
-          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-          type: string
-        previous_risk_score:
-          $ref: '#/components/schemas/ns_RiskScorePayload'
-        risk_score:
-          $ref: '#/components/schemas/ns_RiskScorePayload'
-        webhook_type:
-          example: CUSTOMER_RISK_SCORE_CHANGED
-          type: string
-      required:
-      - account_identifier
-      - api_version
-      - customer_external_identifier
-      - risk_score
-      - webhook_type
-      type: object
-    ns_AlertingStep:
-      properties:
-        error_message:
-          type:
-          - string
-          - 'null'
-        identifier:
-          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-          type:
-          - string
-          - 'null'
-        status:
-          example: COMPLETED
-          type: string
-        step_output:
-          $ref: '#/components/schemas/ns_AlertingOutput'
-      required:
-      - status
-      - step_output
-      type: object
-    ns_ProblemDetailErrorResponse:
-      additionalProperties: true
-      properties:
-        detail:
-          type:
-          - string
-          - 'null'
-        identifier:
-          format: uuid
-          type: string
-        instance:
-          format: uri
-          type:
-          - string
-          - 'null'
-        status:
-          format: int32
-          type:
-          - integer
-          - 'null'
-        timestamp:
-          format: date-time
-          type: string
-        title:
-          type:
-          - string
-          - 'null'
-        type:
-          format: uri
-          type:
-          - string
-          - 'null'
-      required:
-      - identifier
-      - timestamp
-      type: object
-    ns_TransactionReviewedV3JsonPayload:
-      properties:
-        account_identifier:
-          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-          type: string
-        api_version:
-          example: v3
-          type: string
-        evaluation_outcome:
-          example: HOLD
-          type: string
-        review_decision:
-          example: RELEASE
-          type: string
-        transaction_external_identifier:
-          example: your unique transaction identifier
-          type: string
-        transaction_identifier:
-          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-          type: string
-        webhook_type:
-          example: TRANSACTION_REVIEWED
-          type: string
-      required:
-      - account_identifier
-      - api_version
-      - evaluation_outcome
-      - review_decision
-      - transaction_external_identifier
-      - transaction_identifier
-      - webhook_type
-      type: object
-    ns_EvaluationResultV2JsonPayload:
-      properties:
-        priority:
-          format: int32
-          type:
-          - integer
-          - 'null'
-        scenario_identifier:
-          $ref: '#/components/schemas/ns_ScenarioIdentifierV2JsonPayload'
-        scenario_name:
-          type:
-          - string
-          - 'null'
-        scenario_outcome:
-          example: HOLD
-          type: string
-      required:
-      - scenario_identifier
-      - scenario_outcome
-      type: object
-    ns_WebhookTestPayload:
-      properties:
-        url:
-          description: The URL you want the example payload sent to.
-          example: https://example.com/webhook-receive
-          type: string
-      required:
-      - url
-      type: object
-    ns_CaseNote:
-      properties:
-        contents:
-          type: string
-      required:
-      - contents
-      type: object
-    ns_RiskScorePayload:
-      properties:
-        categories_scores:
-          items:
-            $ref: '#/components/schemas/ns_RiskCategory'
+            $ref: '#/components/schemas/ns_RiskAttribute'
           type:
           - array
           - 'null'
-        level:
-          enum:
-          - LOW
-          - MEDIUM
-          - HIGH
-          - PROHIBITED
-          - SKIPPED
-          example: HIGH
+        name:
+          example: country_of_residence
           type: string
-        manual_override:
-          example: false
-          type: boolean
+        parameter:
+          example: PT
+          type:
+          - string
+          - 'null'
         score:
-          example: 75
+          example: 30
           format: double
           type: number
       required:
-      - level
-      - manual_override
+      - name
       - score
-      type: object
-    ns_InitialRiskScoringStep:
-      properties:
-        error_message:
-          type:
-          - string
-          - 'null'
-        identifier:
-          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-          type:
-          - string
-          - 'null'
-        status:
-          example: COMPLETED
-          type: string
-        step_output:
-          $ref: '#/components/schemas/ns_InitialRiskScoringOutput'
-      required:
-      - status
-      - step_output
       type: object
     ns_WebhookConfigurationPayload:
       properties:
@@ -1231,6 +1246,45 @@ components:
       - type
       - url
       type: object
+    ns_WorkflowStepDetails:
+      properties:
+        alerting:
+          $ref: '#/components/schemas/ns_AlertingStep'
+        case-creation:
+          $ref: '#/components/schemas/ns_CaseCreationStep'
+        customer-creation:
+          $ref: '#/components/schemas/ns_CustomerCreationStep'
+        customer-screening:
+          $ref: '#/components/schemas/ns_CustomerScreeningStep'
+        initial-risk-scoring:
+          $ref: '#/components/schemas/ns_InitialRiskScoringStep'
+      type: object
+    ns_CaseStage:
+      properties:
+        decision_type:
+          example: POSITIVE
+          type:
+          - string
+          - 'null'
+        display_name:
+          example: Not Started
+          type: string
+        display_order:
+          example: 1
+          format: int32
+          type: integer
+        identifier:
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          type: string
+        stage_type:
+          example: INITIAL
+          type: string
+      required:
+      - display_name
+      - display_order
+      - identifier
+      - stage_type
+      type: object
     ns_CaseCreationOutput:
       properties:
         case_identifier:
@@ -1238,60 +1292,6 @@ components:
           type:
           - string
           - 'null'
-      type: object
-    ns_WorkflowCompletedV2JsonPayload:
-      properties:
-        account_identifier:
-          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-          type: string
-        api_version:
-          example: v2
-          type: string
-        status:
-          example: COMPLETED
-          type: string
-        step_details:
-          $ref: '#/components/schemas/ns_WorkflowStepDetails'
-        steps:
-          example:
-          - customer-creation
-          - initial-risk-scoring
-          - customer-screening
-          - alerting
-          items:
-            example: '["customer-creation","initial-risk-scoring","customer-screening","alerting"]'
-            type: string
-          type: array
-        webhook_type:
-          example: WORKFLOW_COMPLETED
-          type: string
-        workflow_instance_identifier:
-          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-          type: string
-        workflow_type:
-          example: create-and-screen
-          type: string
-      required:
-      - account_identifier
-      - api_version
-      - status
-      - step_details
-      - steps
-      - webhook_type
-      - workflow_instance_identifier
-      - workflow_type
-      type: object
-    ns_ScenarioIdentifierV2JsonPayload:
-      properties:
-        scenario_id:
-          format: uuid
-          type: string
-        version:
-          format: int64
-          type: integer
-      required:
-      - scenario_id
-      - version
       type: object
   securitySchemes:
     BearerAuth:

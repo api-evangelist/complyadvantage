@@ -115,17 +115,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 components:
-  parameters:
-    SearchId:
-      name: id
-      in: path
-      required: true
-      schema:
-        type: string
-      description: The search ID or ref.
-  responses:
-    NotFound:
-      description: The search or resource was not found.
   schemas:
     MonitorEnvelope:
       type: object
@@ -137,6 +126,17 @@ components:
           properties:
             is_monitored:
               type: boolean
+  responses:
+    NotFound:
+      description: The search or resource was not found.
+  parameters:
+    SearchId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: The search ID or ref.
   securitySchemes:
     apiKeyAuth:
       type: apiKey

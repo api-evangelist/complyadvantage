@@ -164,53 +164,16 @@ paths:
       - Screening Configurations
 components:
   schemas:
-    sra_CreateConfigurationRequest:
-      description: Create configuration request containing a change reason and a screening configuration with multiple collections.
+    sra_ListConfigurationsResponse:
+      description: The response object containing a list of screening configurations.
       properties:
-        change_reason:
-          description: The reason for the change/creation. Defaults to "Initial creation"
+        configurations:
+          description: The list of screening configurations.
+          items:
+            $ref: '#/components/schemas/sra_ScreeningConfiguration'
           type:
-          - string
+          - array
           - 'null'
-        configuration:
-          $ref: '#/components/schemas/sra_Configuration'
-      type: object
-    sra_ScreeningConfigurationVersion:
-      description: The list of configuration versions.
-      properties:
-        change_reason:
-          type:
-          - string
-          - 'null'
-        created_at:
-          type:
-          - string
-          - 'null'
-        created_by:
-          format: uuid
-          type:
-          - string
-          - 'null'
-        name:
-          type:
-          - string
-          - 'null'
-        version:
-          format: int32
-          type:
-          - integer
-          - 'null'
-      type: object
-    sra_UpdateConfigurationRequest:
-      description: Update configuration request containing a change reason and a screening configuration with multiple collections.
-      properties:
-        change_reason:
-          description: The reason for the change.
-          type:
-          - string
-          - 'null'
-        configuration:
-          $ref: '#/components/schemas/sra_Configuration'
       type: object
     sra_ListConfigurationVersionsResponse:
       description: The response object containing a list of configuration versions.
@@ -222,6 +185,17 @@ components:
           type:
           - array
           - 'null'
+      type: object
+    sra_CreateConfigurationRequest:
+      description: Create configuration request containing a change reason and a screening configuration with multiple collections.
+      properties:
+        change_reason:
+          description: The reason for the change/creation. Defaults to "Initial creation"
+          type:
+          - string
+          - 'null'
+        configuration:
+          $ref: '#/components/schemas/sra_Configuration'
       type: object
     sra_ProblemDetailErrorResponse:
       additionalProperties: true
@@ -324,6 +298,43 @@ components:
       - name
       - results_limit
       - source_collections
+      type: object
+    sra_ScreeningConfigurationVersion:
+      description: The list of configuration versions.
+      properties:
+        change_reason:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type:
+          - string
+          - 'null'
+        created_by:
+          format: uuid
+          type:
+          - string
+          - 'null'
+        name:
+          type:
+          - string
+          - 'null'
+        version:
+          format: int32
+          type:
+          - integer
+          - 'null'
+      type: object
+    sra_UpdateConfigurationRequest:
+      description: Update configuration request containing a change reason and a screening configuration with multiple collections.
+      properties:
+        change_reason:
+          description: The reason for the change.
+          type:
+          - string
+          - 'null'
+        configuration:
+          $ref: '#/components/schemas/sra_Configuration'
       type: object
     sra_ScreeningConfiguration:
       description: The response schema for a screening configuration.
@@ -436,17 +447,6 @@ components:
       - name
       - options
       - source_identifiers
-      type: object
-    sra_ListConfigurationsResponse:
-      description: The response object containing a list of screening configurations.
-      properties:
-        configurations:
-          description: The list of screening configurations.
-          items:
-            $ref: '#/components/schemas/sra_ScreeningConfiguration'
-          type:
-          - array
-          - 'null'
       type: object
   securitySchemes:
     BearerAuth:

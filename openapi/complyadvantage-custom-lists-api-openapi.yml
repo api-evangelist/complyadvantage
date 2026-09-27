@@ -573,228 +573,6 @@ paths:
       - Custom Lists
 components:
   schemas:
-    customlist_PersonDTO:
-      properties:
-        addresses:
-          items:
-            $ref: '#/components/schemas/customlist_AddressDTO'
-          type: array
-          uniqueItems: true
-        date_of_birth:
-          format: date
-          type:
-          - string
-          - 'null'
-        identifiers:
-          items:
-            $ref: '#/components/schemas/customlist_IdentifierDTO'
-          type: array
-          uniqueItems: true
-        names:
-          $ref: '#/components/schemas/customlist_PersonNamesDTO'
-        nationalities:
-          description: 2 letter country code as defined by iso-3166-alpha-2
-          format: iso-3166-alpha-2
-          items:
-            description: 2 letter country code as defined by iso-3166-alpha-2
-            format: iso-3166-alpha-2
-            type: string
-          type: array
-          uniqueItems: true
-      required:
-      - addresses
-      - identifiers
-      - names
-      - nationalities
-      type: object
-    customlist_CustomListAddDTO:
-      properties:
-        description:
-          type: string
-        name:
-          type: string
-        type:
-          enum:
-          - CUSTOM_ENTITY
-          - RISK_WORD
-          type: string
-      required:
-      - description
-      - name
-      - type
-      type: object
-    customlist_CustomListPageDTO:
-      properties:
-        first:
-          type: string
-        lists:
-          items:
-            $ref: '#/components/schemas/customlist_CustomListDTO'
-          type: array
-        next:
-          type:
-          - string
-          - 'null'
-        prev:
-          type:
-          - string
-          - 'null'
-        self:
-          type: string
-      required:
-      - first
-      - lists
-      - self
-      type: object
-    customlist_RiskWordAddDTO:
-      properties:
-        identifier:
-          type: string
-        word:
-          maxLength: 256
-          minLength: 0
-          type: string
-      required:
-      - identifier
-      - word
-      type: object
-    customlist_CompanyDTO:
-      properties:
-        addresses:
-          items:
-            $ref: '#/components/schemas/customlist_AddressDTO'
-          type: array
-          uniqueItems: true
-        legal_forms:
-          items:
-            type: string
-          type: array
-          uniqueItems: true
-        names:
-          $ref: '#/components/schemas/customlist_CompanyNamesDTO'
-        registration_numbers:
-          items:
-            type: string
-          type: array
-          uniqueItems: true
-      required:
-      - addresses
-      - legal_forms
-      - names
-      - registration_numbers
-      type: object
-    customlist_EntityDTO:
-      properties:
-        additional_information:
-          type:
-          - string
-          - 'null'
-        archived_at:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        company:
-          $ref: '#/components/schemas/customlist_CompanyDTO'
-        custom_list_id:
-          format: uuid
-          type: string
-        id:
-          type: string
-        last_updated:
-          $ref: '#/components/schemas/customlist_AuditDTO'
-        narrative:
-          type:
-          - string
-          - 'null'
-        person:
-          $ref: '#/components/schemas/customlist_PersonDTO'
-        url:
-          type:
-          - string
-          - 'null'
-        version:
-          format: int32
-          type: integer
-      required:
-      - custom_list_id
-      - id
-      - last_updated
-      - version
-      type: object
-    customlist_PersonNamesDTO:
-      properties:
-        aliases:
-          items:
-            $ref: '#/components/schemas/customlist_PersonNameDTO'
-          type:
-          - array
-          - 'null'
-          uniqueItems: true
-        primary_name:
-          $ref: '#/components/schemas/customlist_PersonNameDTO'
-      required:
-      - primary_name
-      type: object
-    customlist_CompanyNamesDTO:
-      properties:
-        aliases:
-          items:
-            type: string
-          type:
-          - array
-          - 'null'
-          uniqueItems: true
-        legal:
-          type: string
-        trading:
-          items:
-            type: string
-          type:
-          - array
-          - 'null'
-          uniqueItems: true
-      required:
-      - legal
-      type: object
-    customlist_EntityAddDTO:
-      properties:
-        additional_information:
-          type:
-          - string
-          - 'null'
-        company:
-          $ref: '#/components/schemas/customlist_CompanyAddDTO'
-        id:
-          type: string
-        narrative:
-          type:
-          - string
-          - 'null'
-        person:
-          $ref: '#/components/schemas/customlist_PersonAddDTO'
-        url:
-          type:
-          - string
-          - 'null'
-      required:
-      - id
-      type: object
-    customlist_AuditDTO:
-      properties:
-        issued_at:
-          format: date-time
-          type: string
-        issued_by:
-          format: uuid
-          type: string
-        reason:
-          type: string
-      required:
-      - issued_at
-      - issued_by
-      - reason
-      type: object
     customlist_AddressDTO:
       properties:
         address_line1:
@@ -841,6 +619,221 @@ components:
           - string
           - 'null'
       type: object
+    customlist_RiskWordAddDTO:
+      properties:
+        identifier:
+          type: string
+        word:
+          maxLength: 256
+          minLength: 0
+          type: string
+      required:
+      - identifier
+      - word
+      type: object
+    customlist_PersonNamesDTO:
+      properties:
+        aliases:
+          items:
+            $ref: '#/components/schemas/customlist_PersonNameDTO'
+          type:
+          - array
+          - 'null'
+          uniqueItems: true
+        primary_name:
+          $ref: '#/components/schemas/customlist_PersonNameDTO'
+      required:
+      - primary_name
+      type: object
+    customlist_CompanyDTO:
+      properties:
+        addresses:
+          items:
+            $ref: '#/components/schemas/customlist_AddressDTO'
+          type: array
+          uniqueItems: true
+        legal_forms:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        names:
+          $ref: '#/components/schemas/customlist_CompanyNamesDTO'
+        registration_numbers:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+      required:
+      - addresses
+      - legal_forms
+      - names
+      - registration_numbers
+      type: object
+    customlist_RiskWordDTO:
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        created_by:
+          format: uuid
+          type: string
+        identifier:
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+        updated_by:
+          format: uuid
+          type:
+          - string
+          - 'null'
+        word:
+          type: string
+      required:
+      - created_at
+      - created_by
+      - identifier
+      - updated_at
+      - word
+      type: object
+    customlist_EntityAddDTO:
+      properties:
+        additional_information:
+          type:
+          - string
+          - 'null'
+        company:
+          $ref: '#/components/schemas/customlist_CompanyAddDTO'
+        id:
+          type: string
+        narrative:
+          type:
+          - string
+          - 'null'
+        person:
+          $ref: '#/components/schemas/customlist_PersonAddDTO'
+        url:
+          type:
+          - string
+          - 'null'
+      required:
+      - id
+      type: object
+    customlist_CustomListAddDTO:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        type:
+          enum:
+          - CUSTOM_ENTITY
+          - RISK_WORD
+          type: string
+      required:
+      - description
+      - name
+      - type
+      type: object
+    customlist_PersonDTO:
+      properties:
+        addresses:
+          items:
+            $ref: '#/components/schemas/customlist_AddressDTO'
+          type: array
+          uniqueItems: true
+        date_of_birth:
+          format: date
+          type:
+          - string
+          - 'null'
+        identifiers:
+          items:
+            $ref: '#/components/schemas/customlist_IdentifierDTO'
+          type: array
+          uniqueItems: true
+        names:
+          $ref: '#/components/schemas/customlist_PersonNamesDTO'
+        nationalities:
+          description: 2 letter country code as defined by iso-3166-alpha-2
+          format: iso-3166-alpha-2
+          items:
+            description: 2 letter country code as defined by iso-3166-alpha-2
+            format: iso-3166-alpha-2
+            type: string
+          type: array
+          uniqueItems: true
+      required:
+      - addresses
+      - identifiers
+      - names
+      - nationalities
+      type: object
+    customlist_AuditDTO:
+      properties:
+        issued_at:
+          format: date-time
+          type: string
+        issued_by:
+          format: uuid
+          type: string
+        reason:
+          type: string
+      required:
+      - issued_at
+      - issued_by
+      - reason
+      type: object
+    customlist_CompanyNamesDTO:
+      properties:
+        aliases:
+          items:
+            type: string
+          type:
+          - array
+          - 'null'
+          uniqueItems: true
+        legal:
+          type: string
+        trading:
+          items:
+            type: string
+          type:
+          - array
+          - 'null'
+          uniqueItems: true
+      required:
+      - legal
+      type: object
+    customlist_CompanyAddDTO:
+      properties:
+        addresses:
+          items:
+            $ref: '#/components/schemas/customlist_AddressDTO'
+          type:
+          - array
+          - 'null'
+          uniqueItems: true
+        legal_forms:
+          items:
+            type: string
+          type:
+          - array
+          - 'null'
+          uniqueItems: true
+        names:
+          $ref: '#/components/schemas/customlist_CompanyNamesDTO'
+        registration_numbers:
+          items:
+            type: string
+          type:
+          - array
+          - 'null'
+          uniqueItems: true
+      required:
+      - names
+      type: object
     customlist_CustomListDTO:
       properties:
         archived_at:
@@ -874,97 +867,6 @@ components:
       - last_updated
       - name
       - type
-      type: object
-    customlist_ProblemDetailErrorResponse:
-      additionalProperties: true
-      properties:
-        detail:
-          type:
-          - string
-          - 'null'
-        identifier:
-          format: uuid
-          type: string
-        instance:
-          format: uri
-          type:
-          - string
-          - 'null'
-        status:
-          format: int32
-          type:
-          - integer
-          - 'null'
-        timestamp:
-          format: date-time
-          type: string
-        title:
-          type:
-          - string
-          - 'null'
-        type:
-          format: uri
-          type:
-          - string
-          - 'null'
-      required:
-      - identifier
-      - timestamp
-      type: object
-    customlist_RiskWordDTO:
-      properties:
-        created_at:
-          format: date-time
-          type: string
-        created_by:
-          format: uuid
-          type: string
-        identifier:
-          type: string
-        updated_at:
-          format: date-time
-          type: string
-        updated_by:
-          format: uuid
-          type:
-          - string
-          - 'null'
-        word:
-          type: string
-      required:
-      - created_at
-      - created_by
-      - identifier
-      - updated_at
-      - word
-      type: object
-    customlist_PersonNameDTO:
-      description: "\nA name will be considered valid if:\n- full_name is set and the other fields are not\n- first_name, middle_names and last_name are set and full_name is not set\n- first_name and last_name are the only fields with a value\nAny other combination will be considered invalid\n    "
-      properties:
-        first_name:
-          type:
-          - string
-          - 'null'
-        full_name:
-          type:
-          - string
-          - 'null'
-        last_name:
-          type:
-          - string
-          - 'null'
-        middle_names:
-          type:
-          - string
-          - 'null'
-      type: object
-    customlist_EntitiesCountDTO:
-      properties:
-        active_count:
-          format: int32
-          type: integer
-      required:
-      - active_count
       type: object
     customlist_PersonAddDTO:
       properties:
@@ -1005,33 +907,64 @@ components:
       required:
       - names
       type: object
-    customlist_CompanyAddDTO:
+    customlist_EntityDTO:
       properties:
-        addresses:
-          items:
-            $ref: '#/components/schemas/customlist_AddressDTO'
+        additional_information:
           type:
-          - array
+          - string
           - 'null'
-          uniqueItems: true
-        legal_forms:
-          items:
-            type: string
+        archived_at:
+          format: date-time
           type:
-          - array
+          - string
           - 'null'
-          uniqueItems: true
-        names:
-          $ref: '#/components/schemas/customlist_CompanyNamesDTO'
-        registration_numbers:
-          items:
-            type: string
+        company:
+          $ref: '#/components/schemas/customlist_CompanyDTO'
+        custom_list_id:
+          format: uuid
+          type: string
+        id:
+          type: string
+        last_updated:
+          $ref: '#/components/schemas/customlist_AuditDTO'
+        narrative:
           type:
-          - array
+          - string
           - 'null'
-          uniqueItems: true
+        person:
+          $ref: '#/components/schemas/customlist_PersonDTO'
+        url:
+          type:
+          - string
+          - 'null'
+        version:
+          format: int32
+          type: integer
       required:
-      - names
+      - custom_list_id
+      - id
+      - last_updated
+      - version
+      type: object
+    customlist_PersonNameDTO:
+      description: "\nA name will be considered valid if:\n- full_name is set and the other fields are not\n- first_name, middle_names and last_name are set and full_name is not set\n- first_name and last_name are the only fields with a value\nAny other combination will be considered invalid\n    "
+      properties:
+        first_name:
+          type:
+          - string
+          - 'null'
+        full_name:
+          type:
+          - string
+          - 'null'
+        last_name:
+          type:
+          - string
+          - 'null'
+        middle_names:
+          type:
+          - string
+          - 'null'
       type: object
     customlist_IdentifierDTO:
       properties:
@@ -1045,6 +978,73 @@ components:
       required:
       - type
       - value
+      type: object
+    customlist_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
+    customlist_CustomListPageDTO:
+      properties:
+        first:
+          type: string
+        lists:
+          items:
+            $ref: '#/components/schemas/customlist_CustomListDTO'
+          type: array
+        next:
+          type:
+          - string
+          - 'null'
+        prev:
+          type:
+          - string
+          - 'null'
+        self:
+          type: string
+      required:
+      - first
+      - lists
+      - self
+      type: object
+    customlist_EntitiesCountDTO:
+      properties:
+        active_count:
+          format: int32
+          type: integer
+      required:
+      - active_count
       type: object
   securitySchemes:
     BearerAuth:

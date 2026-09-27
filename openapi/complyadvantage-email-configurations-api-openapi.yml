@@ -296,18 +296,95 @@ paths:
       - Email Configurations
 components:
   schemas:
-    ns_TestEmailResponse:
+    ns_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
+    ns_DeletedEmailConfigurationResponse:
       properties:
         identifier:
-          description: Test email unique identifier
+          description: Email configuration unique identifier
           example: 6de244da-11f8-479d-aec7-c4d2126b092e
           format: uuid
           type: string
-        test_result:
-          $ref: '#/components/schemas/ns_TestEmailResult'
       required:
       - identifier
-      - test_result
+      type: object
+    ns_TestEmailResult:
+      description: Response from the SMTP email server on the attempt to send
+      properties:
+        response_type:
+          description: Type of response
+          enum:
+          - SUCCESS
+          - SERVER_ERROR
+          example: SUCCESS
+          format: String
+          type: string
+        server_response_code:
+          description: SMTP server response
+          example: 200
+          format: int32
+          type:
+          - integer
+          - 'null'
+      required:
+      - response_type
+      type: object
+    ns_EnabledFor:
+      description: Lists of user and role identifiers the email will be sent to
+      properties:
+        roles:
+          description: List of role identifiers the email will be sent to
+          format: uuid
+          items:
+            description: List of role identifiers the email will be sent to
+            format: uuid
+            type: string
+          type: array
+        users:
+          description: List of user identifiers the email will be sent to
+          format: uuid
+          items:
+            description: List of user identifiers the email will be sent to
+            format: uuid
+            type: string
+          type: array
+      required:
+      - roles
+      - users
       type: object
     ns_UpdateEmailConfigurationPayload:
       properties:
@@ -354,28 +431,18 @@ components:
       - self
       - email_notification_configurations
       type: object
-    ns_EnabledFor:
-      description: Lists of user and role identifiers the email will be sent to
+    ns_TestEmailResponse:
       properties:
-        roles:
-          description: List of role identifiers the email will be sent to
+        identifier:
+          description: Test email unique identifier
+          example: 6de244da-11f8-479d-aec7-c4d2126b092e
           format: uuid
-          items:
-            description: List of role identifiers the email will be sent to
-            format: uuid
-            type: string
-          type: array
-        users:
-          description: List of user identifiers the email will be sent to
-          format: uuid
-          items:
-            description: List of user identifiers the email will be sent to
-            format: uuid
-            type: string
-          type: array
+          type: string
+        test_result:
+          $ref: '#/components/schemas/ns_TestEmailResult'
       required:
-      - roles
-      - users
+      - identifier
+      - test_result
       type: object
     ns_EmailConfigurationLog:
       properties:
@@ -415,72 +482,15 @@ components:
       - type
       - updated_at
       type: object
-    ns_DeletedEmailConfigurationResponse:
+    ns_EmailTestPayload:
       properties:
-        identifier:
-          description: Email configuration unique identifier
-          example: 6de244da-11f8-479d-aec7-c4d2126b092e
-          format: uuid
+        email:
+          description: The recipient email address to which the test email will be sent.
+          example: me@complyadvantage.com
+          format: email
           type: string
       required:
-      - identifier
-      type: object
-    ns_TestEmailResult:
-      description: Response from the SMTP email server on the attempt to send
-      properties:
-        response_type:
-          description: Type of response
-          enum:
-          - SUCCESS
-          - SERVER_ERROR
-          example: SUCCESS
-          format: String
-          type: string
-        server_response_code:
-          description: SMTP server response
-          example: 200
-          format: int32
-          type:
-          - integer
-          - 'null'
-      required:
-      - response_type
-      type: object
-    ns_ProblemDetailErrorResponse:
-      additionalProperties: true
-      properties:
-        detail:
-          type:
-          - string
-          - 'null'
-        identifier:
-          format: uuid
-          type: string
-        instance:
-          format: uri
-          type:
-          - string
-          - 'null'
-        status:
-          format: int32
-          type:
-          - integer
-          - 'null'
-        timestamp:
-          format: date-time
-          type: string
-        title:
-          type:
-          - string
-          - 'null'
-        type:
-          format: uri
-          type:
-          - string
-          - 'null'
-      required:
-      - identifier
-      - timestamp
+      - email
       type: object
     ns_EmailConfigurationPayload:
       properties:
@@ -495,16 +505,6 @@ components:
           - 'null'
       required:
       - enabled_for
-      type: object
-    ns_EmailTestPayload:
-      properties:
-        email:
-          description: The recipient email address to which the test email will be sent.
-          example: me@complyadvantage.com
-          format: email
-          type: string
-      required:
-      - email
       type: object
   securitySchemes:
     BearerAuth:

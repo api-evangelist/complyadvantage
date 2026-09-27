@@ -285,13 +285,19 @@ components:
       - self
       - batches
       type: object
-    bulk_BatchReport:
+    bulk_RowError:
       properties:
-        workflows_download_link:
-          format: url
-          type:
-          - string
-          - 'null'
+        errors:
+          items:
+            $ref: '#/components/schemas/bulk_RowErrorMessage'
+          type: array
+          uniqueItems: true
+        row_number:
+          format: int64
+          type: integer
+      required:
+      - errors
+      - row_number
       type: object
     bulk_ErrorAttributes:
       properties:
@@ -347,48 +353,6 @@ components:
       - required_format
       - required_formats
       type: object
-    bulk_FileError:
-      properties:
-        attributes:
-          $ref: '#/components/schemas/bulk_ErrorAttributes'
-        code:
-          enum:
-          - UNSUPPORTED_MIMETYPE
-          - MULTIPLE_SHEETS_FOUND
-          - MALFORMED_CONTENT
-          - UNSUPPORTED_COLUMN
-          - MAX_ROW_LIMIT_EXCEEDED
-          - INVALID_CUSTOM_LIST_IDENTIFIER
-          - INVALID_LOOKUP_LIST_IDENTIFIER
-          - INVALID_LOOKUP_LIST_STATUS
-          type: string
-      required:
-      - code
-      type: object
-    bulk_BatchStatistics:
-      properties:
-        num_of_completed_workflows:
-          format: int32
-          type: integer
-        num_of_created_workflows:
-          format: int32
-          type: integer
-        num_of_errored_workflows:
-          format: int32
-          type: integer
-        num_of_processed_rows:
-          format: int64
-          type: integer
-        num_of_validated_rows:
-          format: int32
-          type: integer
-      required:
-      - num_of_completed_workflows
-      - num_of_created_workflows
-      - num_of_errored_workflows
-      - num_of_processed_rows
-      - num_of_validated_rows
-      type: object
     bulk_BatchRequest:
       properties:
         file_name:
@@ -416,31 +380,6 @@ components:
           type: string
       required:
       - identifier
-      type: object
-    bulk_BatchErrors:
-      properties:
-        file_errors:
-          items:
-            $ref: '#/components/schemas/bulk_FileError'
-          type: array
-          uniqueItems: true
-        reason:
-          enum:
-          - INTERNAL_ERROR
-          - MALFORMED_FILE
-          - INVALID_ROWS
-          - INVALID_SEQUENCE_KEY
-          type:
-          - string
-          - 'null'
-        row_errors:
-          items:
-            $ref: '#/components/schemas/bulk_RowError'
-          type: array
-          uniqueItems: true
-      required:
-      - file_errors
-      - row_errors
       type: object
     bulk_Batch:
       properties:
@@ -484,6 +423,63 @@ components:
       - request
       - status
       - updated_at
+      type: object
+    bulk_BatchErrors:
+      properties:
+        file_errors:
+          items:
+            $ref: '#/components/schemas/bulk_FileError'
+          type: array
+          uniqueItems: true
+        reason:
+          enum:
+          - INTERNAL_ERROR
+          - MALFORMED_FILE
+          - INVALID_ROWS
+          - INVALID_SEQUENCE_KEY
+          type:
+          - string
+          - 'null'
+        row_errors:
+          items:
+            $ref: '#/components/schemas/bulk_RowError'
+          type: array
+          uniqueItems: true
+      required:
+      - file_errors
+      - row_errors
+      type: object
+    bulk_BatchReport:
+      properties:
+        workflows_download_link:
+          format: url
+          type:
+          - string
+          - 'null'
+      type: object
+    bulk_BatchStatistics:
+      properties:
+        num_of_completed_workflows:
+          format: int32
+          type: integer
+        num_of_created_workflows:
+          format: int32
+          type: integer
+        num_of_errored_workflows:
+          format: int32
+          type: integer
+        num_of_processed_rows:
+          format: int64
+          type: integer
+        num_of_validated_rows:
+          format: int32
+          type: integer
+      required:
+      - num_of_completed_workflows
+      - num_of_created_workflows
+      - num_of_errored_workflows
+      - num_of_processed_rows
+      - num_of_validated_rows
       type: object
     bulk_RowErrorMessage:
       properties:
@@ -579,19 +575,23 @@ components:
       required:
       - code
       type: object
-    bulk_RowError:
+    bulk_FileError:
       properties:
-        errors:
-          items:
-            $ref: '#/components/schemas/bulk_RowErrorMessage'
-          type: array
-          uniqueItems: true
-        row_number:
-          format: int64
-          type: integer
+        attributes:
+          $ref: '#/components/schemas/bulk_ErrorAttributes'
+        code:
+          enum:
+          - UNSUPPORTED_MIMETYPE
+          - MULTIPLE_SHEETS_FOUND
+          - MALFORMED_CONTENT
+          - UNSUPPORTED_COLUMN
+          - MAX_ROW_LIMIT_EXCEEDED
+          - INVALID_CUSTOM_LIST_IDENTIFIER
+          - INVALID_LOOKUP_LIST_IDENTIFIER
+          - INVALID_LOOKUP_LIST_STATUS
+          type: string
       required:
-      - errors
-      - row_number
+      - code
       type: object
   securitySchemes:
     BearerAuth:

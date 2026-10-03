@@ -165,90 +165,6 @@ paths:
       - Custom Fields
 components:
   schemas:
-    customer-manager_CreateCustomFieldRequest:
-      properties:
-        customer_type:
-          enum:
-          - PERSON
-          - COMPANY
-          - UNDEFINED
-          type: string
-        data_type:
-          $ref: '#/components/schemas/customer-manager_CustomFieldDataType'
-        display_name:
-          maxLength: 50
-          minLength: 0
-          type: string
-        key:
-          maxLength: 50
-          minLength: 0
-          type: string
-      required:
-      - customer_type
-      - data_type
-      - display_name
-      - key
-      type: object
-    customer-manager_CustomField:
-      description: List of custom fields.
-      properties:
-        customer_type:
-          enum:
-          - PERSON
-          - COMPANY
-          type: string
-        data_type:
-          $ref: '#/components/schemas/customer-manager_CustomFieldDataType'
-        display_name:
-          type: string
-        identifier:
-          format: uuid
-          type: string
-        key:
-          type: string
-      required:
-      - customer_type
-      - data_type
-      - display_name
-      - identifier
-      - key
-      type: object
-    customer-manager_ProblemDetailErrorResponse:
-      additionalProperties: true
-      properties:
-        detail:
-          type:
-          - string
-          - 'null'
-        identifier:
-          format: uuid
-          type: string
-        instance:
-          format: uri
-          type:
-          - string
-          - 'null'
-        status:
-          format: int32
-          type:
-          - integer
-          - 'null'
-        timestamp:
-          format: date-time
-          type: string
-        title:
-          type:
-          - string
-          - 'null'
-        type:
-          format: uri
-          type:
-          - string
-          - 'null'
-      required:
-      - identifier
-      - timestamp
-      type: object
     customer-manager_PaginatedCustomFieldsResponse:
       properties:
         custom_fields:
@@ -287,6 +203,75 @@ components:
       - self
       - total_count
       type: object
+    customer-manager_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
+    customer-manager_CustomField:
+      description: List of custom fields.
+      properties:
+        customer_type:
+          enum:
+          - PERSON
+          - COMPANY
+          type: string
+        data_type:
+          $ref: '#/components/schemas/customer-manager_CustomFieldDataType'
+        display_name:
+          type: string
+        identifier:
+          format: uuid
+          type: string
+        key:
+          type: string
+      required:
+      - customer_type
+      - data_type
+      - display_name
+      - identifier
+      - key
+      type: object
+    customer-manager_UpdateCustomFieldRequest:
+      properties:
+        display_name:
+          maxLength: 50
+          minLength: 0
+          type: string
+      required:
+      - display_name
+      type: object
     customer-manager_CustomFieldDataType:
       description: The type of data stored in a custom field.
       enum:
@@ -296,14 +281,29 @@ components:
       - DATE
       - DATETIME
       type: string
-    customer-manager_UpdateCustomFieldRequest:
+    customer-manager_CreateCustomFieldRequest:
       properties:
+        customer_type:
+          enum:
+          - PERSON
+          - COMPANY
+          - UNDEFINED
+          type: string
+        data_type:
+          $ref: '#/components/schemas/customer-manager_CustomFieldDataType'
         display_name:
           maxLength: 50
           minLength: 0
           type: string
+        key:
+          maxLength: 50
+          minLength: 0
+          type: string
       required:
+      - customer_type
+      - data_type
       - display_name
+      - key
       type: object
   securitySchemes:
     BearerAuth:

@@ -252,36 +252,25 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 components:
-  responses:
-    TooManyRequests:
-      description: Rate limit exceeded (600 calls/minute on standard contracts, 300 on sandbox). Retry with exponential backoff starting at 2 seconds, capped at 60 seconds.
-    Unauthorized:
-      description: Missing or invalid API key.
-    NotFound:
-      description: The search or resource was not found.
   schemas:
-    SearchEnvelope:
+    Hit:
       type: object
       properties:
-        status:
-          type: string
-        content:
+        doc:
           type: object
-          properties:
-            data:
-              $ref: '#/components/schemas/Search'
-    SearchListEnvelope:
-      type: object
-      properties:
-        status:
-          type: string
-        content:
+          description: The matched entity - id, name, entity_type, aka, associates, sources, types, fields, and media references.
+        match_types:
+          type: array
+          items:
+            type: string
+        match_types_details:
           type: object
-          properties:
-            data:
-              type: array
-              items:
-                $ref: '#/components/schemas/Search'
+        score:
+          type: number
+        is_whitelisted:
+          type: boolean
+        match_status:
+          type: string
     SearchRequest:
       type: object
       required:
@@ -357,6 +346,16 @@ components:
               - organisation
               - vessel
               - aircraft
+    SearchEnvelope:
+      type: object
+      properties:
+        status:
+          type: string
+        content:
+          type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Search'
     Search:
       type: object
       properties:
@@ -388,24 +387,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Hit'
-    Hit:
+    SearchListEnvelope:
       type: object
       properties:
-        doc:
-          type: object
-          description: The matched entity - id, name, entity_type, aka, associates, sources, types, fields, and media references.
-        match_types:
-          type: array
-          items:
-            type: string
-        match_types_details:
-          type: object
-        score:
-          type: number
-        is_whitelisted:
-          type: boolean
-        match_status:
+        status:
           type: string
+        content:
+          type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Search'
+  responses:
+    NotFound:
+      description: The search or resource was not found.
+    Unauthorized:
+      description: Missing or invalid API key.
+    TooManyRequests:
+      description: Rate limit exceeded (600 calls/minute on standard contracts, 300 on sandbox). Retry with exponential backoff starting at 2 seconds, capped at 60 seconds.
   parameters:
     SearchId:
       name: id

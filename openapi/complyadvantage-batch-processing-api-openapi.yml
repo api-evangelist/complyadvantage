@@ -247,58 +247,6 @@ paths:
       - Batch Processing
 components:
   schemas:
-    bulk_PaginatedResponseBatch:
-      properties:
-        batches:
-          items:
-            $ref: '#/components/schemas/bulk_Batch'
-          type: array
-        first:
-          description: The URL path to the first page.
-          example: /v1/resource?page_number=1
-          type: string
-        next:
-          description: The URL path to the next page.
-          example: /v1/resource?page_number=4
-          type:
-          - string
-          - 'null'
-        prev:
-          description: The URL path to the previous page.
-          example: /v1/resource?page_number=2
-          type:
-          - string
-          - 'null'
-        self:
-          description: The URL path to the current page.
-          example: /v1/resource?page_number=3
-          type: string
-        total_count:
-          description: Total number of items.
-          example: 60
-          format: int64
-          type:
-          - integer
-          - 'null'
-      required:
-      - first
-      - self
-      - batches
-      type: object
-    bulk_RowError:
-      properties:
-        errors:
-          items:
-            $ref: '#/components/schemas/bulk_RowErrorMessage'
-          type: array
-          uniqueItems: true
-        row_number:
-          format: int64
-          type: integer
-      required:
-      - errors
-      - row_number
-      type: object
     bulk_ErrorAttributes:
       properties:
         affected_rows:
@@ -353,33 +301,75 @@ components:
       - required_format
       - required_formats
       type: object
-    bulk_BatchRequest:
+    bulk_BatchReport:
       properties:
-        file_name:
-          type: string
-        upload_method:
-          enum:
-          - HTTP
-          - SFTP
-          type: string
-        workflow_type:
-          enum:
-          - create-and-screen
-          - create-and-monitor
-          - manage-lookup-list
-          type: string
-      required:
-      - file_name
-      - upload_method
-      - workflow_type
+        workflows_download_link:
+          format: url
+          type:
+          - string
+          - 'null'
       type: object
-    bulk_DeletedBatch:
+    bulk_BatchStatistics:
       properties:
-        identifier:
-          format: uuid
-          type: string
+        num_of_completed_workflows:
+          format: int32
+          type: integer
+        num_of_created_workflows:
+          format: int32
+          type: integer
+        num_of_errored_workflows:
+          format: int32
+          type: integer
+        num_of_processed_rows:
+          format: int64
+          type: integer
+        num_of_validated_rows:
+          format: int32
+          type: integer
       required:
-      - identifier
+      - num_of_completed_workflows
+      - num_of_created_workflows
+      - num_of_errored_workflows
+      - num_of_processed_rows
+      - num_of_validated_rows
+      type: object
+    bulk_PaginatedResponseBatch:
+      properties:
+        batches:
+          items:
+            $ref: '#/components/schemas/bulk_Batch'
+          type: array
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - batches
       type: object
     bulk_Batch:
       properties:
@@ -424,62 +414,19 @@ components:
       - status
       - updated_at
       type: object
-    bulk_BatchErrors:
+    bulk_RowError:
       properties:
-        file_errors:
+        errors:
           items:
-            $ref: '#/components/schemas/bulk_FileError'
+            $ref: '#/components/schemas/bulk_RowErrorMessage'
           type: array
           uniqueItems: true
-        reason:
-          enum:
-          - INTERNAL_ERROR
-          - MALFORMED_FILE
-          - INVALID_ROWS
-          - INVALID_SEQUENCE_KEY
-          type:
-          - string
-          - 'null'
-        row_errors:
-          items:
-            $ref: '#/components/schemas/bulk_RowError'
-          type: array
-          uniqueItems: true
-      required:
-      - file_errors
-      - row_errors
-      type: object
-    bulk_BatchReport:
-      properties:
-        workflows_download_link:
-          format: url
-          type:
-          - string
-          - 'null'
-      type: object
-    bulk_BatchStatistics:
-      properties:
-        num_of_completed_workflows:
-          format: int32
-          type: integer
-        num_of_created_workflows:
-          format: int32
-          type: integer
-        num_of_errored_workflows:
-          format: int32
-          type: integer
-        num_of_processed_rows:
+        row_number:
           format: int64
           type: integer
-        num_of_validated_rows:
-          format: int32
-          type: integer
       required:
-      - num_of_completed_workflows
-      - num_of_created_workflows
-      - num_of_errored_workflows
-      - num_of_processed_rows
-      - num_of_validated_rows
+      - errors
+      - row_number
       type: object
     bulk_RowErrorMessage:
       properties:
@@ -575,6 +522,34 @@ components:
       required:
       - code
       type: object
+    bulk_DeletedBatch:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+      required:
+      - identifier
+      type: object
+    bulk_BatchRequest:
+      properties:
+        file_name:
+          type: string
+        upload_method:
+          enum:
+          - HTTP
+          - SFTP
+          type: string
+        workflow_type:
+          enum:
+          - create-and-screen
+          - create-and-monitor
+          - manage-lookup-list
+          type: string
+      required:
+      - file_name
+      - upload_method
+      - workflow_type
+      type: object
     bulk_FileError:
       properties:
         attributes:
@@ -592,6 +567,31 @@ components:
           type: string
       required:
       - code
+      type: object
+    bulk_BatchErrors:
+      properties:
+        file_errors:
+          items:
+            $ref: '#/components/schemas/bulk_FileError'
+          type: array
+          uniqueItems: true
+        reason:
+          enum:
+          - INTERNAL_ERROR
+          - MALFORMED_FILE
+          - INVALID_ROWS
+          - INVALID_SEQUENCE_KEY
+          type:
+          - string
+          - 'null'
+        row_errors:
+          items:
+            $ref: '#/components/schemas/bulk_RowError'
+          type: array
+          uniqueItems: true
+      required:
+      - file_errors
+      - row_errors
       type: object
   securitySchemes:
     BearerAuth:

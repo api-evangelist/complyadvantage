@@ -332,6 +332,44 @@ paths:
       - Exports
 components:
   schemas:
+    exports_CreateExportPayload:
+      properties:
+        end_date:
+          description: Export data end date
+          example: '2023-11-05T21:00:00.000Z'
+          format: date-time
+          type:
+          - string
+          - 'null'
+        export_name:
+          description: Export name, created by customer
+          example: profiles-2023-q1-exports
+          maxLength: 50
+          minLength: 0
+          type: string
+        export_type_key:
+          description: Export type key
+          example: CUSTOMER_SCREENING
+          minLength: 1
+          type: string
+        start_date:
+          description: Export data start date
+          example: '2023-11-01T21:00:00.000Z'
+          format: date-time
+          type:
+          - string
+          - 'null'
+      required:
+      - export_name
+      - export_type_key
+      type: object
+    exports_ExportTypeKeys:
+      properties:
+        key:
+          type: string
+      required:
+      - key
+      type: object
     exports_ProblemDetailErrorResponse:
       additionalProperties: true
       properties:
@@ -368,36 +406,52 @@ components:
       - identifier
       - timestamp
       type: object
-    exports_CreateExportPayload:
+    exports_PaginatedResponseExportTypeKeys:
       properties:
-        end_date:
-          description: Export data end date
-          example: '2023-11-05T21:00:00.000Z'
-          format: date-time
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        items:
+          items:
+            $ref: '#/components/schemas/exports_ExportTypeKeys'
+          type: array
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
           type:
           - string
           - 'null'
-        export_name:
-          description: Export name, created by customer
-          example: profiles-2023-q1-exports
-          maxLength: 50
-          minLength: 0
-          type: string
-        export_type_key:
-          description: Export type key
-          example: CUSTOMER_SCREENING
-          minLength: 1
-          type: string
-        start_date:
-          description: Export data start date
-          example: '2023-11-01T21:00:00.000Z'
-          format: date-time
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
           type:
           - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
           - 'null'
       required:
-      - export_name
-      - export_type_key
+      - first
+      - self
+      - items
+      type: object
+    exports_DownloadExportResponseBody:
+      properties:
+        download_url:
+          description: Download url
+          example: s3://export.csv
+          type: string
+      required:
+      - download_url
       type: object
     exports_ExportItem:
       properties:
@@ -443,60 +497,6 @@ components:
       - export_type_key
       - identifier
       - status
-      type: object
-    exports_ExportTypeKeys:
-      properties:
-        key:
-          type: string
-      required:
-      - key
-      type: object
-    exports_DownloadExportResponseBody:
-      properties:
-        download_url:
-          description: Download url
-          example: s3://export.csv
-          type: string
-      required:
-      - download_url
-      type: object
-    exports_PaginatedResponseExportTypeKeys:
-      properties:
-        first:
-          description: The URL path to the first page.
-          example: /v1/resource?page_number=1
-          type: string
-        items:
-          items:
-            $ref: '#/components/schemas/exports_ExportTypeKeys'
-          type: array
-        next:
-          description: The URL path to the next page.
-          example: /v1/resource?page_number=4
-          type:
-          - string
-          - 'null'
-        prev:
-          description: The URL path to the previous page.
-          example: /v1/resource?page_number=2
-          type:
-          - string
-          - 'null'
-        self:
-          description: The URL path to the current page.
-          example: /v1/resource?page_number=3
-          type: string
-        total_count:
-          description: Total number of items.
-          example: 60
-          format: int64
-          type:
-          - integer
-          - 'null'
-      required:
-      - first
-      - self
-      - items
       type: object
     exports_PaginatedResponseExportItem:
       properties:

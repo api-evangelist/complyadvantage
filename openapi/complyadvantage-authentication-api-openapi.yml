@@ -124,6 +124,25 @@ components:
       - access_key
       - secret
       type: object
+    TokenCreateResponseData:
+      properties:
+        access_token:
+          description: 'The generated token that should be included in the authorization header of each call (`Authorization: Bearer {access_token}`)'
+          example: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+          type: string
+        expires_in:
+          description: The number of seconds until the token expires
+          example: 86400
+          type: integer
+        scope:
+          enum:
+          - read:api write:api
+          type: string
+        token_type:
+          enum:
+          - Bearer
+          type: string
+      type: object
     TokenCreateRequestBody:
       properties:
         password:
@@ -143,25 +162,6 @@ components:
       - username
       - password
       - realm
-      type: object
-    TokenCreateResponseData:
-      properties:
-        access_token:
-          description: 'The generated token that should be included in the authorization header of each call (`Authorization: Bearer {access_token}`)'
-          example: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-          type: string
-        expires_in:
-          description: The number of seconds until the token expires
-          example: 86400
-          type: integer
-        scope:
-          enum:
-          - read:api write:api
-          type: string
-        token_type:
-          enum:
-          - Bearer
-          type: string
       type: object
   securitySchemes:
     BearerAuth:

@@ -234,85 +234,6 @@ paths:
       - Case Workflows
 components:
   schemas:
-    case-management_Stage:
-      description: Stage
-      properties:
-        decision_type:
-          description: The decision type of the stage (decision stages only).
-          enum:
-          - POSITIVE
-          - NEGATIVE
-          - PARTIAL_POSITIVE
-          type:
-          - string
-          - 'null'
-        display_name:
-          description: The display name of the stage.
-          maxLength: 30
-          minLength: 3
-          type: string
-        display_order:
-          description: The display order of the stage.
-          format: int32
-          minimum: 1
-          type: integer
-        identifier:
-          description: Stage unique identifier.
-          format: uuid
-          type: string
-        stage_type:
-          description: The type of the stage.
-          enum:
-          - INITIAL
-          - REVIEW
-          - DECISION
-          type: string
-      required:
-      - display_name
-      - display_order
-      - identifier
-      - stage_type
-      type: object
-    case-management_NewStage:
-      additionalProperties: false
-      description: The stage to be created
-      properties:
-        decision_type:
-          description: The decision type of the stage (decision stages only).
-          enum:
-          - POSITIVE
-          - NEGATIVE
-          - PARTIAL_POSITIVE
-          type:
-          - string
-          - 'null'
-        display_name:
-          description: The display name of the stage.
-          maxLength: 30
-          minLength: 3
-          type: string
-        display_order:
-          description: The display order of the stage.
-          format: int32
-          minimum: 1
-          type: integer
-        stage_type:
-          description: The type of the stage.
-          enum:
-          - INITIAL
-          - REVIEW
-          - DECISION
-          type: string
-      required:
-      - display_name
-      - display_order
-      - stage_type
-      type: object
-    case-management_StageData:
-      oneOf:
-      - $ref: '#/components/schemas/case-management_ExistingStage'
-      - $ref: '#/components/schemas/case-management_NewStage'
-      type: object
     case-management_PaginatedResponseWorkflowResponse:
       properties:
         first:
@@ -396,6 +317,50 @@ components:
       - stages
       - version
       type: object
+    case-management_Stage:
+      description: Stage
+      properties:
+        decision_type:
+          description: The decision type of the stage (decision stages only).
+          enum:
+          - POSITIVE
+          - NEGATIVE
+          - PARTIAL_POSITIVE
+          type:
+          - string
+          - 'null'
+        display_name:
+          description: The display name of the stage.
+          maxLength: 30
+          minLength: 3
+          type: string
+        display_order:
+          description: The display order of the stage.
+          format: int32
+          minimum: 1
+          type: integer
+        identifier:
+          description: Stage unique identifier.
+          format: uuid
+          type: string
+        stage_type:
+          description: The type of the stage.
+          enum:
+          - INITIAL
+          - REVIEW
+          - DECISION
+          type: string
+      required:
+      - display_name
+      - display_order
+      - identifier
+      - stage_type
+      type: object
+    case-management_StageData:
+      oneOf:
+      - $ref: '#/components/schemas/case-management_ExistingStage'
+      - $ref: '#/components/schemas/case-management_NewStage'
+      type: object
     case-management_UpdateWorkflowRequest:
       properties:
         alert_grouping_enabled:
@@ -447,6 +412,41 @@ components:
       - display_name
       - display_order
       - identifier
+      - stage_type
+      type: object
+    case-management_NewStage:
+      additionalProperties: false
+      description: The stage to be created
+      properties:
+        decision_type:
+          description: The decision type of the stage (decision stages only).
+          enum:
+          - POSITIVE
+          - NEGATIVE
+          - PARTIAL_POSITIVE
+          type:
+          - string
+          - 'null'
+        display_name:
+          description: The display name of the stage.
+          maxLength: 30
+          minLength: 3
+          type: string
+        display_order:
+          description: The display order of the stage.
+          format: int32
+          minimum: 1
+          type: integer
+        stage_type:
+          description: The type of the stage.
+          enum:
+          - INITIAL
+          - REVIEW
+          - DECISION
+          type: string
+      required:
+      - display_name
+      - display_order
       - stage_type
       type: object
   securitySchemes:

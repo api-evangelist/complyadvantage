@@ -943,15 +943,101 @@ paths:
       - Enrichment
 components:
   schemas:
-    mes_PaginatedResponseLookupListVersionResponse:
+    mes_LookupListNoSchemaResponse:
+      properties:
+        created_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        created_by:
+          format: uuid
+          type: string
+        identifier:
+          format: uuid
+          type: string
+        items_count:
+          format: int32
+          type: integer
+        name:
+          type: string
+        updated_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        updated_by:
+          format: uuid
+          type: string
+        version:
+          $ref: '#/components/schemas/mes_VersionResponse'
+      required:
+      - created_by
+      - identifier
+      - items_count
+      - name
+      - updated_by
+      type: object
+    mes_VersionResponse:
+      properties:
+        number:
+          format: int32
+          type: integer
+        status:
+          enum:
+          - DRAFT
+          - ACTIVE
+          - INACTIVE
+          type: string
+      required:
+      - number
+      - status
+      type: object
+    mes_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
+    mes_PaginatedResponseLookupListMappingResponse:
       properties:
         first:
           description: The URL path to the first page.
           example: /v1/resource?page_number=1
           type: string
-        items:
+        lookup_list_mappings:
           items:
-            $ref: '#/components/schemas/mes_LookupListVersionResponse'
+            $ref: '#/components/schemas/mes_LookupListMappingResponse'
           type: array
         next:
           description: The URL path to the next page.
@@ -979,25 +1065,7 @@ components:
       required:
       - first
       - self
-      - items
-      type: object
-    mes_LookupListMappingCreateRequestBody:
-      properties:
-        lookup_list_identifier:
-          format: uuid
-          type: string
-        output_fields:
-          items:
-            $ref: '#/components/schemas/mes_OutputField'
-          type: array
-        source_fields:
-          items:
-            $ref: '#/components/schemas/mes_SourceField'
-          type: array
-      required:
-      - lookup_list_identifier
-      - output_fields
-      - source_fields
+      - lookup_list_mappings
       type: object
     mes_LookupListMappingPatchRequestBody:
       properties:
@@ -1019,16 +1087,25 @@ components:
           - array
           - 'null'
       type: object
-    mes_LookupListItemResponse:
-      additionalProperties:
-        oneOf:
-        - type: string
-        - type: number
-      description: Dynamic lookup list item with field-value pairs
-      example:
-        field1: string_value
-        field2: 123
-        field3: 45.67
+    mes_LookupListUpdateRequestBody:
+      properties:
+        name:
+          type: string
+      required:
+      - name
+      type: object
+    mes_AvailableSourceFieldFromPath:
+      properties:
+        key:
+          type: string
+        type:
+          enum:
+          - STRING
+          - NUMBER
+          type: string
+      required:
+      - key
+      - type
       type: object
     mes_PaginatedResponseLookupListNoSchemaResponse:
       properties:
@@ -1068,330 +1145,23 @@ components:
       - self
       - lookup_lists
       type: object
-    mes_LookupListUpdateRequestBody:
+    mes_LookupListMappingCreateRequestBody:
       properties:
-        name:
+        lookup_list_identifier:
+          format: uuid
           type: string
-      required:
-      - name
-      type: object
-    mes_VersionResponse:
-      properties:
-        number:
-          format: int32
-          type: integer
-        status:
-          enum:
-          - DRAFT
-          - ACTIVE
-          - INACTIVE
-          type: string
-      required:
-      - number
-      - status
-      type: object
-    mes_SchemaResponse:
-      properties:
-        name:
-          type: string
-        type:
-          enum:
-          - string
-          - number
-          - decimal
-          type: string
-      required:
-      - name
-      - type
-      type: object
-    mes_PaginatedResponseLookupListItemResponse:
-      properties:
-        first:
-          description: The URL path to the first page.
-          example: /v1/resource?page_number=1
-          type: string
-        items:
+        output_fields:
           items:
-            $ref: '#/components/schemas/mes_LookupListItemResponse'
+            $ref: '#/components/schemas/mes_OutputField'
           type: array
-        next:
-          description: The URL path to the next page.
-          example: /v1/resource?page_number=4
-          type:
-          - string
-          - 'null'
-        prev:
-          description: The URL path to the previous page.
-          example: /v1/resource?page_number=2
-          type:
-          - string
-          - 'null'
-        self:
-          description: The URL path to the current page.
-          example: /v1/resource?page_number=3
-          type: string
-        total_count:
-          description: Total number of items.
-          example: 60
-          format: int64
-          type:
-          - integer
-          - 'null'
-      required:
-      - first
-      - self
-      - items
-      type: object
-    mes_LookupListNoSchemaResponse:
-      properties:
-        created_at:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        created_by:
-          format: uuid
-          type: string
-        identifier:
-          format: uuid
-          type: string
-        items_count:
-          format: int32
-          type: integer
-        name:
-          type: string
-        updated_at:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        updated_by:
-          format: uuid
-          type: string
-        version:
-          $ref: '#/components/schemas/mes_VersionResponse'
-      required:
-      - created_by
-      - identifier
-      - items_count
-      - name
-      - updated_by
-      type: object
-    mes_LookupListVersionResponse:
-      properties:
-        created_at:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        created_by:
-          format: uuid
-          type: string
-        number:
-          format: int32
-          type: integer
-        status:
-          enum:
-          - DRAFT
-          - ACTIVE
-          - INACTIVE
-          type: string
-        updated_at:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        updated_by:
-          format: uuid
-          type: string
-      required:
-      - created_by
-      - number
-      - status
-      - updated_by
-      type: object
-    mes_ProblemDetailErrorResponse:
-      additionalProperties: true
-      properties:
-        detail:
-          type:
-          - string
-          - 'null'
-        identifier:
-          format: uuid
-          type: string
-        instance:
-          format: uri
-          type:
-          - string
-          - 'null'
-        status:
-          format: int32
-          type:
-          - integer
-          - 'null'
-        timestamp:
-          format: date-time
-          type: string
-        title:
-          type:
-          - string
-          - 'null'
-        type:
-          format: uri
-          type:
-          - string
-          - 'null'
-      required:
-      - identifier
-      - timestamp
-      type: object
-    mes_LookupListsResponse:
-      properties:
-        created_at:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        created_by:
-          format: uuid
-          type: string
-        identifier:
-          format: uuid
-          type: string
-        input_schema:
+        source_fields:
           items:
-            $ref: '#/components/schemas/mes_SchemaResponse'
-          type: array
-        items_count:
-          format: int32
-          type: integer
-        name:
-          type: string
-        output_schema:
-          items:
-            $ref: '#/components/schemas/mes_SchemaResponse'
-          type: array
-        updated_at:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        updated_by:
-          format: uuid
-          type: string
-        version:
-          $ref: '#/components/schemas/mes_VersionResponse'
-      required:
-      - created_by
-      - identifier
-      - input_schema
-      - items_count
-      - name
-      - output_schema
-      - updated_by
-      type: object
-    mes_AvailableSourceFieldFromPath:
-      properties:
-        key:
-          type: string
-        type:
-          enum:
-          - STRING
-          - NUMBER
-          type: string
-      required:
-      - key
-      - type
-      type: object
-    mes_SourceField:
-      properties:
-        field_key:
-          type: string
-        lookup_list_column_name:
-          type: string
-      required:
-      - field_key
-      - lookup_list_column_name
-      type: object
-    mes_AvailableSourceFieldFromBlock:
-      properties:
-        description:
-          type: string
-        identifier:
-          type: string
-        name:
-          type: string
-        type:
-          enum:
-          - STRING
-          - NUMBER
-          type: string
-      required:
-      - description
-      - identifier
-      - name
-      - type
-      type: object
-    mes_AvailableSourceFieldsResponse:
-      description: List of Available Source Fields
-      properties:
-        blocks:
-          items:
-            $ref: '#/components/schemas/mes_AvailableSourceFieldFromBlock'
-          type: array
-        paths:
-          items:
-            $ref: '#/components/schemas/mes_AvailableSourceFieldFromPath'
+            $ref: '#/components/schemas/mes_SourceField'
           type: array
       required:
-      - blocks
-      - paths
-      type: object
-    mes_LookupListSchemaCreateRequestBody:
-      properties:
-        name:
-          type: string
-        type:
-          enum:
-          - string
-          - number
-          - decimal
-          type: string
-      required:
-      - name
-      - type
-      type: object
-    mes_LookupListCreateRequestBody:
-      properties:
-        input_schema:
-          items:
-            $ref: '#/components/schemas/mes_LookupListSchemaCreateRequestBody'
-          maxItems: 1
-          minItems: 1
-          type: array
-        name:
-          type: string
-        output_schema:
-          items:
-            $ref: '#/components/schemas/mes_LookupListSchemaCreateRequestBody'
-          maxItems: 1
-          minItems: 1
-          type: array
-      required:
-      - input_schema
-      - name
-      - output_schema
-      type: object
-    mes_OutputField:
-      properties:
-        field_key:
-          type: string
-        lookup_list_column_name:
-          type: string
-      required:
-      - field_key
-      - lookup_list_column_name
+      - lookup_list_identifier
+      - output_fields
+      - source_fields
       type: object
     mes_LookupListMappingResponse:
       properties:
@@ -1439,15 +1209,29 @@ components:
       - source_fields
       - status
       type: object
-    mes_PaginatedResponseLookupListMappingResponse:
+    mes_LookupListSchemaCreateRequestBody:
+      properties:
+        name:
+          type: string
+        type:
+          enum:
+          - string
+          - number
+          - decimal
+          type: string
+      required:
+      - name
+      - type
+      type: object
+    mes_PaginatedResponseLookupListVersionResponse:
       properties:
         first:
           description: The URL path to the first page.
           example: /v1/resource?page_number=1
           type: string
-        lookup_list_mappings:
+        items:
           items:
-            $ref: '#/components/schemas/mes_LookupListMappingResponse'
+            $ref: '#/components/schemas/mes_LookupListVersionResponse'
           type: array
         next:
           description: The URL path to the next page.
@@ -1475,7 +1259,223 @@ components:
       required:
       - first
       - self
-      - lookup_list_mappings
+      - items
+      type: object
+    mes_LookupListCreateRequestBody:
+      properties:
+        input_schema:
+          items:
+            $ref: '#/components/schemas/mes_LookupListSchemaCreateRequestBody'
+          maxItems: 1
+          minItems: 1
+          type: array
+        name:
+          type: string
+        output_schema:
+          items:
+            $ref: '#/components/schemas/mes_LookupListSchemaCreateRequestBody'
+          maxItems: 1
+          minItems: 1
+          type: array
+      required:
+      - input_schema
+      - name
+      - output_schema
+      type: object
+    mes_PaginatedResponseLookupListItemResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        items:
+          items:
+            $ref: '#/components/schemas/mes_LookupListItemResponse'
+          type: array
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - items
+      type: object
+    mes_AvailableSourceFieldsResponse:
+      description: List of Available Source Fields
+      properties:
+        blocks:
+          items:
+            $ref: '#/components/schemas/mes_AvailableSourceFieldFromBlock'
+          type: array
+        paths:
+          items:
+            $ref: '#/components/schemas/mes_AvailableSourceFieldFromPath'
+          type: array
+      required:
+      - blocks
+      - paths
+      type: object
+    mes_SchemaResponse:
+      properties:
+        name:
+          type: string
+        type:
+          enum:
+          - string
+          - number
+          - decimal
+          type: string
+      required:
+      - name
+      - type
+      type: object
+    mes_LookupListItemResponse:
+      additionalProperties:
+        oneOf:
+        - type: string
+        - type: number
+      description: Dynamic lookup list item with field-value pairs
+      example:
+        field1: string_value
+        field2: 123
+        field3: 45.67
+      type: object
+    mes_LookupListVersionResponse:
+      properties:
+        created_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        created_by:
+          format: uuid
+          type: string
+        number:
+          format: int32
+          type: integer
+        status:
+          enum:
+          - DRAFT
+          - ACTIVE
+          - INACTIVE
+          type: string
+        updated_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        updated_by:
+          format: uuid
+          type: string
+      required:
+      - created_by
+      - number
+      - status
+      - updated_by
+      type: object
+    mes_LookupListsResponse:
+      properties:
+        created_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        created_by:
+          format: uuid
+          type: string
+        identifier:
+          format: uuid
+          type: string
+        input_schema:
+          items:
+            $ref: '#/components/schemas/mes_SchemaResponse'
+          type: array
+        items_count:
+          format: int32
+          type: integer
+        name:
+          type: string
+        output_schema:
+          items:
+            $ref: '#/components/schemas/mes_SchemaResponse'
+          type: array
+        updated_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        updated_by:
+          format: uuid
+          type: string
+        version:
+          $ref: '#/components/schemas/mes_VersionResponse'
+      required:
+      - created_by
+      - identifier
+      - input_schema
+      - items_count
+      - name
+      - output_schema
+      - updated_by
+      type: object
+    mes_OutputField:
+      properties:
+        field_key:
+          type: string
+        lookup_list_column_name:
+          type: string
+      required:
+      - field_key
+      - lookup_list_column_name
+      type: object
+    mes_AvailableSourceFieldFromBlock:
+      properties:
+        description:
+          type: string
+        identifier:
+          type: string
+        name:
+          type: string
+        type:
+          enum:
+          - STRING
+          - NUMBER
+          type: string
+      required:
+      - description
+      - identifier
+      - name
+      - type
+      type: object
+    mes_SourceField:
+      properties:
+        field_key:
+          type: string
+        lookup_list_column_name:
+          type: string
+      required:
+      - field_key
+      - lookup_list_column_name
       type: object
   securitySchemes:
     BearerAuth:

@@ -421,138 +421,6 @@ components:
     Unauthorized:
       description: Missing or invalid API key.
   schemas:
-    identity_AccountUserRolesResponse:
-      properties:
-        identifier:
-          description: The unique identifier of the user.
-          example: 00000000-0000-0000-0000-000000000000
-          format: uuid
-          type: string
-        roles:
-          description: List of roles within the account.
-          items:
-            $ref: '#/components/schemas/identity_UserRole'
-          type: array
-      required:
-      - identifier
-      - roles
-      type: object
-    identity_PermissionResponse:
-      properties:
-        description:
-          description: Description of the permission.
-          example: Accessing API, user and account management
-          type: string
-        identifier:
-          description: The unique identifier of the permission.
-          example: 1
-          format: int32
-          type: integer
-        level:
-          description: Permission level type
-          enum:
-          - USER
-          - ACCOUNT
-          example: USER
-          type: string
-        name:
-          description: Name of the permission.
-          example: insights
-          type: string
-      required:
-      - description
-      - identifier
-      - level
-      - name
-      type: object
-    identity_UserAccountRolesResponse:
-      properties:
-        accounts:
-          description: List of accounts.
-          items:
-            $ref: '#/components/schemas/identity_UserAccountsRoles'
-          type: array
-        first:
-          description: The url with parameters of the first page
-          type: string
-        next:
-          description: The url with parameters of the next page, null if there are no more pages
-          type:
-          - string
-          - 'null'
-        prev:
-          description: The url with parameters of the previous page, null if current page_number is 1
-          type:
-          - string
-          - 'null'
-        self:
-          description: The url with parameters of the current page
-          type:
-          - string
-          - 'null'
-        total_count:
-          description: Total number of items.
-          example: 60
-          format: int64
-          type:
-          - integer
-          - 'null'
-      required:
-      - accounts
-      - first
-      type: object
-    identity_ExtendedUserAccountsRoles:
-      description: List of accounts.
-      properties:
-        account_type:
-          description: Type of the account.
-          enum:
-          - CLIENT_ACCOUNT_TYPE_UNSPECIFIED
-          - CLIENT_ACCOUNT_TYPE_NON_PRODUCTION
-          - CLIENT_ACCOUNT_TYPE_PRODUCTION
-          - UNRECOGNIZED
-          type: string
-        client_identifier:
-          description: The unique identifier of the client.
-          example: 00000000-0000-0000-0000-000000000000
-          format: uuid
-          type: string
-        identifier:
-          description: The unique identifier of the account.
-          example: 00000000-0000-0000-0000-000000000000
-          format: uuid
-          type: string
-        name:
-          description: Name of the account.
-          example: A Bank Retail
-          type: string
-        roles:
-          description: List of roles within the account.
-          items:
-            $ref: '#/components/schemas/identity_ExtendedUserRole'
-          type: array
-      required:
-      - account_type
-      - client_identifier
-      - identifier
-      - name
-      - roles
-      type: object
-    identity_BulkAccountUserRolesError:
-      description: Details for in case it wasn't successful.
-      properties:
-        details:
-          description: Detail of the error.
-          example: Failed to connect with database
-          type: string
-        message:
-          description: Error message.
-          example: DATABASE_ERROR
-          type: string
-      required:
-      - details
-      - message
-      type: object
     identity_ExtendedUserAccountRolesResponse:
       properties:
         accounts:
@@ -589,7 +457,68 @@ components:
       - accounts
       - first
       type: object
-    identity_ExtendedUserRole:
+    identity_BulkAccountUserRoles:
+      description: List with the result of the operation on each user identifier.
+      properties:
+        errors:
+          default: null
+          description: Details for in case it wasn't successful.
+          items:
+            $ref: '#/components/schemas/identity_BulkAccountUserRolesError'
+          type:
+          - array
+          - 'null'
+        success:
+          default: false
+          description: The unique identifier of the user.
+          example: true
+          type: boolean
+        user_identifier:
+          description: The unique identifier of the user.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+      required:
+      - success
+      - user_identifier
+      type: object
+    identity_PermissionListResponse:
+      properties:
+        bitfield:
+          type: string
+        permissions:
+          description: List of your permissions.
+          items:
+            $ref: '#/components/schemas/identity_PermissionResponse'
+          type: array
+      required:
+      - bitfield
+      - permissions
+      type: object
+    identity_UserPartialUpdateRequestBody:
+      properties:
+        active:
+          default: false
+          description: If the user is active or deactivated.
+          example: true
+          type:
+          - boolean
+          - 'null'
+        enforce_mfa_after:
+          description: Date and time of when MFA will be enforced for the user.
+          example: '2024-06-01T00:00:00.000Z'
+          format: date-time
+          type: string
+        name:
+          description: Full name of the user.
+          example: John Doe
+          maxLength: 50
+          minLength: 1
+          type:
+          - string
+          - 'null'
+      type: object
+    identity_StandardUserRole:
       description: List of roles within the account.
       properties:
         assigned_at:
@@ -601,32 +530,62 @@ components:
           description: Name of the role
           example: Admin
           type: string
-        user_role_identifier:
-          description: The unique identifier of the user role.
-          example: 00000000-0000-0000-0000-000000000000
-          format: uuid
-          type: string
       required:
       - name
       type: object
-    identity_UserRequestBody:
+    identity_PermissionResponse:
       properties:
-        email:
-          description: Email address of the user.
-          example: john@example.com
-          format: email
-          maxLength: 100
-          minLength: 1
+        description:
+          description: Description of the permission.
+          example: Accessing API, user and account management
+          type: string
+        identifier:
+          description: The unique identifier of the permission.
+          example: 1
+          format: int32
+          type: integer
+        level:
+          description: Permission level type
+          enum:
+          - USER
+          - ACCOUNT
+          example: USER
           type: string
         name:
-          description: Full name of the user.
-          example: John Doe
-          maxLength: 50
-          minLength: 1
+          description: Name of the permission.
+          example: insights
           type: string
       required:
-      - email
+      - description
+      - identifier
+      - level
       - name
+      type: object
+    identity_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type: string
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type: string
+        status:
+          format: int32
+          type: integer
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type: string
+        type:
+          format: uri
+          type: string
+      required:
+      - identifier
+      - timestamp
       type: object
     identity_AnyUserResponse:
       properties:
@@ -697,6 +656,22 @@ components:
       - updated_by
       - user_type
       type: object
+    identity_AccountUserRolesResponse:
+      properties:
+        identifier:
+          description: The unique identifier of the user.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        roles:
+          description: List of roles within the account.
+          items:
+            $ref: '#/components/schemas/identity_UserRole'
+          type: array
+      required:
+      - identifier
+      - roles
+      type: object
     identity_UserAccountsRoles:
       description: List of accounts.
       properties:
@@ -734,57 +709,25 @@ components:
       - name
       - roles
       type: object
-    identity_BulkAccountUserRolesResponse:
+    identity_ExtendedUserRole:
+      description: List of roles within the account.
       properties:
-        results:
-          description: List with the result of the operation on each user identifier.
-          items:
-            $ref: '#/components/schemas/identity_BulkAccountUserRoles'
-          type: array
-      required:
-      - results
-      type: object
-    identity_UsersMePartialUpdateRequestBody:
-      properties:
-        cookie_consent:
-          default: false
-          description: Whether the user consents to cookies.
-          example: false
-          type: boolean
-        locale:
-          description: User locale.
-          enum:
-          - en-US
-          - en-GB
-          - fr-CA
-          - fr-FR
-          example: en-US
-          type:
-          - string
-          - 'null'
-      type: object
-    identity_UserPartialUpdateRequestBody:
-      properties:
-        active:
-          default: false
-          description: If the user is active or deactivated.
-          example: true
-          type:
-          - boolean
-          - 'null'
-        enforce_mfa_after:
-          description: Date and time of when MFA will be enforced for the user.
-          example: '2024-06-01T00:00:00.000Z'
+        assigned_at:
+          description: Date and time the user was assigned the user role in the account.
+          example: '2023-01-01T10:10:10.000Z'
           format: date-time
           type: string
         name:
-          description: Full name of the user.
-          example: John Doe
-          maxLength: 50
-          minLength: 1
-          type:
-          - string
-          - 'null'
+          description: Name of the role
+          example: Admin
+          type: string
+        user_role_identifier:
+          description: The unique identifier of the user role.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+      required:
+      - name
       type: object
     identity_BulkAccountUserRolesRequestBody:
       properties:
@@ -817,98 +760,56 @@ components:
       - role_identifiers
       - user_identifiers
       type: object
-    identity_StandardUserRole:
-      description: List of roles within the account.
+    identity_UserAccountRolesResponse:
       properties:
-        assigned_at:
-          description: Date and time the user was assigned the user role in the account.
-          example: '2023-01-01T10:10:10.000Z'
-          format: date-time
-          type: string
-        name:
-          description: Name of the role
-          example: Admin
-          type: string
-      required:
-      - name
-      type: object
-    identity_UserRole:
-      description: List of roles within the account.
-      properties:
-        assigned_at:
-          description: Date and time the user was assigned the user role in the account.
-          example: '2023-01-01T10:10:10.000Z'
-          format: date-time
-          type: string
-        name:
-          description: Name of the role
-          example: Admin
-          type: string
-        user_role_identifier:
-          description: The unique identifier of the user role.
-          example: 00000000-0000-0000-0000-000000000000
-          format: uuid
-          type: string
-      required:
-      - name
-      type: object
-    identity_BulkAccountUserRoles:
-      description: List with the result of the operation on each user identifier.
-      properties:
-        errors:
-          default: null
-          description: Details for in case it wasn't successful.
+        accounts:
+          description: List of accounts.
           items:
-            $ref: '#/components/schemas/identity_BulkAccountUserRolesError'
+            $ref: '#/components/schemas/identity_UserAccountsRoles'
+          type: array
+        first:
+          description: The url with parameters of the first page
+          type: string
+        next:
+          description: The url with parameters of the next page, null if there are no more pages
           type:
-          - array
+          - string
           - 'null'
-        success:
-          default: false
-          description: The unique identifier of the user.
-          example: true
-          type: boolean
-        user_identifier:
-          description: The unique identifier of the user.
-          example: 00000000-0000-0000-0000-000000000000
-          format: uuid
-          type: string
+        prev:
+          description: The url with parameters of the previous page, null if current page_number is 1
+          type:
+          - string
+          - 'null'
+        self:
+          description: The url with parameters of the current page
+          type:
+          - string
+          - 'null'
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
       required:
-      - success
-      - user_identifier
+      - accounts
+      - first
       type: object
-    identity_PermissionListResponse:
+    identity_BulkAccountUserRolesError:
+      description: Details for in case it wasn't successful.
       properties:
-        bitfield:
+        details:
+          description: Detail of the error.
+          example: Failed to connect with database
           type: string
-        permissions:
-          description: List of your permissions.
-          items:
-            $ref: '#/components/schemas/identity_PermissionResponse'
-          type: array
-      required:
-      - bitfield
-      - permissions
-      type: object
-    identity_AccountUserRolesRequestBody:
-      properties:
-        account_identifier:
-          description: The unique identifier of the account.
-          example: 00000000-0000-0000-0000-000000000000
-          format: uuid
+        message:
+          description: Error message.
+          example: DATABASE_ERROR
           type: string
-        role_identifiers:
-          description: List of role identifiers.
-          example:
-          - 00000000-0000-0000-0000-000000000000
-          items:
-            example: 00000000-0000-0000-0000-000000000000
-            format: uuid
-            type: string
-          type: array
-          uniqueItems: true
       required:
-      - role_identifiers
+      - details
+      - message
       type: object
     identity_OwnUserResponse:
       properties:
@@ -996,31 +897,130 @@ components:
       - updated_at
       - updated_by
       type: object
-    identity_ProblemDetailErrorResponse:
-      additionalProperties: true
+    identity_UserRequestBody:
       properties:
-        detail:
+        email:
+          description: Email address of the user.
+          example: john@example.com
+          format: email
+          maxLength: 100
+          minLength: 1
           type: string
-        identifier:
-          format: uuid
-          type: string
-        instance:
-          format: uri
-          type: string
-        status:
-          format: int32
-          type: integer
-        timestamp:
-          format: date-time
-          type: string
-        title:
-          type: string
-        type:
-          format: uri
+        name:
+          description: Full name of the user.
+          example: John Doe
+          maxLength: 50
+          minLength: 1
           type: string
       required:
+      - email
+      - name
+      type: object
+    identity_ExtendedUserAccountsRoles:
+      description: List of accounts.
+      properties:
+        account_type:
+          description: Type of the account.
+          enum:
+          - CLIENT_ACCOUNT_TYPE_UNSPECIFIED
+          - CLIENT_ACCOUNT_TYPE_NON_PRODUCTION
+          - CLIENT_ACCOUNT_TYPE_PRODUCTION
+          - UNRECOGNIZED
+          type: string
+        client_identifier:
+          description: The unique identifier of the client.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        identifier:
+          description: The unique identifier of the account.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        name:
+          description: Name of the account.
+          example: A Bank Retail
+          type: string
+        roles:
+          description: List of roles within the account.
+          items:
+            $ref: '#/components/schemas/identity_ExtendedUserRole'
+          type: array
+      required:
+      - account_type
+      - client_identifier
       - identifier
-      - timestamp
+      - name
+      - roles
+      type: object
+    identity_UserRole:
+      description: List of roles within the account.
+      properties:
+        assigned_at:
+          description: Date and time the user was assigned the user role in the account.
+          example: '2023-01-01T10:10:10.000Z'
+          format: date-time
+          type: string
+        name:
+          description: Name of the role
+          example: Admin
+          type: string
+        user_role_identifier:
+          description: The unique identifier of the user role.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+      required:
+      - name
+      type: object
+    identity_AccountUserRolesRequestBody:
+      properties:
+        account_identifier:
+          description: The unique identifier of the account.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        role_identifiers:
+          description: List of role identifiers.
+          example:
+          - 00000000-0000-0000-0000-000000000000
+          items:
+            example: 00000000-0000-0000-0000-000000000000
+            format: uuid
+            type: string
+          type: array
+          uniqueItems: true
+      required:
+      - role_identifiers
+      type: object
+    identity_UsersMePartialUpdateRequestBody:
+      properties:
+        cookie_consent:
+          default: false
+          description: Whether the user consents to cookies.
+          example: false
+          type: boolean
+        locale:
+          description: User locale.
+          enum:
+          - en-US
+          - en-GB
+          - fr-CA
+          - fr-FR
+          example: en-US
+          type:
+          - string
+          - 'null'
+      type: object
+    identity_BulkAccountUserRolesResponse:
+      properties:
+        results:
+          description: List with the result of the operation on each user identifier.
+          items:
+            $ref: '#/components/schemas/identity_BulkAccountUserRoles'
+          type: array
+      required:
+      - results
       type: object
   securitySchemes:
     apiKeyAuth:

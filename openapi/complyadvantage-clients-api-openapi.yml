@@ -149,41 +149,6 @@ paths:
       - Clients
 components:
   schemas:
-    identity_AccountsResponse:
-      properties:
-        accounts:
-          items:
-            $ref: '#/components/schemas/identity_AccountData'
-          type: array
-        first:
-          description: The url with parameters of the first page
-          type: string
-        next:
-          description: The url with parameters of the next page, null if there are no more pages
-          type:
-          - string
-          - 'null'
-        prev:
-          description: The url with parameters of the previous page, null if current page_number is 1
-          type:
-          - string
-          - 'null'
-        self:
-          description: The url with parameters of the current page
-          type:
-          - string
-          - 'null'
-        total_count:
-          description: Total number of accounts.
-          example: 60
-          format: int64
-          type:
-          - integer
-          - 'null'
-      required:
-      - accounts
-      - first
-      type: object
     identity_ClientData:
       properties:
         active:
@@ -233,6 +198,54 @@ components:
       - can_manage_subscription
       - identifier
       - idp_identifier
+      - name
+      type: object
+    identity_AccountData:
+      properties:
+        account_type:
+          description: Type of the account
+          enum:
+          - CLIENT_ACCOUNT_TYPE_UNSPECIFIED
+          - CLIENT_ACCOUNT_TYPE_NON_PRODUCTION
+          - CLIENT_ACCOUNT_TYPE_PRODUCTION
+          - UNRECOGNIZED
+          example: CLIENT_ACCOUNT_TYPE_NON_PRODUCTION
+          type: string
+        active:
+          default: false
+          description: If the account is active or deactivated.
+          type: boolean
+        client_identifier:
+          description: The unique identifier of the account's client.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        created_at:
+          description: Date and time the account was created.
+          format: date-time
+          type: string
+        deactivated_at:
+          description: Date and time the account was deactivated.
+          format: date-time
+          type: string
+        identifier:
+          description: The unique identifier of the account.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        name:
+          description: Name of the account
+          example: A Bank PLC Sandbox
+          type: string
+        updated_at:
+          description: Date and time the account was last updated.
+          format: date-time
+          type: string
+      required:
+      - account_type
+      - active
+      - client_identifier
+      - identifier
       - name
       type: object
     identity_NoRolesUserData:
@@ -299,53 +312,40 @@ components:
       - name
       - user_type
       type: object
-    identity_AccountData:
+    identity_AccountsResponse:
       properties:
-        account_type:
-          description: Type of the account
-          enum:
-          - CLIENT_ACCOUNT_TYPE_UNSPECIFIED
-          - CLIENT_ACCOUNT_TYPE_NON_PRODUCTION
-          - CLIENT_ACCOUNT_TYPE_PRODUCTION
-          - UNRECOGNIZED
-          example: CLIENT_ACCOUNT_TYPE_NON_PRODUCTION
+        accounts:
+          items:
+            $ref: '#/components/schemas/identity_AccountData'
+          type: array
+        first:
+          description: The url with parameters of the first page
           type: string
-        active:
-          default: false
-          description: If the account is active or deactivated.
-          type: boolean
-        client_identifier:
-          description: The unique identifier of the account's client.
-          example: 00000000-0000-0000-0000-000000000000
-          format: uuid
-          type: string
-        created_at:
-          description: Date and time the account was created.
-          format: date-time
-          type: string
-        deactivated_at:
-          description: Date and time the account was deactivated.
-          format: date-time
-          type: string
-        identifier:
-          description: The unique identifier of the account.
-          example: 00000000-0000-0000-0000-000000000000
-          format: uuid
-          type: string
-        name:
-          description: Name of the account
-          example: A Bank PLC Sandbox
-          type: string
-        updated_at:
-          description: Date and time the account was last updated.
-          format: date-time
-          type: string
+        next:
+          description: The url with parameters of the next page, null if there are no more pages
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The url with parameters of the previous page, null if current page_number is 1
+          type:
+          - string
+          - 'null'
+        self:
+          description: The url with parameters of the current page
+          type:
+          - string
+          - 'null'
+        total_count:
+          description: Total number of accounts.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
       required:
-      - account_type
-      - active
-      - client_identifier
-      - identifier
-      - name
+      - accounts
+      - first
       type: object
     identity_NoRolesUsersResponse:
       properties:

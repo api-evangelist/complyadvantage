@@ -366,24 +366,6 @@ paths:
       - IAM
 components:
   schemas:
-    identity_AndPermissionDependencyNode:
-      description: An AND compound node — all children must be satisfied.
-      properties:
-        type:
-          description: Defines the type of a permission dependency node.
-          enum:
-          - AND
-          example: AND
-          type: string
-        values:
-          description: Child nodes, all of which must be satisfied.
-          items:
-            $ref: '#/components/schemas/identity_PermissionDependencyNode'
-          type: array
-      required:
-      - type
-      - values
-      type: object
     identity_PartialUpdateRoleRequestBody:
       properties:
         description:
@@ -416,6 +398,285 @@ components:
           - array
           - 'null'
           uniqueItems: true
+      type: object
+    identity_ListPermissionsResponseItem:
+      properties:
+        description:
+          description: Description of the permission.
+          example: Accessing API, user and account management
+          type: string
+        identifier:
+          description: The unique identifier of the permission.
+          example: 1
+          format: int32
+          type: integer
+        level:
+          description: Permission level type
+          enum:
+          - USER
+          - ACCOUNT
+          example: USER
+          type: string
+        name:
+          description: Name of the permission.
+          example: insights
+          type: string
+        required_user_permissions:
+          $ref: '#/components/schemas/identity_PermissionDependencyNode'
+      required:
+      - description
+      - identifier
+      - level
+      - name
+      - required_user_permissions
+      type: object
+    identity_RoleWithPermissionResponse:
+      properties:
+        description:
+          description: Description of the role.
+          example: View Cases
+          type: string
+        identifier:
+          description: The unique identifier of the role.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        name:
+          description: Name of the role.
+          example: Supervisor
+          type: string
+        permissions:
+          description: Role permission identifiers
+          example:
+          - 1
+          items:
+            description: Role permission identifiers
+            format: int32
+            type: integer
+          type: array
+          uniqueItems: true
+        users_assigned_count:
+          description: Number of users assigned.
+          example: 1
+          format: int32
+          type: integer
+      required:
+      - description
+      - identifier
+      - name
+      - permissions
+      - users_assigned_count
+      type: object
+    identity_RoleResponse:
+      type: object
+    identity_BuiltInRoleResponse:
+      allOf:
+      - $ref: '#/components/schemas/identity_RoleResponse'
+      - properties:
+          description:
+            description: Description of the role.
+            example: View Cases
+            type: string
+          identifier:
+            description: The unique identifier of the role.
+            example: 00000000-0000-0000-0000-000000000000
+            format: uuid
+            type: string
+          name:
+            description: Name of the role.
+            example: Supervisor
+            type: string
+          users_assigned_count:
+            description: Number of users assigned.
+            example: 1
+            format: int32
+            type: integer
+        type: object
+      required:
+      - description
+      - identifier
+      - name
+      - users_assigned_count
+      type: object
+    identity_PermissionWithDepsResponse:
+      properties:
+        description:
+          description: Description of the permission.
+          example: Accessing API, user and account management
+          type: string
+        identifier:
+          description: The unique identifier of the permission.
+          example: 1
+          format: int32
+          type: integer
+        level:
+          description: Permission level type
+          enum:
+          - USER
+          - ACCOUNT
+          example: USER
+          type: string
+        name:
+          description: Name of the permission.
+          example: insights
+          type: string
+        required_user_permissions:
+          description: User-level permissions required for this permission to be given to a role
+          items:
+            description: Permission identifier
+            format: int32
+            type: integer
+          type: array
+          uniqueItems: true
+      required:
+      - description
+      - identifier
+      - level
+      - name
+      - required_user_permissions
+      type: object
+    identity_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type: string
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type: string
+        status:
+          format: int32
+          type: integer
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type: string
+        type:
+          format: uri
+          type: string
+      required:
+      - identifier
+      - timestamp
+      type: object
+    identity_PermissionDependencyNode:
+      description: A node in the permission dependency tree.
+      discriminator:
+        mapping:
+          AND: '#/components/schemas/identity_AndPermissionDependencyNode'
+          ID: '#/components/schemas/identity_IdPermissionDependencyNode'
+          OR: '#/components/schemas/identity_OrPermissionDependencyNode'
+        propertyName: type
+      oneOf:
+      - $ref: '#/components/schemas/identity_AndPermissionDependencyNode'
+      - $ref: '#/components/schemas/identity_OrPermissionDependencyNode'
+      - $ref: '#/components/schemas/identity_IdPermissionDependencyNode'
+      properties:
+        type:
+          description: Defines the type of a permission dependency node.
+          enum:
+          - AND
+          - OR
+          - ID
+          type: string
+      required:
+      - type
+      type: object
+    identity_IdPermissionDependencyNode:
+      description: A leaf node referencing a permission by its identifier.
+      properties:
+        type:
+          description: Defines the type of a permission dependency node.
+          enum:
+          - ID
+          example: ID
+          type: string
+        value:
+          description: The permission identifier.
+          example: 13
+          format: int32
+          type: integer
+      required:
+      - type
+      - value
+      type: object
+    identity_PaginatedResponseGroupWithPermissionsHttpResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        groups:
+          items:
+            $ref: '#/components/schemas/identity_GroupWithPermissionsHttpResponse'
+          type: array
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - groups
+      - self
+      type: object
+    identity_PaginatedResponseListPermissionsResponseItem:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        permissions:
+          items:
+            $ref: '#/components/schemas/identity_ListPermissionsResponseItem'
+          type: array
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - permissions
+      - self
       type: object
     identity_PaginatedResponsePermissionWithDepsResponse:
       properties:
@@ -454,6 +715,36 @@ components:
       - first
       - permissions
       - self
+      type: object
+    identity_RoleRequestBody:
+      properties:
+        description:
+          description: Description of the role.
+          example: View Cases
+          maxLength: 300
+          minLength: 0
+          type: string
+        name:
+          description: Name of the role.
+          example: Role name
+          maxLength: 100
+          minLength: 1
+          type: string
+        permissions:
+          description: List of user permission identifiers
+          example:
+          - 1
+          - 2
+          items:
+            description: List of user permission identifiers
+            format: int32
+            type: integer
+          type: array
+          uniqueItems: true
+      required:
+      - description
+      - name
+      - permissions
       type: object
     identity_CustomRoleWithPermissionsResponse:
       allOf:
@@ -502,342 +793,6 @@ components:
       - permissions
       - updated_at
       - updated_by
-      - users_assigned_count
-      type: object
-    identity_PaginatedResponseListPermissionsResponseItem:
-      properties:
-        first:
-          description: The URL path to the first page.
-          example: /v1/resource?page_number=1
-          type: string
-        next:
-          description: The URL path to the next page.
-          example: /v1/resource?page_number=4
-          type:
-          - string
-          - 'null'
-        permissions:
-          items:
-            $ref: '#/components/schemas/identity_ListPermissionsResponseItem'
-          type: array
-        prev:
-          description: The URL path to the previous page.
-          example: /v1/resource?page_number=2
-          type:
-          - string
-          - 'null'
-        self:
-          description: The URL path to the current page.
-          example: /v1/resource?page_number=3
-          type: string
-        total_count:
-          description: Total number of items.
-          example: 60
-          format: int64
-          type:
-          - integer
-          - 'null'
-      required:
-      - first
-      - permissions
-      - self
-      type: object
-    identity_IdPermissionDependencyNode:
-      description: A leaf node referencing a permission by its identifier.
-      properties:
-        type:
-          description: Defines the type of a permission dependency node.
-          enum:
-          - ID
-          example: ID
-          type: string
-        value:
-          description: The permission identifier.
-          example: 13
-          format: int32
-          type: integer
-      required:
-      - type
-      - value
-      type: object
-    identity_ListPermissionsResponseItem:
-      properties:
-        description:
-          description: Description of the permission.
-          example: Accessing API, user and account management
-          type: string
-        identifier:
-          description: The unique identifier of the permission.
-          example: 1
-          format: int32
-          type: integer
-        level:
-          description: Permission level type
-          enum:
-          - USER
-          - ACCOUNT
-          example: USER
-          type: string
-        name:
-          description: Name of the permission.
-          example: insights
-          type: string
-        required_user_permissions:
-          $ref: '#/components/schemas/identity_PermissionDependencyNode'
-      required:
-      - description
-      - identifier
-      - level
-      - name
-      - required_user_permissions
-      type: object
-    identity_OrPermissionDependencyNode:
-      description: An OR compound node — at least one child must be satisfied.
-      properties:
-        type:
-          description: Defines the type of a permission dependency node.
-          enum:
-          - OR
-          example: OR
-          type: string
-        values:
-          description: Child nodes, at least one of which must be satisfied.
-          items:
-            $ref: '#/components/schemas/identity_PermissionDependencyNode'
-          type: array
-      required:
-      - type
-      - values
-      type: object
-    identity_RoleRequestBody:
-      properties:
-        description:
-          description: Description of the role.
-          example: View Cases
-          maxLength: 300
-          minLength: 0
-          type: string
-        name:
-          description: Name of the role.
-          example: Role name
-          maxLength: 100
-          minLength: 1
-          type: string
-        permissions:
-          description: List of user permission identifiers
-          example:
-          - 1
-          - 2
-          items:
-            description: List of user permission identifiers
-            format: int32
-            type: integer
-          type: array
-          uniqueItems: true
-      required:
-      - description
-      - name
-      - permissions
-      type: object
-    identity_PermissionDependencyNode:
-      description: A node in the permission dependency tree.
-      discriminator:
-        mapping:
-          AND: '#/components/schemas/identity_AndPermissionDependencyNode'
-          ID: '#/components/schemas/identity_IdPermissionDependencyNode'
-          OR: '#/components/schemas/identity_OrPermissionDependencyNode'
-        propertyName: type
-      oneOf:
-      - $ref: '#/components/schemas/identity_AndPermissionDependencyNode'
-      - $ref: '#/components/schemas/identity_OrPermissionDependencyNode'
-      - $ref: '#/components/schemas/identity_IdPermissionDependencyNode'
-      properties:
-        type:
-          description: Defines the type of a permission dependency node.
-          enum:
-          - AND
-          - OR
-          - ID
-          type: string
-      required:
-      - type
-      type: object
-    identity_PaginatedResponseRoleResponse:
-      properties:
-        first:
-          description: The URL path to the first page.
-          example: /v1/resource?page_number=1
-          type: string
-        next:
-          description: The URL path to the next page.
-          example: /v1/resource?page_number=4
-          type:
-          - string
-          - 'null'
-        prev:
-          description: The URL path to the previous page.
-          example: /v1/resource?page_number=2
-          type:
-          - string
-          - 'null'
-        roles:
-          items:
-            oneOf:
-            - $ref: '#/components/schemas/identity_BuiltInRoleResponse'
-            - $ref: '#/components/schemas/identity_CustomRoleResponse'
-          type: array
-        self:
-          description: The URL path to the current page.
-          example: /v1/resource?page_number=3
-          type: string
-        total_count:
-          description: Total number of items.
-          example: 60
-          format: int64
-          type:
-          - integer
-          - 'null'
-      required:
-      - first
-      - roles
-      - self
-      type: object
-    identity_RoleResponse:
-      type: object
-    identity_DefaultRoleWithPermissionsResponse:
-      allOf:
-      - $ref: '#/components/schemas/identity_RoleWithPermissionResponse'
-      required:
-      - description
-      - identifier
-      - name
-      - permissions
-      - users_assigned_count
-      type: object
-    identity_PaginatedResponseGroupWithPermissionsHttpResponse:
-      properties:
-        first:
-          description: The URL path to the first page.
-          example: /v1/resource?page_number=1
-          type: string
-        groups:
-          items:
-            $ref: '#/components/schemas/identity_GroupWithPermissionsHttpResponse'
-          type: array
-        next:
-          description: The URL path to the next page.
-          example: /v1/resource?page_number=4
-          type:
-          - string
-          - 'null'
-        prev:
-          description: The URL path to the previous page.
-          example: /v1/resource?page_number=2
-          type:
-          - string
-          - 'null'
-        self:
-          description: The URL path to the current page.
-          example: /v1/resource?page_number=3
-          type: string
-        total_count:
-          description: Total number of items.
-          example: 60
-          format: int64
-          type:
-          - integer
-          - 'null'
-      required:
-      - first
-      - groups
-      - self
-      type: object
-    identity_GroupWithPermissionsHttpResponse:
-      properties:
-        name:
-          description: Name
-          example: permissions.groups.00000000-0000-0000-0000-000000000000.name
-          type: string
-        permissions:
-          description: Permissions
-          example:
-          - 1
-          - 2
-          - 3
-          items:
-            description: Permissions
-            format: int32
-            type: integer
-          type: array
-          uniqueItems: true
-      required:
-      - name
-      - permissions
-      type: object
-    identity_PermissionWithDepsResponse:
-      properties:
-        description:
-          description: Description of the permission.
-          example: Accessing API, user and account management
-          type: string
-        identifier:
-          description: The unique identifier of the permission.
-          example: 1
-          format: int32
-          type: integer
-        level:
-          description: Permission level type
-          enum:
-          - USER
-          - ACCOUNT
-          example: USER
-          type: string
-        name:
-          description: Name of the permission.
-          example: insights
-          type: string
-        required_user_permissions:
-          description: User-level permissions required for this permission to be given to a role
-          items:
-            description: Permission identifier
-            format: int32
-            type: integer
-          type: array
-          uniqueItems: true
-      required:
-      - description
-      - identifier
-      - level
-      - name
-      - required_user_permissions
-      type: object
-    identity_BuiltInRoleResponse:
-      allOf:
-      - $ref: '#/components/schemas/identity_RoleResponse'
-      - properties:
-          description:
-            description: Description of the role.
-            example: View Cases
-            type: string
-          identifier:
-            description: The unique identifier of the role.
-            example: 00000000-0000-0000-0000-000000000000
-            format: uuid
-            type: string
-          name:
-            description: Name of the role.
-            example: Supervisor
-            type: string
-          users_assigned_count:
-            description: Number of users assigned.
-            example: 1
-            format: int32
-            type: integer
-        type: object
-      required:
-      - description
-      - identifier
-      - name
       - users_assigned_count
       type: object
     identity_CustomRoleResponse:
@@ -906,68 +861,113 @@ components:
       - updated_by
       - users_assigned_count
       type: object
-    identity_ProblemDetailErrorResponse:
-      additionalProperties: true
+    identity_OrPermissionDependencyNode:
+      description: An OR compound node — at least one child must be satisfied.
       properties:
-        detail:
-          type: string
-        identifier:
-          format: uuid
-          type: string
-        instance:
-          format: uri
-          type: string
-        status:
-          format: int32
-          type: integer
-        timestamp:
-          format: date-time
-          type: string
-        title:
-          type: string
         type:
-          format: uri
+          description: Defines the type of a permission dependency node.
+          enum:
+          - OR
+          example: OR
           type: string
+        values:
+          description: Child nodes, at least one of which must be satisfied.
+          items:
+            $ref: '#/components/schemas/identity_PermissionDependencyNode'
+          type: array
       required:
-      - identifier
-      - timestamp
+      - type
+      - values
       type: object
-    identity_RoleWithPermissionResponse:
+    identity_AndPermissionDependencyNode:
+      description: An AND compound node — all children must be satisfied.
       properties:
-        description:
-          description: Description of the role.
-          example: View Cases
+        type:
+          description: Defines the type of a permission dependency node.
+          enum:
+          - AND
+          example: AND
           type: string
-        identifier:
-          description: The unique identifier of the role.
-          example: 00000000-0000-0000-0000-000000000000
-          format: uuid
-          type: string
+        values:
+          description: Child nodes, all of which must be satisfied.
+          items:
+            $ref: '#/components/schemas/identity_PermissionDependencyNode'
+          type: array
+      required:
+      - type
+      - values
+      type: object
+    identity_GroupWithPermissionsHttpResponse:
+      properties:
         name:
-          description: Name of the role.
-          example: Supervisor
+          description: Name
+          example: permissions.groups.00000000-0000-0000-0000-000000000000.name
           type: string
         permissions:
-          description: Role permission identifiers
+          description: Permissions
           example:
           - 1
+          - 2
+          - 3
           items:
-            description: Role permission identifiers
+            description: Permissions
             format: int32
             type: integer
           type: array
           uniqueItems: true
-        users_assigned_count:
-          description: Number of users assigned.
-          example: 1
-          format: int32
-          type: integer
+      required:
+      - name
+      - permissions
+      type: object
+    identity_DefaultRoleWithPermissionsResponse:
+      allOf:
+      - $ref: '#/components/schemas/identity_RoleWithPermissionResponse'
       required:
       - description
       - identifier
       - name
       - permissions
       - users_assigned_count
+      type: object
+    identity_PaginatedResponseRoleResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        roles:
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/identity_BuiltInRoleResponse'
+            - $ref: '#/components/schemas/identity_CustomRoleResponse'
+          type: array
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - roles
+      - self
       type: object
   securitySchemes:
     BearerAuth:

@@ -1,0 +1,113 @@
+slug: complyadvantage
+provider: ComplyAdvantage
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 9
+edges:
+- tag: IAM
+  spec_file: complyadvantage-iam-api-openapi.yml
+  capability_id: BC-620.20
+  capability_id_l1: BC-620
+  capability_name: Identity & Access Management
+  confidence: 0.82
+  evidence: GET /v2/iam/permissions  List permissions; POST /v2/iam/roles  Create a new role; identity_CustomRoleWithPermissionsResponse
+  reason: Operations manage roles, permissions and permission groups for platform users — role-based access
+    control, which is Identity & Access Management. It is access-control functionality rather than the
+    vendor's AML domain.
+- tag: Searches
+  spec_file: complyadvantage-searches-api-openapi.yml
+  capability_id: BC-130.10
+  capability_id_l1: BC-130
+  capability_name: Regulatory Compliance Management
+  confidence: 0.75
+  evidence: POST /searches  createSearch  Create a new search; getSearchCertificate  Download search certificate;
+    schema Hit
+  reason: 'Core screening surface: create a search of a person/company against sanctions, watchlists,
+    PEP and adverse-media data, review hits and download a screening certificate — AML regulatory compliance
+    screening, not generic search plumbing.'
+- tag: Webhooks
+  spec_file: complyadvantage-webhooks-api-openapi.yml
+  capability_id: BC-4270.80
+  capability_id_l1: BC-4270
+  capability_name: Webhook & Event Subscription Management
+  confidence: 0.75
+  evidence: '''Create a new webhook configuration'', ''Test a webhook'', ''Update a webhook notification
+    configuration'', schemas ns_TransactionMonitoredV2JsonPayload, ns_CaseCreatedJsonPayloadV2'
+  reason: Lifecycle of outbound webhook notification subscriptions and their event payload schemas, which
+    is exactly the webhook & event subscription management capability.
+- tag: Payment Screening
+  spec_file: complyadvantage-payment-screening-api-openapi.yml
+  capability_id: BC-130.10
+  capability_id_l1: BC-130
+  capability_name: Regulatory Compliance Management
+  confidence: 0.72
+  evidence: paymentScreeningGetRisksByTransaction  Retrieve risks for a transaction; ps_ScreenedEntityInfo;
+    ps_BicMatch
+  reason: Screening payment transactions and their parties against sanctions profiles, with risk disposition
+    workflow, is AML/sanctions regulatory compliance. Mapped to Regulatory Compliance Management as the
+    closest candidate.
+- tag: Alerts & Risks
+  spec_file: complyadvantage-alerts-risks-api-openapi.yml
+  capability_id: BC-130.10
+  capability_id_l1: BC-130
+  capability_name: Regulatory Compliance Management
+  confidence: 0.7
+  evidence: '"Get risks within an alert", "Update the status of a risk", "Get the notes for a screening
+    risk", schema am_TransactionMonitoringRisk'
+  reason: These are AML screening and transaction-monitoring alerts with risk adjudication, muting and
+    investigator notes — regulated financial-crime compliance work. The candidate list has no financial-crime-specific
+    capability, so Regulatory Compliance Management (sector-specific regulation) is the closest honest
+    fit; confidence held at 0.7 because of that imperfect match.
+- tag: Cases
+  spec_file: complyadvantage-cases-api-openapi.yml
+  capability_id: BC-130.10
+  capability_id_l1: BC-130
+  capability_name: Regulatory Compliance Management
+  confidence: 0.7
+  evidence: '"Retrieve the alerts for a case", "Assign a case to a user", "Transition cases in bulk",
+    schemas case-management_CryptoPaymentSubjectDetail, case-management_RemittancePaymentSummaryResponse'
+  reason: Investigation case lifecycle over AML alerts on payments (card, crypto, remittance) — assignment,
+    notes, state transitions by compliance analysts. Mapped to Regulatory Compliance Management as the
+    nearest candidate for financial-crime compliance operations.
+- tag: Monitored Searches
+  spec_file: complyadvantage-monitored-searches-api-openapi.yml
+  capability_id: BC-130.10
+  capability_id_l1: BC-130
+  capability_name: Regulatory Compliance Management
+  confidence: 0.7
+  evidence: The ComplyAdvantage REST API screens people and companies against sanctions and watchlists
+    ... and keeps them under ongoing monitoring; acknowledgeMonitoredSearchChanges  Acknowledge monitored
+    search changes
+  reason: Ongoing sanctions/PEP/adverse-media monitoring of screened subjects with change acknowledgement
+    is AML regulatory compliance monitoring. No AML-specific capability exists in the frame, so Regulatory
+    Compliance Management is the honest fit.
+- tag: Regulatory Reporting
+  spec_file: complyadvantage-regulatory-reporting-api-openapi.yml
+  capability_id: BC-130.10
+  capability_id_l1: BC-130
+  capability_name: Regulatory Compliance Management
+  confidence: 0.7
+  evidence: regulatoryReportingBulkUpsertSarFinancialInstitutions  Bulk create or update SAR financial
+    institutions; /v2/regulatory-reports/prefill-information/fincen/ctr/transaction-locations/bulk
+  reason: Maintains prefill reference data for FinCEN SAR/CTR filings — preparation of mandated AML regulatory
+    reports. Chose Regulatory Compliance Management over BC-200.70 because these are financial-crime filings,
+    not statutory financial accounts.
+- tag: Users
+  spec_file: complyadvantage-users-api-openapi.yml
+  capability_id: BC-620.20
+  capability_id_l1: BC-620
+  capability_name: Identity & Access Management
+  confidence: 0.7
+  evidence: '''List account users'', ''Create a new user'', ''Get permissions for your user'', ''Bulk
+    assign user roles'', schema identity_UserAccountRolesResponse'
+  reason: Tag covers administration of platform user accounts, their account memberships, roles and permissions
+    — identity and access administration, not any AML business function.

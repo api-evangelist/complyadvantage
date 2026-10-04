@@ -695,6 +695,9 @@ apis:
   - type: Webhooks
     url: asyncapi/complyadvantage-webhooks.yml
 common:
+- type: CapabilityMap
+  url: capabilities/complyadvantage-capability-edges.yml
+  name: ComplyAdvantage Business Capability Map
 - type: AgenticAccess
   url: agentic-access/complyadvantage-agentic-access.yml
 - type: DomainSecurity

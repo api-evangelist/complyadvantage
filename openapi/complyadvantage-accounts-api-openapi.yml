@@ -171,69 +171,6 @@ paths:
       - Accounts
 components:
   schemas:
-    identity_StandardUserRole:
-      description: List of roles within the account.
-      properties:
-        assigned_at:
-          description: Date and time the user was assigned the user role in the account.
-          example: '2023-01-01T10:10:10.000Z'
-          format: date-time
-          type: string
-        name:
-          description: Name of the role
-          example: Admin
-          type: string
-      required:
-      - name
-      type: object
-    identity_AccountData:
-      properties:
-        account_type:
-          description: Type of the account
-          enum:
-          - CLIENT_ACCOUNT_TYPE_UNSPECIFIED
-          - CLIENT_ACCOUNT_TYPE_NON_PRODUCTION
-          - CLIENT_ACCOUNT_TYPE_PRODUCTION
-          - UNRECOGNIZED
-          example: CLIENT_ACCOUNT_TYPE_NON_PRODUCTION
-          type: string
-        active:
-          default: false
-          description: If the account is active or deactivated.
-          type: boolean
-        client_identifier:
-          description: The unique identifier of the account's client.
-          example: 00000000-0000-0000-0000-000000000000
-          format: uuid
-          type: string
-        created_at:
-          description: Date and time the account was created.
-          format: date-time
-          type: string
-        deactivated_at:
-          description: Date and time the account was deactivated.
-          format: date-time
-          type: string
-        identifier:
-          description: The unique identifier of the account.
-          example: 00000000-0000-0000-0000-000000000000
-          format: uuid
-          type: string
-        name:
-          description: Name of the account
-          example: A Bank PLC Sandbox
-          type: string
-        updated_at:
-          description: Date and time the account was last updated.
-          format: date-time
-          type: string
-      required:
-      - account_type
-      - active
-      - client_identifier
-      - identifier
-      - name
-      type: object
     identity_ProblemDetailErrorResponse:
       additionalProperties: true
       properties:
@@ -295,6 +232,16 @@ components:
       required:
       - first
       - users
+      type: object
+    identity_AccountSwitchRequestBody:
+      properties:
+        account_identifier:
+          description: The unique identifier of the account.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+      required:
+      - account_identifier
       type: object
     identity_UserData:
       description: List of users.
@@ -359,15 +306,68 @@ components:
       - name
       - user_type
       type: object
-    identity_AccountSwitchRequestBody:
+    identity_AccountData:
       properties:
-        account_identifier:
+        account_type:
+          description: Type of the account
+          enum:
+          - CLIENT_ACCOUNT_TYPE_UNSPECIFIED
+          - CLIENT_ACCOUNT_TYPE_NON_PRODUCTION
+          - CLIENT_ACCOUNT_TYPE_PRODUCTION
+          - UNRECOGNIZED
+          example: CLIENT_ACCOUNT_TYPE_NON_PRODUCTION
+          type: string
+        active:
+          default: false
+          description: If the account is active or deactivated.
+          type: boolean
+        client_identifier:
+          description: The unique identifier of the account's client.
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        created_at:
+          description: Date and time the account was created.
+          format: date-time
+          type: string
+        deactivated_at:
+          description: Date and time the account was deactivated.
+          format: date-time
+          type: string
+        identifier:
           description: The unique identifier of the account.
           example: 00000000-0000-0000-0000-000000000000
           format: uuid
           type: string
+        name:
+          description: Name of the account
+          example: A Bank PLC Sandbox
+          type: string
+        updated_at:
+          description: Date and time the account was last updated.
+          format: date-time
+          type: string
       required:
-      - account_identifier
+      - account_type
+      - active
+      - client_identifier
+      - identifier
+      - name
+      type: object
+    identity_StandardUserRole:
+      description: List of roles within the account.
+      properties:
+        assigned_at:
+          description: Date and time the user was assigned the user role in the account.
+          example: '2023-01-01T10:10:10.000Z'
+          format: date-time
+          type: string
+        name:
+          description: Name of the role
+          example: Admin
+          type: string
+      required:
+      - name
       type: object
   securitySchemes:
     BearerAuth:

@@ -110,20 +110,6 @@ paths:
       - Authentication
 components:
   schemas:
-    TokenCreateRequestBodyV3:
-      properties:
-        access_key:
-          description: The access key identifying your API Credential.
-          example: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-          type: string
-        secret:
-          description: The randomly generated secret associated with your API Credential, used to authenticate the request. Treat this as sensitive, store it securely and do not share it.
-          example: randomsecretstring
-          type: string
-      required:
-      - access_key
-      - secret
-      type: object
     TokenCreateResponseData:
       properties:
         access_token:
@@ -162,6 +148,20 @@ components:
       - username
       - password
       - realm
+      type: object
+    TokenCreateRequestBodyV3:
+      properties:
+        access_key:
+          description: The access key identifying your API Credential.
+          example: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+          type: string
+        secret:
+          description: The randomly generated secret associated with your API Credential, used to authenticate the request. Treat this as sensitive, store it securely and do not share it.
+          example: randomsecretstring
+          type: string
+      required:
+      - access_key
+      - secret
       type: object
   securitySchemes:
     BearerAuth:

@@ -694,102 +694,51 @@ paths:
       - Alerts & Risks
 components:
   schemas:
-    am_AlertMuteV3Response:
+    am_ProblemDetailErrorResponse:
+      additionalProperties: true
       properties:
-        created_at:
-          description: Timestamp when the alert mute was created.
-          example: '2026-03-10T14:55:17.835Z'
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
           format: date-time
           type: string
-        created_by:
-          description: Identifier of the user that created the alert mute.
-          example: 019cd83e-c008-71ca-b7d8-4b834b516614
+        title:
           type:
           - string
           - 'null'
-        entity:
-          $ref: '#/components/schemas/am_AlertMuteEntityResponse'
-        identifier:
-          description: Unique identifier of the alert mute.
-          example: 1cf055ed-f05d-4814-902f-654668b12910
-          format: uuid
-          type: string
-        risk_code:
-          description: Risk code/profile identifier muted for the entity.
-          example: PEP
-          type: string
-        risk_signal_identifier:
-          description: Risk signal identifier associated with the alert mute, when provided.
-          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
-          format: uuid
+        type:
+          format: uri
           type:
           - string
           - 'null'
       required:
-      - created_at
-      - entity
       - identifier
-      - risk_code
+      - timestamp
       type: object
-    sra_Company:
-      description: Identity information of the profile.
+    sra_PostNoteRequest:
+      description: Object containing new note content
       properties:
-        associates:
-          description: List of known associates
-          items:
-            $ref: '#/components/schemas/sra_Associate'
-          type:
-          - array
-          - 'null'
-        fields:
-          description: List of relevant information from the profile
-          items:
-            $ref: '#/components/schemas/sra_Field'
-          type:
-          - array
-          - 'null'
-        names:
-          description: List of known names
-          items:
-            $ref: '#/components/schemas/sra_Name'
-          type:
-          - array
-          - 'null'
-      type:
-      - object
-      - 'null'
-    am_TransitionStatePayload:
-      properties:
-        state:
-          enum:
-          - NOT_STARTED
-          - IN_PROGRESS
-          - POSITIVE_END_STATE
-          - NEGATIVE_END_STATE
+        contents:
+          description: Text content of new note
           type: string
       required:
-      - state
+      - contents
       type: object
-    sra_Aircraft:
-      description: Identity information of the profile.
-      properties:
-        associates:
-          description: List of known associates
-          items:
-            $ref: '#/components/schemas/sra_Associate'
-          type:
-          - array
-          - 'null'
-        names:
-          description: List of known names
-          items:
-            $ref: '#/components/schemas/sra_Name'
-          type:
-          - array
-          - 'null'
-      type:
-      - object
-      - 'null'
     am_TransactionMonitoringRisksResponse:
       properties:
         first:
@@ -828,57 +777,6 @@ components:
       - risks
       - self
       type: object
-    sra_AddedMentions:
-      description: Added mention for a risk
-      properties:
-        added_aml_types:
-          description: Added AML mentions
-          items:
-            description: Added AML mentions
-            type: string
-          type:
-          - array
-          - 'null'
-        added_listings:
-          description: Added listing mentions
-          items:
-            description: Added listing mentions
-            type: string
-          type:
-          - array
-          - 'null'
-        added_snippets:
-          description: Added snippet mentions
-          items:
-            description: Added snippet mentions
-            type: string
-          type:
-          - array
-          - 'null'
-      type: object
-    sra_RiskDetail:
-      description: Detail of the risk.
-      properties:
-        added_mentions:
-          $ref: '#/components/schemas/sra_AddedMentions'
-        change_type:
-          description: Type of change detected on the profile between two successive screens.
-          enum:
-          - ADDED
-          - REMOVED
-          - UPDATED
-          type:
-          - string
-          - 'null'
-        configuration_identifier:
-          description: Unique identifier of the screening configuration used
-          format: uuid
-          type:
-          - string
-          - 'null'
-        profile:
-          $ref: '#/components/schemas/sra_Profile'
-      type: object
     sra_ScreeningNoteResponse:
       description: Object containing note information
       properties:
@@ -913,19 +811,6 @@ components:
           - string
           - 'null'
       type: object
-    am_TransactionMonitoringRiskDetail:
-      properties:
-        scenario:
-          $ref: '#/components/schemas/am_Scenario'
-        transaction:
-          $ref: '#/components/schemas/am_Transaction'
-        triggered_segment:
-          $ref: '#/components/schemas/am_Segment'
-      required:
-      - scenario
-      - transaction
-      - triggered_segment
-      type: object
     am_Transaction:
       properties:
         external_identifier:
@@ -942,6 +827,20 @@ components:
       - identifier
       - type
       type: object
+    sra_DateOfBirth:
+      description: Date of birth
+      properties:
+        source:
+          description: Source associated with the date of birth
+          type:
+          - string
+          - 'null'
+        value:
+          description: Date of birth
+          type:
+          - string
+          - 'null'
+      type: object
     sra_PlaceOfBirth:
       description: Place of birth
       properties:
@@ -952,6 +851,247 @@ components:
           - 'null'
         value:
           description: Place of birth
+          type:
+          - string
+          - 'null'
+      type: object
+    sra_Associate:
+      description: Associate
+      properties:
+        name:
+          description: Name of associate
+          type:
+          - string
+          - 'null'
+        type:
+          description: Association type
+          example: father
+          type:
+          - string
+          - 'null'
+      type: object
+    am_AlertMuteEntityRequest:
+      description: Entity scope for the mute. CUSTOMER identifiers must be valid UUIDs.
+      properties:
+        identifier:
+          description: Identifier of the entity to mute. Must be a UUID when type is CUSTOMER.
+          example: 89013cff-8b3a-4301-bb59-c20f1d381c20
+          type: string
+        type:
+          description: Type of entity the alert mute applies to.
+          enum:
+          - CUSTOMER
+          - COUNTERPARTY
+          example: CUSTOMER
+          type: string
+      required:
+      - identifier
+      - type
+      type: object
+    am_Segment:
+      properties:
+        identifiers:
+          items:
+            format: uuid
+            type: string
+          type: array
+        name:
+          type: string
+        outcome:
+          enum:
+          - ALLOW
+          - HOLD
+          type: string
+        priority:
+          description: Priority 1 is the highest while 9 is the lowest
+          format: int32
+          maximum: 9
+          minimum: 1
+          type: integer
+      required:
+      - identifiers
+      - name
+      - outcome
+      - priority
+      type: object
+    am_RiskStatusUpdatePayload:
+      properties:
+        decision:
+          enum:
+          - NOT_REVIEWED
+          - IN_REVIEW
+          - FALSE_POSITIVE
+          - TRUE_POSITIVE
+          type: string
+      required:
+      - decision
+      type: object
+    am_Scenario:
+      properties:
+        description:
+          type: string
+        identifier:
+          format: uuid
+          type: string
+        name:
+          type: string
+        version:
+          format: int32
+          type: integer
+      required:
+      - description
+      - identifier
+      - name
+      - version
+      type: object
+    sra_Name:
+      description: Name
+      properties:
+        name:
+          description: Name
+          type:
+          - string
+          - 'null'
+        type:
+          description: Name type
+          enum:
+          - AKA
+          example: AKA
+          type:
+          - string
+          - 'null'
+      type: object
+    sra_Image:
+      description: Image
+      properties:
+        source:
+          description: Source associated with the image
+          type:
+          - string
+          - 'null'
+        url:
+          description: Url of the image
+          type:
+          - string
+          - 'null'
+      type: object
+    sra_Company:
+      description: Identity information of the profile.
+      properties:
+        associates:
+          description: List of known associates
+          items:
+            $ref: '#/components/schemas/sra_Associate'
+          type:
+          - array
+          - 'null'
+        fields:
+          description: List of relevant information from the profile
+          items:
+            $ref: '#/components/schemas/sra_Field'
+          type:
+          - array
+          - 'null'
+        names:
+          description: List of known names
+          items:
+            $ref: '#/components/schemas/sra_Name'
+          type:
+          - array
+          - 'null'
+      type:
+      - object
+      - 'null'
+    am_AlertMuteV3Response:
+      properties:
+        created_at:
+          description: Timestamp when the alert mute was created.
+          example: '2026-03-10T14:55:17.835Z'
+          format: date-time
+          type: string
+        created_by:
+          description: Identifier of the user that created the alert mute.
+          example: 019cd83e-c008-71ca-b7d8-4b834b516614
+          type:
+          - string
+          - 'null'
+        entity:
+          $ref: '#/components/schemas/am_AlertMuteEntityResponse'
+        identifier:
+          description: Unique identifier of the alert mute.
+          example: 1cf055ed-f05d-4814-902f-654668b12910
+          format: uuid
+          type: string
+        risk_code:
+          description: Risk code/profile identifier muted for the entity.
+          example: PEP
+          type: string
+        risk_signal_identifier:
+          description: Risk signal identifier associated with the alert mute, when provided.
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+          format: uuid
+          type:
+          - string
+          - 'null'
+      required:
+      - created_at
+      - entity
+      - identifier
+      - risk_code
+      type: object
+    sra_Risk:
+      description: Object containing risk information.
+      properties:
+        created_at:
+          description: Timestamp of when the risk was created
+          format: date-time
+          type:
+          - string
+          - 'null'
+        decision:
+          description: Decision made on the risk.
+          enum:
+          - NOT_REVIEWED
+          - IN_REVIEW
+          - FALSE_POSITIVE
+          - TRUE_POSITIVE
+          type:
+          - string
+          - 'null'
+        detail:
+          $ref: '#/components/schemas/sra_RiskDetail'
+        identifier:
+          description: Unique identifier of the risk
+          format: uuid
+          type:
+          - string
+          - 'null'
+        previous_decision:
+          description: Decision made on the risk.
+          enum:
+          - NOT_REVIEWED
+          - IN_REVIEW
+          - FALSE_POSITIVE
+          - TRUE_POSITIVE
+          type:
+          - string
+          - 'null'
+        type:
+          description: Type of risk
+          enum:
+          - ENTITY_SCREENING
+          type:
+          - string
+          - 'null'
+        updated_at:
+          description: Timestamp of when the risk was updated
+          format: date-time
+          type:
+          - string
+          - 'null'
+        updated_by:
+          description: Unique identifier of the user of last updated the risk
+          format: uuid
           type:
           - string
           - 'null'
@@ -996,103 +1136,82 @@ components:
           - array
           - 'null'
       type: object
-    sra_Source:
-      description: Risks identified from sanction or watch lists.
+    sra_Vessel:
+      description: Identity information of the profile.
       properties:
-        aml_types:
-          description: Aml types associated with the source
+        associates:
+          description: List of known associates
           items:
-            description: Aml types associated with the source
-            type: string
+            $ref: '#/components/schemas/sra_Associate'
           type:
           - array
           - 'null'
-        country_codes:
-          description: Country codes associated with the source
+        names:
+          description: List of known names
           items:
-            description: Country codes associated with the source
-            type: string
+            $ref: '#/components/schemas/sra_Name'
           type:
           - array
           - 'null'
-        fields:
-          description: List of relevant information from the source
-          items:
-            $ref: '#/components/schemas/sra_Field'
-          type:
-          - array
-          - 'null'
-        identifier:
-          description: Unique identifier of the source
-          type:
-          - string
-          - 'null'
-        listing_ended_utc:
-          description: Date the source was removed
-          type:
-          - string
-          - 'null'
-        listing_started_utc:
-          description: Date the source was first published
-          type:
-          - string
-          - 'null'
-        name:
-          description: Name of the source
-          type:
-          - string
-          - 'null'
-        related_urls:
-          description: List urls related to the source
-          items:
-            description: List urls related to the source
-            type: string
-          type:
-          - array
-          - 'null'
-        url:
-          description: Url of the source
-          type:
-          - string
-          - 'null'
-      type: object
-    am_TransactionMonitoringRisk:
+      type:
+      - object
+      - 'null'
+    am_CreateAlertMuteV3Request:
       properties:
-        created_at:
-          format: date-time
+        entity:
+          $ref: '#/components/schemas/am_AlertMuteEntityRequest'
+        risk_code:
+          description: Risk code/profile identifier to mute for the entity.
+          example: PEP
           type: string
-        detail:
-          $ref: '#/components/schemas/am_TransactionMonitoringRiskDetail'
-        identifier:
+        risk_signal_identifier:
+          description: Optional risk signal identifier associated with the alert mute.
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
           format: uuid
-          type: string
-        type:
+          type:
+          - string
+          - 'null'
+        source_risk_app:
+          description: Risk application that produced the muted risk.
           enum:
-          - TRANSACTION_MONITORING
+          - UNSPECIFIED
+          - CUSTOMER_SCREENING
+          - PAYMENT_SCREENING
+          example: PAYMENT_SCREENING
           type: string
       required:
-      - created_at
-      - detail
-      - identifier
-      - type
+      - entity
+      - risk_code
+      - source_risk_app
       type: object
-    am_Scenario:
+    am_TransitionStatePayload:
       properties:
-        description:
+        state:
+          enum:
+          - NOT_STARTED
+          - IN_PROGRESS
+          - POSITIVE_END_STATE
+          - NEGATIVE_END_STATE
           type: string
-        identifier:
-          format: uuid
-          type: string
-        name:
-          type: string
-        version:
-          format: int32
-          type: integer
       required:
-      - description
-      - identifier
-      - name
-      - version
+      - state
+      type: object
+    am_CreateAlertMuteRequest:
+      properties:
+        customer_identifier:
+          format: uuid
+          type:
+          - string
+          - 'null'
+        profile_identifier:
+          type: string
+        risk_identifier:
+          format: uuid
+          type:
+          - string
+          - 'null'
+      required:
+      - profile_identifier
       type: object
     am_PaginatedResponseAlertMuteV3Response:
       properties:
@@ -1156,118 +1275,62 @@ components:
       - id
       - profile_identifier
       type: object
-    sra_Image:
-      description: Image
+    am_TransactionMonitoringRisk:
       properties:
-        source:
-          description: Source associated with the image
-          type:
-          - string
-          - 'null'
-        url:
-          description: Url of the image
-          type:
-          - string
-          - 'null'
-      type: object
-    sra_Vessel:
-      description: Identity information of the profile.
-      properties:
-        associates:
-          description: List of known associates
-          items:
-            $ref: '#/components/schemas/sra_Associate'
-          type:
-          - array
-          - 'null'
-        names:
-          description: List of known names
-          items:
-            $ref: '#/components/schemas/sra_Name'
-          type:
-          - array
-          - 'null'
-      type:
-      - object
-      - 'null'
-    am_ProblemDetailErrorResponse:
-      additionalProperties: true
-      properties:
+        created_at:
+          format: date-time
+          type: string
         detail:
-          type:
-          - string
-          - 'null'
+          $ref: '#/components/schemas/am_TransactionMonitoringRiskDetail'
         identifier:
           format: uuid
           type: string
-        instance:
-          format: uri
-          type:
-          - string
-          - 'null'
-        status:
-          format: int32
-          type:
-          - integer
-          - 'null'
-        timestamp:
-          format: date-time
-          type: string
-        title:
-          type:
-          - string
-          - 'null'
         type:
-          format: uri
-          type:
-          - string
-          - 'null'
+          enum:
+          - TRANSACTION_MONITORING
+          type: string
       required:
+      - created_at
+      - detail
       - identifier
-      - timestamp
+      - type
       type: object
-    sra_Associate:
-      description: Associate
+    sra_GetNotesResponse:
+      description: A paginated collection of notes
       properties:
-        name:
-          description: Name of associate
-          type:
-          - string
-          - 'null'
-        type:
-          description: Association type
-          example: father
-          type:
-          - string
-          - 'null'
-      type: object
-    am_GetAlertMutesResponse:
-      properties:
-        alert_mutes:
-          items:
-            $ref: '#/components/schemas/am_AlertMuteDTO'
-          type: array
         first:
-          type: string
-        next:
+          description: URL to fetch the first page of items
           type:
           - string
+          - 'null'
+        next:
+          description: URL to fetch the next page of items
+          type:
+          - string
+          - 'null'
+        notes:
+          description: List of notes
+          items:
+            $ref: '#/components/schemas/sra_ScreeningNoteResponse'
+          type:
+          - array
           - 'null'
         prev:
+          description: URL to fetch the previous page of items
           type:
           - string
           - 'null'
         self:
-          type: string
+          description: URL to fetch the current page of items
+          type:
+          - string
+          - 'null'
         total_count:
-          format: int64
+          description: Total number of notes across all pages
+          format: int32
           type:
           - integer
           - 'null'
-      required:
-      - alert_mutes
-      - first
-      - self
       type: object
     sra_ListRiskV1Response:
       properties:
@@ -1310,35 +1373,323 @@ components:
           - integer
           - 'null'
       type: object
-    sra_Media:
-      description: Risk identified in media.
+    sra_AddedMentions:
+      description: Added mention for a risk
       properties:
+        added_aml_types:
+          description: Added AML mentions
+          items:
+            description: Added AML mentions
+            type: string
+          type:
+          - array
+          - 'null'
+        added_listings:
+          description: Added listing mentions
+          items:
+            description: Added listing mentions
+            type: string
+          type:
+          - array
+          - 'null'
+        added_snippets:
+          description: Added snippet mentions
+          items:
+            description: Added snippet mentions
+            type: string
+          type:
+          - array
+          - 'null'
+      type: object
+    sra_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
         identifier:
-          description: Unique identifier of the media (if available)
+          format: uuid
           type:
           - string
           - 'null'
-        publishing_date:
-          description: Publishing date of the media (if available)
+        instance:
+          format: uri
           type:
           - string
           - 'null'
-        snippet:
-          description: Snippet of the media (if available)
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
           type:
           - string
           - 'null'
         title:
-          description: Title of the media (if available)
           type:
           - string
           - 'null'
-        url:
-          description: Url of the media (if available)
+        type:
+          format: uri
           type:
           - string
           - 'null'
       type: object
+    am_AlertMuteEntityResponse:
+      description: Entity scope the alert mute applies to.
+      properties:
+        identifier:
+          description: Identifier of the muted entity.
+          example: 89013cff-8b3a-4301-bb59-c20f1d381c20
+          type: string
+        type:
+          description: Type of muted entity.
+          enum:
+          - CUSTOMER
+          - COUNTERPARTY
+          example: CUSTOMER
+          type: string
+      required:
+      - identifier
+      - type
+      type: object
+    am_GetAlertMutesResponse:
+      properties:
+        alert_mutes:
+          items:
+            $ref: '#/components/schemas/am_AlertMuteDTO'
+          type: array
+        first:
+          type: string
+        next:
+          type:
+          - string
+          - 'null'
+        prev:
+          type:
+          - string
+          - 'null'
+        self:
+          type: string
+        total_count:
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - alert_mutes
+      - first
+      - self
+      type: object
+    sra_Source:
+      description: Risks identified from sanction or watch lists.
+      properties:
+        aml_types:
+          description: Aml types associated with the source
+          items:
+            description: Aml types associated with the source
+            type: string
+          type:
+          - array
+          - 'null'
+        country_codes:
+          description: Country codes associated with the source
+          items:
+            description: Country codes associated with the source
+            type: string
+          type:
+          - array
+          - 'null'
+        fields:
+          description: List of relevant information from the source
+          items:
+            $ref: '#/components/schemas/sra_Field'
+          type:
+          - array
+          - 'null'
+        identifier:
+          description: Unique identifier of the source
+          type:
+          - string
+          - 'null'
+        listing_ended_utc:
+          description: Date the source was removed
+          type:
+          - string
+          - 'null'
+        listing_started_utc:
+          description: Date the source was first published
+          type:
+          - string
+          - 'null'
+        name:
+          description: Name of the source
+          type:
+          - string
+          - 'null'
+        related_urls:
+          description: List urls related to the source
+          items:
+            description: List urls related to the source
+            type: string
+          type:
+          - array
+          - 'null'
+        url:
+          description: Url of the source
+          type:
+          - string
+          - 'null'
+      type: object
+    sra_RiskDetail:
+      description: Detail of the risk.
+      properties:
+        added_mentions:
+          $ref: '#/components/schemas/sra_AddedMentions'
+        change_type:
+          description: Type of change detected on the profile between two successive screens.
+          enum:
+          - ADDED
+          - REMOVED
+          - UPDATED
+          type:
+          - string
+          - 'null'
+        configuration_identifier:
+          description: Unique identifier of the screening configuration used
+          format: uuid
+          type:
+          - string
+          - 'null'
+        profile:
+          $ref: '#/components/schemas/sra_Profile'
+      type: object
+    sra_DateOfDeath:
+      description: Date of death
+      properties:
+        source:
+          description: Source associated with the date of death
+          type:
+          - string
+          - 'null'
+        value:
+          description: Date of death
+          type:
+          - string
+          - 'null'
+      type: object
+    am_TransactionMonitoringRiskDetail:
+      properties:
+        scenario:
+          $ref: '#/components/schemas/am_Scenario'
+        transaction:
+          $ref: '#/components/schemas/am_Transaction'
+        triggered_segment:
+          $ref: '#/components/schemas/am_Segment'
+      required:
+      - scenario
+      - transaction
+      - triggered_segment
+      type: object
+    sra_Profile:
+      description: A list of entity screening risks associated with the alert.
+      properties:
+        aircraft:
+          $ref: '#/components/schemas/sra_Aircraft'
+        company:
+          $ref: '#/components/schemas/sra_Company'
+        identifier:
+          description: Unique identifier of the profile
+          type:
+          - string
+          - 'null'
+        match_score:
+          description: Match score
+          format: double
+          type:
+          - number
+          - 'null'
+        match_types:
+          description: List of reasons the profile matched the screen criteria
+          example:
+          - name_exact
+          items:
+            description: List of reasons the profile matched the screen criteria
+            example: '["name_exact"]'
+            type: string
+          type:
+          - array
+          - 'null'
+        matching_name:
+          description: Name of the profile that matched the screen criteria
+          type:
+          - string
+          - 'null'
+        person:
+          $ref: '#/components/schemas/sra_Person'
+        risk_indicators:
+          $ref: '#/components/schemas/sra_RiskIndicators'
+        vessel:
+          $ref: '#/components/schemas/sra_Vessel'
+      type: object
+    sra_Person:
+      description: Identity information of the profile.
+      properties:
+        associates:
+          description: List of known associates
+          items:
+            $ref: '#/components/schemas/sra_Associate'
+          type:
+          - array
+          - 'null'
+        dates_of_birth:
+          description: List of known dates of birth
+          items:
+            $ref: '#/components/schemas/sra_DateOfBirth'
+          type:
+          - array
+          - 'null'
+        dates_of_death:
+          description: List of known dates of death
+          items:
+            $ref: '#/components/schemas/sra_DateOfDeath'
+          type:
+          - array
+          - 'null'
+        fields:
+          description: List of relevant information from the profile
+          items:
+            $ref: '#/components/schemas/sra_Field'
+          type:
+          - array
+          - 'null'
+        images:
+          description: List of images
+          items:
+            $ref: '#/components/schemas/sra_Image'
+          type:
+          - array
+          - 'null'
+        names:
+          description: List of known names
+          items:
+            $ref: '#/components/schemas/sra_Name'
+          type:
+          - array
+          - 'null'
+        places_of_birth:
+          description: List of known places of birth
+          items:
+            $ref: '#/components/schemas/sra_PlaceOfBirth'
+          type:
+          - array
+          - 'null'
+      type:
+      - object
+      - 'null'
     sra_PepSource:
       description: Risks identified from PEP lists.
       properties:
@@ -1439,333 +1790,31 @@ components:
           - string
           - 'null'
       type: object
-    sra_PostNoteRequest:
-      description: Object containing new note content
-      properties:
-        contents:
-          description: Text content of new note
-          type: string
-      required:
-      - contents
-      type: object
-    am_Segment:
-      properties:
-        identifiers:
-          items:
-            format: uuid
-            type: string
-          type: array
-        name:
-          type: string
-        outcome:
-          enum:
-          - ALLOW
-          - HOLD
-          type: string
-        priority:
-          description: Priority 1 is the highest while 9 is the lowest
-          format: int32
-          maximum: 9
-          minimum: 1
-          type: integer
-      required:
-      - identifiers
-      - name
-      - outcome
-      - priority
-      type: object
-    am_CreateAlertMuteV3Request:
-      properties:
-        entity:
-          $ref: '#/components/schemas/am_AlertMuteEntityRequest'
-        risk_code:
-          description: Risk code/profile identifier to mute for the entity.
-          example: PEP
-          type: string
-        risk_signal_identifier:
-          description: Optional risk signal identifier associated with the alert mute.
-          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
-          format: uuid
-          type:
-          - string
-          - 'null'
-        source_risk_app:
-          description: Risk application that produced the muted risk.
-          enum:
-          - UNSPECIFIED
-          - CUSTOMER_SCREENING
-          - PAYMENT_SCREENING
-          example: PAYMENT_SCREENING
-          type: string
-      required:
-      - entity
-      - risk_code
-      - source_risk_app
-      type: object
-    sra_Name:
-      description: Name
-      properties:
-        name:
-          description: Name
-          type:
-          - string
-          - 'null'
-        type:
-          description: Name type
-          enum:
-          - AKA
-          example: AKA
-          type:
-          - string
-          - 'null'
-      type: object
-    sra_DateOfDeath:
-      description: Date of death
-      properties:
-        source:
-          description: Source associated with the date of death
-          type:
-          - string
-          - 'null'
-        value:
-          description: Date of death
-          type:
-          - string
-          - 'null'
-      type: object
-    am_CreateAlertMuteRequest:
-      properties:
-        customer_identifier:
-          format: uuid
-          type:
-          - string
-          - 'null'
-        profile_identifier:
-          type: string
-        risk_identifier:
-          format: uuid
-          type:
-          - string
-          - 'null'
-      required:
-      - profile_identifier
-      type: object
-    sra_GetNotesResponse:
-      description: A paginated collection of notes
-      properties:
-        first:
-          description: URL to fetch the first page of items
-          type:
-          - string
-          - 'null'
-        next:
-          description: URL to fetch the next page of items
-          type:
-          - string
-          - 'null'
-        notes:
-          description: List of notes
-          items:
-            $ref: '#/components/schemas/sra_ScreeningNoteResponse'
-          type:
-          - array
-          - 'null'
-        prev:
-          description: URL to fetch the previous page of items
-          type:
-          - string
-          - 'null'
-        self:
-          description: URL to fetch the current page of items
-          type:
-          - string
-          - 'null'
-        total_count:
-          description: Total number of notes across all pages
-          format: int32
-          type:
-          - integer
-          - 'null'
-      type: object
-    am_AlertMuteEntityResponse:
-      description: Entity scope the alert mute applies to.
+    sra_Media:
+      description: Risk identified in media.
       properties:
         identifier:
-          description: Identifier of the muted entity.
-          example: 89013cff-8b3a-4301-bb59-c20f1d381c20
-          type: string
-        type:
-          description: Type of muted entity.
-          enum:
-          - CUSTOMER
-          - COUNTERPARTY
-          example: CUSTOMER
-          type: string
-      required:
-      - identifier
-      - type
-      type: object
-    sra_Profile:
-      description: A list of entity screening risks associated with the alert.
-      properties:
-        aircraft:
-          $ref: '#/components/schemas/sra_Aircraft'
-        company:
-          $ref: '#/components/schemas/sra_Company'
-        identifier:
-          description: Unique identifier of the profile
+          description: Unique identifier of the media (if available)
           type:
           - string
           - 'null'
-        match_score:
-          description: Match score
-          format: double
-          type:
-          - number
-          - 'null'
-        match_types:
-          description: List of reasons the profile matched the screen criteria
-          example:
-          - name_exact
-          items:
-            description: List of reasons the profile matched the screen criteria
-            example: '["name_exact"]'
-            type: string
-          type:
-          - array
-          - 'null'
-        matching_name:
-          description: Name of the profile that matched the screen criteria
+        publishing_date:
+          description: Publishing date of the media (if available)
           type:
           - string
           - 'null'
-        person:
-          $ref: '#/components/schemas/sra_Person'
-        risk_indicators:
-          $ref: '#/components/schemas/sra_RiskIndicators'
-        vessel:
-          $ref: '#/components/schemas/sra_Vessel'
-      type: object
-    sra_Person:
-      description: Identity information of the profile.
-      properties:
-        associates:
-          description: List of known associates
-          items:
-            $ref: '#/components/schemas/sra_Associate'
-          type:
-          - array
-          - 'null'
-        dates_of_birth:
-          description: List of known dates of birth
-          items:
-            $ref: '#/components/schemas/sra_DateOfBirth'
-          type:
-          - array
-          - 'null'
-        dates_of_death:
-          description: List of known dates of death
-          items:
-            $ref: '#/components/schemas/sra_DateOfDeath'
-          type:
-          - array
-          - 'null'
-        fields:
-          description: List of relevant information from the profile
-          items:
-            $ref: '#/components/schemas/sra_Field'
-          type:
-          - array
-          - 'null'
-        images:
-          description: List of images
-          items:
-            $ref: '#/components/schemas/sra_Image'
-          type:
-          - array
-          - 'null'
-        names:
-          description: List of known names
-          items:
-            $ref: '#/components/schemas/sra_Name'
-          type:
-          - array
-          - 'null'
-        places_of_birth:
-          description: List of known places of birth
-          items:
-            $ref: '#/components/schemas/sra_PlaceOfBirth'
-          type:
-          - array
-          - 'null'
-      type:
-      - object
-      - 'null'
-    am_RiskStatusUpdatePayload:
-      properties:
-        decision:
-          enum:
-          - NOT_REVIEWED
-          - IN_REVIEW
-          - FALSE_POSITIVE
-          - TRUE_POSITIVE
-          type: string
-      required:
-      - decision
-      type: object
-    sra_Risk:
-      description: Object containing risk information.
-      properties:
-        created_at:
-          description: Timestamp of when the risk was created
-          format: date-time
+        snippet:
+          description: Snippet of the media (if available)
           type:
           - string
           - 'null'
-        decision:
-          description: Decision made on the risk.
-          enum:
-          - NOT_REVIEWED
-          - IN_REVIEW
-          - FALSE_POSITIVE
-          - TRUE_POSITIVE
+        title:
+          description: Title of the media (if available)
           type:
           - string
           - 'null'
-        detail:
-          $ref: '#/components/schemas/sra_RiskDetail'
-        identifier:
-          description: Unique identifier of the risk
-          format: uuid
-          type:
-          - string
-          - 'null'
-        previous_decision:
-          description: Decision made on the risk.
-          enum:
-          - NOT_REVIEWED
-          - IN_REVIEW
-          - FALSE_POSITIVE
-          - TRUE_POSITIVE
-          type:
-          - string
-          - 'null'
-        type:
-          description: Type of risk
-          enum:
-          - ENTITY_SCREENING
-          type:
-          - string
-          - 'null'
-        updated_at:
-          description: Timestamp of when the risk was updated
-          format: date-time
-          type:
-          - string
-          - 'null'
-        updated_by:
-          description: Unique identifier of the user of last updated the risk
-          format: uuid
+        url:
+          description: Url of the media (if available)
           type:
           - string
           - 'null'
@@ -1789,75 +1838,26 @@ components:
           - string
           - 'null'
       type: object
-    am_AlertMuteEntityRequest:
-      description: Entity scope for the mute. CUSTOMER identifiers must be valid UUIDs.
+    sra_Aircraft:
+      description: Identity information of the profile.
       properties:
-        identifier:
-          description: Identifier of the entity to mute. Must be a UUID when type is CUSTOMER.
-          example: 89013cff-8b3a-4301-bb59-c20f1d381c20
-          type: string
-        type:
-          description: Type of entity the alert mute applies to.
-          enum:
-          - CUSTOMER
-          - COUNTERPARTY
-          example: CUSTOMER
-          type: string
-      required:
-      - identifier
-      - type
-      type: object
-    sra_ProblemDetailErrorResponse:
-      additionalProperties: true
-      properties:
-        detail:
+        associates:
+          description: List of known associates
+          items:
+            $ref: '#/components/schemas/sra_Associate'
           type:
-          - string
+          - array
           - 'null'
-        identifier:
-          format: uuid
+        names:
+          description: List of known names
+          items:
+            $ref: '#/components/schemas/sra_Name'
           type:
-          - string
+          - array
           - 'null'
-        instance:
-          format: uri
-          type:
-          - string
-          - 'null'
-        status:
-          format: int32
-          type:
-          - integer
-          - 'null'
-        timestamp:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        title:
-          type:
-          - string
-          - 'null'
-        type:
-          format: uri
-          type:
-          - string
-          - 'null'
-      type: object
-    sra_DateOfBirth:
-      description: Date of birth
-      properties:
-        source:
-          description: Source associated with the date of birth
-          type:
-          - string
-          - 'null'
-        value:
-          description: Date of birth
-          type:
-          - string
-          - 'null'
-      type: object
+      type:
+      - object
+      - 'null'
   securitySchemes:
     BearerAuth:
       description: HTTP Bearer Token Authentication

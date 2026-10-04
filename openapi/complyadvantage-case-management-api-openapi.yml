@@ -137,25 +137,10 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 components:
+  responses:
+    NotFound:
+      description: The search or resource was not found.
   schemas:
-    Hit:
-      type: object
-      properties:
-        doc:
-          type: object
-          description: The matched entity - id, name, entity_type, aka, associates, sources, types, fields, and media references.
-        match_types:
-          type: array
-          items:
-            type: string
-        match_types_details:
-          type: object
-        score:
-          type: number
-        is_whitelisted:
-          type: boolean
-        match_status:
-          type: string
     SearchEnvelope:
       type: object
       properties:
@@ -197,9 +182,24 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Hit'
-  responses:
-    NotFound:
-      description: The search or resource was not found.
+    Hit:
+      type: object
+      properties:
+        doc:
+          type: object
+          description: The matched entity - id, name, entity_type, aka, associates, sources, types, fields, and media references.
+        match_types:
+          type: array
+          items:
+            type: string
+        match_types_details:
+          type: object
+        score:
+          type: number
+        is_whitelisted:
+          type: boolean
+        match_status:
+          type: string
   parameters:
     SearchId:
       name: id

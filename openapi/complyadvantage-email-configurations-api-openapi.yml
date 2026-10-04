@@ -306,87 +306,15 @@ components:
       required:
       - email
       type: object
-    ns_PaginatedResponseEmailConfigurationLog:
+    ns_DeletedEmailConfigurationResponse:
       properties:
-        email_notification_configurations:
-          items:
-            $ref: '#/components/schemas/ns_EmailConfigurationLog'
-          type: array
-        first:
-          description: The URL path to the first page.
-          example: /v1/resource?page_number=1
-          type: string
-        next:
-          description: The URL path to the next page.
-          example: /v1/resource?page_number=4
-          type:
-          - string
-          - 'null'
-        prev:
-          description: The URL path to the previous page.
-          example: /v1/resource?page_number=2
-          type:
-          - string
-          - 'null'
-        self:
-          description: The URL path to the current page.
-          example: /v1/resource?page_number=3
-          type: string
-        total_count:
-          description: Total number of items.
-          example: 60
-          format: int64
-          type:
-          - integer
-          - 'null'
-      required:
-      - first
-      - self
-      - email_notification_configurations
-      type: object
-    ns_EnabledFor:
-      description: Lists of user and role identifiers the email will be sent to
-      properties:
-        roles:
-          description: List of role identifiers the email will be sent to
+        identifier:
+          description: Email configuration unique identifier
+          example: 6de244da-11f8-479d-aec7-c4d2126b092e
           format: uuid
-          items:
-            description: List of role identifiers the email will be sent to
-            format: uuid
-            type: string
-          type: array
-        users:
-          description: List of user identifiers the email will be sent to
-          format: uuid
-          items:
-            description: List of user identifiers the email will be sent to
-            format: uuid
-            type: string
-          type: array
+          type: string
       required:
-      - roles
-      - users
-      type: object
-    ns_UpdateEmailConfigurationPayload:
-      properties:
-        enabled_for:
-          $ref: '#/components/schemas/ns_EnabledFor'
-      required:
-      - enabled_for
-      type: object
-    ns_EmailConfigurationPayload:
-      properties:
-        enabled_for:
-          $ref: '#/components/schemas/ns_EnabledFor'
-        type:
-          description: The event type that the user wants to listen to
-          enum:
-          - CASE_ASSIGNED
-          type:
-          - string
-          - 'null'
-      required:
-      - enabled_for
+      - identifier
       type: object
     ns_ProblemDetailErrorResponse:
       additionalProperties: true
@@ -424,49 +352,28 @@ components:
       - identifier
       - timestamp
       type: object
-    ns_TestEmailResult:
-      description: Response from the SMTP email server on the attempt to send
+    ns_EnabledFor:
+      description: Lists of user and role identifiers the email will be sent to
       properties:
-        response_type:
-          description: Type of response
-          enum:
-          - SUCCESS
-          - SERVER_ERROR
-          example: SUCCESS
-          format: String
-          type: string
-        server_response_code:
-          description: SMTP server response
-          example: 200
-          format: int32
-          type:
-          - integer
-          - 'null'
-      required:
-      - response_type
-      type: object
-    ns_TestEmailResponse:
-      properties:
-        identifier:
-          description: Test email unique identifier
-          example: 6de244da-11f8-479d-aec7-c4d2126b092e
+        roles:
+          description: List of role identifiers the email will be sent to
           format: uuid
-          type: string
-        test_result:
-          $ref: '#/components/schemas/ns_TestEmailResult'
-      required:
-      - identifier
-      - test_result
-      type: object
-    ns_DeletedEmailConfigurationResponse:
-      properties:
-        identifier:
-          description: Email configuration unique identifier
-          example: 6de244da-11f8-479d-aec7-c4d2126b092e
+          items:
+            description: List of role identifiers the email will be sent to
+            format: uuid
+            type: string
+          type: array
+        users:
+          description: List of user identifiers the email will be sent to
           format: uuid
-          type: string
+          items:
+            description: List of user identifiers the email will be sent to
+            format: uuid
+            type: string
+          type: array
       required:
-      - identifier
+      - roles
+      - users
       type: object
     ns_EmailConfigurationLog:
       properties:
@@ -505,6 +412,99 @@ components:
       - identifier
       - type
       - updated_at
+      type: object
+    ns_UpdateEmailConfigurationPayload:
+      properties:
+        enabled_for:
+          $ref: '#/components/schemas/ns_EnabledFor'
+      required:
+      - enabled_for
+      type: object
+    ns_PaginatedResponseEmailConfigurationLog:
+      properties:
+        email_notification_configurations:
+          items:
+            $ref: '#/components/schemas/ns_EmailConfigurationLog'
+          type: array
+        first:
+          description: The URL path to the first page.
+          example: /v1/resource?page_number=1
+          type: string
+        next:
+          description: The URL path to the next page.
+          example: /v1/resource?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v1/resource?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v1/resource?page_number=3
+          type: string
+        total_count:
+          description: Total number of items.
+          example: 60
+          format: int64
+          type:
+          - integer
+          - 'null'
+      required:
+      - first
+      - self
+      - email_notification_configurations
+      type: object
+    ns_EmailConfigurationPayload:
+      properties:
+        enabled_for:
+          $ref: '#/components/schemas/ns_EnabledFor'
+        type:
+          description: The event type that the user wants to listen to
+          enum:
+          - CASE_ASSIGNED
+          type:
+          - string
+          - 'null'
+      required:
+      - enabled_for
+      type: object
+    ns_TestEmailResult:
+      description: Response from the SMTP email server on the attempt to send
+      properties:
+        response_type:
+          description: Type of response
+          enum:
+          - SUCCESS
+          - SERVER_ERROR
+          example: SUCCESS
+          format: String
+          type: string
+        server_response_code:
+          description: SMTP server response
+          example: 200
+          format: int32
+          type:
+          - integer
+          - 'null'
+      required:
+      - response_type
+      type: object
+    ns_TestEmailResponse:
+      properties:
+        identifier:
+          description: Test email unique identifier
+          example: 6de244da-11f8-479d-aec7-c4d2126b092e
+          format: uuid
+          type: string
+        test_result:
+          $ref: '#/components/schemas/ns_TestEmailResult'
+      required:
+      - identifier
+      - test_result
       type: object
   securitySchemes:
     BearerAuth:

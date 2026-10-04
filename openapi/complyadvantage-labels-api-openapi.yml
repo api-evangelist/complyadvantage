@@ -308,30 +308,7 @@ paths:
       - Labels
 components:
   schemas:
-    label_CreateLabelsResponse:
-      properties:
-        labels:
-          description: List of labels
-          items:
-            $ref: '#/components/schemas/label_Label'
-          type: array
-      required:
-      - labels
-      type: object
-    customer-manager_Unit:
-      type: object
-    customer-manager_LabelV2:
-      properties:
-        identifier:
-          format: uuid
-          type: string
-        name:
-          type: string
-      required:
-      - identifier
-      - name
-      type: object
-    label_ProblemDetailErrorResponse:
+    customer-manager_ProblemDetailErrorResponse:
       additionalProperties: true
       properties:
         detail:
@@ -396,89 +373,6 @@ components:
       - updated_at
       - updated_by
       type: object
-    label_GetLabelsPaginatedResponse:
-      properties:
-        first:
-          description: The URL path to the first page.
-          example: /v2/labels?page_number=1
-          type: string
-        labels:
-          description: List of labels
-          items:
-            $ref: '#/components/schemas/label_Label'
-          type: array
-        next:
-          description: The URL path to the next page.
-          example: /v2/labels?page_number=4
-          type:
-          - string
-          - 'null'
-        prev:
-          description: The URL path to the previous page.
-          example: /v2/labels?page_number=2
-          type:
-          - string
-          - 'null'
-        self:
-          description: The URL path to the current page.
-          example: /v2/labels?page_number=3
-          type: string
-        total_count:
-          description: Total number of labels.
-          example: 50
-          format: int64
-          type: integer
-      required:
-      - first
-      - labels
-      - self
-      - total_count
-      type: object
-    label_UpdateLabelRequest:
-      properties:
-        name:
-          maxLength: 280
-          minLength: 0
-          type: string
-      required:
-      - name
-      type: object
-    customer-manager_ProblemDetailErrorResponse:
-      additionalProperties: true
-      properties:
-        detail:
-          type:
-          - string
-          - 'null'
-        identifier:
-          format: uuid
-          type: string
-        instance:
-          format: uri
-          type:
-          - string
-          - 'null'
-        status:
-          format: int32
-          type:
-          - integer
-          - 'null'
-        timestamp:
-          format: date-time
-          type: string
-        title:
-          type:
-          - string
-          - 'null'
-        type:
-          format: uri
-          type:
-          - string
-          - 'null'
-      required:
-      - identifier
-      - timestamp
-      type: object
     customer-manager_PaginatedCustomerLabelsV2Response:
       properties:
         first:
@@ -517,6 +411,82 @@ components:
       - labels
       - self
       type: object
+    customer-manager_Unit:
+      type: object
+    label_GetLabelsPaginatedResponse:
+      properties:
+        first:
+          description: The URL path to the first page.
+          example: /v2/labels?page_number=1
+          type: string
+        labels:
+          description: List of labels
+          items:
+            $ref: '#/components/schemas/label_Label'
+          type: array
+        next:
+          description: The URL path to the next page.
+          example: /v2/labels?page_number=4
+          type:
+          - string
+          - 'null'
+        prev:
+          description: The URL path to the previous page.
+          example: /v2/labels?page_number=2
+          type:
+          - string
+          - 'null'
+        self:
+          description: The URL path to the current page.
+          example: /v2/labels?page_number=3
+          type: string
+        total_count:
+          description: Total number of labels.
+          example: 50
+          format: int64
+          type: integer
+      required:
+      - first
+      - labels
+      - self
+      - total_count
+      type: object
+    label_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
     label_CreateLabelsPayload:
       properties:
         labels:
@@ -532,6 +502,36 @@ components:
           uniqueItems: true
       required:
       - labels
+      type: object
+    label_CreateLabelsResponse:
+      properties:
+        labels:
+          description: List of labels
+          items:
+            $ref: '#/components/schemas/label_Label'
+          type: array
+      required:
+      - labels
+      type: object
+    customer-manager_LabelV2:
+      properties:
+        identifier:
+          format: uuid
+          type: string
+        name:
+          type: string
+      required:
+      - identifier
+      - name
+      type: object
+    label_UpdateLabelRequest:
+      properties:
+        name:
+          maxLength: 280
+          minLength: 0
+          type: string
+      required:
+      - name
       type: object
   securitySchemes:
     BearerAuth:

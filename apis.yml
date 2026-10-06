@@ -69,7 +69,7 @@ tags_raw:
 - Financial Crime
 - RegTech
 created: '2026-07-11'
-modified: '2026-08-27'
+modified: '2026-10-06'
 specificationVersion: '0.23'
 apis:
 - aid: complyadvantage:complyadvantage-case-management-api
@@ -695,6 +695,8 @@ apis:
   - type: Webhooks
     url: asyncapi/complyadvantage-webhooks.yml
 common:
+- url: https://complyadvantage.com/feed/
+  type: BlogRSS
 - type: CapabilityMap
   url: capabilities/complyadvantage-capability-edges.yml
   name: ComplyAdvantage Business Capability Map

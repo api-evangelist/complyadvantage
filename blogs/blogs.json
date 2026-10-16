@@ -1,0 +1,21 @@
+{
+  "repo": "complyadvantage",
+  "feeds": [
+    {
+      "source": "https://complyadvantage.com/feed/",
+      "feed_url": "https://complyadvantage.com/feed/",
+      "title": "",
+      "saved": 1,
+      "method": "feed"
+    },
+    {
+      "source": "https://complyadvantage.com/insights/",
+      "feed_url": "https://complyadvantage.com/insights/feed/",
+      "title": "",
+      "saved": 0,
+      "method": "discovered"
+    }
+  ],
+  "post_count": 1,
+  "fetched": "2026-10-10T13:15:00Z"
+}

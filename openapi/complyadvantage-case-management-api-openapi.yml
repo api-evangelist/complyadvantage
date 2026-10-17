@@ -137,20 +137,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 components:
-  responses:
-    NotFound:
-      description: The search or resource was not found.
   schemas:
-    SearchEnvelope:
-      type: object
-      properties:
-        status:
-          type: string
-        content:
-          type: object
-          properties:
-            data:
-              $ref: '#/components/schemas/Search'
     Search:
       type: object
       properties:
@@ -200,6 +187,19 @@ components:
           type: boolean
         match_status:
           type: string
+    SearchEnvelope:
+      type: object
+      properties:
+        status:
+          type: string
+        content:
+          type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Search'
+  responses:
+    NotFound:
+      description: The search or resource was not found.
   parameters:
     SearchId:
       name: id

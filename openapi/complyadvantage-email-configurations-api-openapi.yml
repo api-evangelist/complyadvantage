@@ -296,122 +296,19 @@ paths:
       - Email Configurations
 components:
   schemas:
-    ns_EmailTestPayload:
+    ns_EmailConfigurationPayload:
       properties:
-        email:
-          description: The recipient email address to which the test email will be sent.
-          example: me@complyadvantage.com
-          format: email
-          type: string
-      required:
-      - email
-      type: object
-    ns_DeletedEmailConfigurationResponse:
-      properties:
-        identifier:
-          description: Email configuration unique identifier
-          example: 6de244da-11f8-479d-aec7-c4d2126b092e
-          format: uuid
-          type: string
-      required:
-      - identifier
-      type: object
-    ns_ProblemDetailErrorResponse:
-      additionalProperties: true
-      properties:
-        detail:
-          type:
-          - string
-          - 'null'
-        identifier:
-          format: uuid
-          type: string
-        instance:
-          format: uri
-          type:
-          - string
-          - 'null'
-        status:
-          format: int32
-          type:
-          - integer
-          - 'null'
-        timestamp:
-          format: date-time
-          type: string
-        title:
-          type:
-          - string
-          - 'null'
-        type:
-          format: uri
-          type:
-          - string
-          - 'null'
-      required:
-      - identifier
-      - timestamp
-      type: object
-    ns_EnabledFor:
-      description: Lists of user and role identifiers the email will be sent to
-      properties:
-        roles:
-          description: List of role identifiers the email will be sent to
-          format: uuid
-          items:
-            description: List of role identifiers the email will be sent to
-            format: uuid
-            type: string
-          type: array
-        users:
-          description: List of user identifiers the email will be sent to
-          format: uuid
-          items:
-            description: List of user identifiers the email will be sent to
-            format: uuid
-            type: string
-          type: array
-      required:
-      - roles
-      - users
-      type: object
-    ns_EmailConfigurationLog:
-      properties:
-        created_at:
-          description: Timestamp when the configuration was created
-          format: date-time
-          type: string
-        created_by:
-          description: Created by the user
-          format: uuid
-          type: string
         enabled_for:
           $ref: '#/components/schemas/ns_EnabledFor'
-        identifier:
-          description: Unique identifier for the configuration
-          format: uuid
-          type: string
         type:
-          description: The event type that the user wants to be notified about
-          example: CASE_ASSIGNED
-          type: string
-        updated_at:
-          description: Timestamp when the configuration was last updated
-          format: date-time
-          type: string
-        updated_by:
-          description: Last updated by the user
-          format: uuid
+          description: The event type that the user wants to listen to
+          enum:
+          - CASE_ASSIGNED
           type:
           - string
           - 'null'
       required:
-      - created_at
-      - created_by
       - enabled_for
-      - identifier
-      - type
-      - updated_at
       type: object
     ns_UpdateEmailConfigurationPayload:
       properties:
@@ -458,19 +355,125 @@ components:
       - self
       - email_notification_configurations
       type: object
-    ns_EmailConfigurationPayload:
+    ns_EnabledFor:
+      description: Lists of user and role identifiers the email will be sent to
       properties:
-        enabled_for:
-          $ref: '#/components/schemas/ns_EnabledFor'
+        roles:
+          description: List of role identifiers the email will be sent to
+          format: uuid
+          items:
+            description: List of role identifiers the email will be sent to
+            format: uuid
+            type: string
+          type: array
+        users:
+          description: List of user identifiers the email will be sent to
+          format: uuid
+          items:
+            description: List of user identifiers the email will be sent to
+            format: uuid
+            type: string
+          type: array
+      required:
+      - roles
+      - users
+      type: object
+    ns_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
         type:
-          description: The event type that the user wants to listen to
-          enum:
-          - CASE_ASSIGNED
+          format: uri
           type:
           - string
           - 'null'
       required:
+      - identifier
+      - timestamp
+      type: object
+    ns_EmailConfigurationLog:
+      properties:
+        created_at:
+          description: Timestamp when the configuration was created
+          format: date-time
+          type: string
+        created_by:
+          description: Created by the user
+          format: uuid
+          type: string
+        enabled_for:
+          $ref: '#/components/schemas/ns_EnabledFor'
+        identifier:
+          description: Unique identifier for the configuration
+          format: uuid
+          type: string
+        type:
+          description: The event type that the user wants to be notified about
+          example: CASE_ASSIGNED
+          type: string
+        updated_at:
+          description: Timestamp when the configuration was last updated
+          format: date-time
+          type: string
+        updated_by:
+          description: Last updated by the user
+          format: uuid
+          type:
+          - string
+          - 'null'
+      required:
+      - created_at
+      - created_by
       - enabled_for
+      - identifier
+      - type
+      - updated_at
+      type: object
+    ns_TestEmailResponse:
+      properties:
+        identifier:
+          description: Test email unique identifier
+          example: 6de244da-11f8-479d-aec7-c4d2126b092e
+          format: uuid
+          type: string
+        test_result:
+          $ref: '#/components/schemas/ns_TestEmailResult'
+      required:
+      - identifier
+      - test_result
+      type: object
+    ns_DeletedEmailConfigurationResponse:
+      properties:
+        identifier:
+          description: Email configuration unique identifier
+          example: 6de244da-11f8-479d-aec7-c4d2126b092e
+          format: uuid
+          type: string
+      required:
+      - identifier
       type: object
     ns_TestEmailResult:
       description: Response from the SMTP email server on the attempt to send
@@ -493,18 +496,15 @@ components:
       required:
       - response_type
       type: object
-    ns_TestEmailResponse:
+    ns_EmailTestPayload:
       properties:
-        identifier:
-          description: Test email unique identifier
-          example: 6de244da-11f8-479d-aec7-c4d2126b092e
-          format: uuid
+        email:
+          description: The recipient email address to which the test email will be sent.
+          example: me@complyadvantage.com
+          format: email
           type: string
-        test_result:
-          $ref: '#/components/schemas/ns_TestEmailResult'
       required:
-      - identifier
-      - test_result
+      - email
       type: object
   securitySchemes:
     BearerAuth:

@@ -332,89 +332,6 @@ paths:
       - Exports
 components:
   schemas:
-    exports_ExportTypeKeys:
-      properties:
-        key:
-          type: string
-      required:
-      - key
-      type: object
-    exports_DownloadExportResponseBody:
-      properties:
-        download_url:
-          description: Download url
-          example: s3://export.csv
-          type: string
-      required:
-      - download_url
-      type: object
-    exports_ProblemDetailErrorResponse:
-      additionalProperties: true
-      properties:
-        detail:
-          type:
-          - string
-          - 'null'
-        identifier:
-          format: uuid
-          type: string
-        instance:
-          format: uri
-          type:
-          - string
-          - 'null'
-        status:
-          format: int32
-          type:
-          - integer
-          - 'null'
-        timestamp:
-          format: date-time
-          type: string
-        title:
-          type:
-          - string
-          - 'null'
-        type:
-          format: uri
-          type:
-          - string
-          - 'null'
-      required:
-      - identifier
-      - timestamp
-      type: object
-    exports_CreateExportPayload:
-      properties:
-        end_date:
-          description: Export data end date
-          example: '2023-11-05T21:00:00.000Z'
-          format: date-time
-          type:
-          - string
-          - 'null'
-        export_name:
-          description: Export name, created by customer
-          example: profiles-2023-q1-exports
-          maxLength: 50
-          minLength: 0
-          type: string
-        export_type_key:
-          description: Export type key
-          example: CUSTOMER_SCREENING
-          minLength: 1
-          type: string
-        start_date:
-          description: Export data start date
-          example: '2023-11-01T21:00:00.000Z'
-          format: date-time
-          type:
-          - string
-          - 'null'
-      required:
-      - export_name
-      - export_type_key
-      type: object
     exports_PaginatedResponseExportTypeKeys:
       properties:
         first:
@@ -452,6 +369,58 @@ components:
       - first
       - self
       - items
+      type: object
+    exports_ProblemDetailErrorResponse:
+      additionalProperties: true
+      properties:
+        detail:
+          type:
+          - string
+          - 'null'
+        identifier:
+          format: uuid
+          type: string
+        instance:
+          format: uri
+          type:
+          - string
+          - 'null'
+        status:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        type:
+          format: uri
+          type:
+          - string
+          - 'null'
+      required:
+      - identifier
+      - timestamp
+      type: object
+    exports_DownloadExportResponseBody:
+      properties:
+        download_url:
+          description: Download url
+          example: s3://export.csv
+          type: string
+      required:
+      - download_url
+      type: object
+    exports_ExportTypeKeys:
+      properties:
+        key:
+          type: string
+      required:
+      - key
       type: object
     exports_PaginatedResponseExportItem:
       properties:
@@ -535,6 +504,37 @@ components:
       - export_type_key
       - identifier
       - status
+      type: object
+    exports_CreateExportPayload:
+      properties:
+        end_date:
+          description: Export data end date
+          example: '2023-11-05T21:00:00.000Z'
+          format: date-time
+          type:
+          - string
+          - 'null'
+        export_name:
+          description: Export name, created by customer
+          example: profiles-2023-q1-exports
+          maxLength: 50
+          minLength: 0
+          type: string
+        export_type_key:
+          description: Export type key
+          example: CUSTOMER_SCREENING
+          minLength: 1
+          type: string
+        start_date:
+          description: Export data start date
+          example: '2023-11-01T21:00:00.000Z'
+          format: date-time
+          type:
+          - string
+          - 'null'
+      required:
+      - export_name
+      - export_type_key
       type: object
   securitySchemes:
     BearerAuth:

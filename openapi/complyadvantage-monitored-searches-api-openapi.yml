@@ -115,9 +115,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 components:
-  responses:
-    NotFound:
-      description: The search or resource was not found.
   schemas:
     MonitorEnvelope:
       type: object
@@ -137,6 +134,9 @@ components:
       schema:
         type: string
       description: The search ID or ref.
+  responses:
+    NotFound:
+      description: The search or resource was not found.
   securitySchemes:
     apiKeyAuth:
       type: apiKey

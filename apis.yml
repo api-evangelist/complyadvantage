@@ -440,6 +440,8 @@ apis:
   humanURL: https://docs.mesh.complyadvantage.com/
   baseURL: https://api.mesh.complyadvantage.com
   tags:
+  - Data Enrichment
+  tags_raw:
   - Enrichment
   properties:
   - type: OpenAPI

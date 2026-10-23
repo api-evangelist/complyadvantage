@@ -74,3 +74,35 @@
     sector: business-applications, fintech
   status: not-a-workflow
   arazzo: null
+- slug: complyadvantage-packagist
+  label: Packagist
+  partner: packagist
+  partner_name: Packagist
+  category: official SDK (PHP)
+  type: register
+  channel: package-registry
+  evidence: https://packagist.org/packages/complyadvantage/php-compliance-api
+  source: edge
+  relationship: distribution-channel
+  contract_reference:
+    register: Packagist (public registry JSON)
+    spec_file: null
+    language: PHP
+    packages:
+    - name: complyadvantage/php-compliance-api
+      version: 0.8.1
+      released: '2014-10-16'
+      released_field: time
+      lapsed: true
+      page: https://packagist.org/packages/complyadvantage/php-compliance-api
+      repo_leg: github-org:complyadvantage
+      publisher_leg: org:complyadvantage
+      matched_by: github-org
+      abandoned: true
+    current: false
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-php-dart-elixir-package-registries.py
+    detected: '2026-10-22'
+  status: not-a-workflow
+  arazzo: null

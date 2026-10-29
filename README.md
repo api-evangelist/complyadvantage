@@ -1,4 +1,4 @@
-# ComplyAdvantage (complyadvantage)
+# ComplyAdvantage
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -64,146 +64,183 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-ComplyAdvantage provides AI-driven anti-money laundering (AML) and financial crime risk detection - screening people and companies against sanctions and watchlists, politically exposed persons (PEPs and RCAs), and adverse media, with ongoing monitoring that alerts you when a customer's risk profile changes. The REST API (api.complyadvantage.com, with US and APAC regional bases) exposes searches, monitored searches, case management, comments, tags, and users with api-key auth, plus webhooks for match and monitoring updates. The newer Mesh platform API adds customer lifecycle screening, cases and alerts, transaction monitoring, and fraud detection workflows.
+ComplyAdvantage provides AI-driven anti-money laundering (AML) and financial crime risk detection - screening people and companies against sanctions and watchlists, politically exposed persons (PEPs and RCAs), and adverse media, with ongoing monitoring that alerts you when a customer's risk profile changes. The REST API (api.complyadvantage.com, with US and APAC regional bases) exposes searches, monitored searches, case management, comments, tags, and users with api-key auth, plus webhooks for match and monitoring updates. The newer Mesh platform API adds customer lifecycle screening, cases and alerts, transaction monitoring, and fraud detection workflows. Used by banks, fintechs, payments, and crypto firms for KYC/AML compliance, sanctions screening, and fraud prevention.
 
-**Access model:** the API reference at [docs.complyadvantage.com](https://docs.complyadvantage.com/) is fully public, but API keys are account-gated - they are generated inside the ComplyAdvantage web platform. The self-serve Starter Plan (from $99/month, sized by a 100-2,000 monitored-entity allowance) includes full API access; payments screening and transaction monitoring require a custom-priced Enterprise agreement. Sandbox accounts are available for integration testing. The OpenAPI document and collections in this repository were modeled from the publicly documented endpoints; paths and parameters are grounded in the published reference, while response schemas are summarized rather than exhaustive.
+**Areas:** AML · Fraud Prevention · Sanctions Screening · Compliance · PEP Screening · Adverse Media · KYC · Watchlist · Transaction Monitoring · Financial Crime · RegTech
 
-**APIs.json:** [https://raw.githubusercontent.com/api-evangelist/complyadvantage/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/complyadvantage/refs/heads/main/apis.yml)
+## ComplyAdvantage on APIs.io
 
-## Tags
+Everything profiled for ComplyAdvantage is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/complyadvantage/](https://apis.io/providers/complyadvantage/)** — or go straight to one of the APIs or properties below.
 
-- Anti-Money Laundering
-- AML
-- Fraud Detection
-- Sanctions Screening
-- Compliance
-- PEP Screening
-- Adverse Media
-- KYC
-- Watchlists
-- Transaction Monitoring
-- Financial Crime
-- RegTech
+### APIs (26)
 
-## Timestamps
+- [ComplyAdvantage Case Management API](https://apis.io/apis/complyadvantage/complyadvantage-case-management-api/) — Comments, tags, assignment, and match status workflow on searches.
+- [ComplyAdvantage Monitored Searches API](https://apis.io/apis/complyadvantage/complyadvantage-monitored-searches-api/) — Ongoing monitoring of searches, change differences, and acknowledgement.
+- [ComplyAdvantage Searches API](https://apis.io/apis/complyadvantage/complyadvantage-searches-api/) — Create and manage AML screening searches against sanctions, PEP, warning, and adverse media data.
+- [ComplyAdvantage Users API](https://apis.io/apis/complyadvantage/complyadvantage-users-api/) — Users on your ComplyAdvantage account.
+- [ComplyAdvantage Accounts API](https://apis.io/apis/complyadvantage/complyadvantage-accounts-api/) — The Accounts API from ComplyAdvantage — 2 operation(s) for accounts.
+- [ComplyAdvantage Alerts & Risks API](https://apis.io/apis/complyadvantage/complyadvantage-alerts-risks-api/) — The Alerts & Risks API from ComplyAdvantage — 8 operation(s) for alerts & risks.
+- [ComplyAdvantage Audit API](https://apis.io/apis/complyadvantage/complyadvantage-audit-api/) — The Audit API from ComplyAdvantage — 6 operation(s) for audit.
+- [ComplyAdvantage Authentication API](https://apis.io/apis/complyadvantage/complyadvantage-authentication-api/) — The Authentication API from ComplyAdvantage — 2 operation(s) for authentication.
+- [ComplyAdvantage Batch Processing API](https://apis.io/apis/complyadvantage/complyadvantage-batch-processing-api/) — The Batch Processing API from ComplyAdvantage — 3 operation(s) for batch processing.
+- [ComplyAdvantage Case Workflows API](https://apis.io/apis/complyadvantage/complyadvantage-case-workflows-api/) — The Case Workflows API from ComplyAdvantage — 3 operation(s) for case workflows.
+- [ComplyAdvantage Cases API](https://apis.io/apis/complyadvantage/complyadvantage-cases-api/) — The Cases API from ComplyAdvantage — 12 operation(s) for cases.
+- [ComplyAdvantage Clients API](https://apis.io/apis/complyadvantage/complyadvantage-clients-api/) — The Clients API from ComplyAdvantage — 3 operation(s) for clients.
+- [ComplyAdvantage Custom Fields API](https://apis.io/apis/complyadvantage/complyadvantage-custom-fields-api/) — The Custom Fields API from ComplyAdvantage — 2 operation(s) for custom fields.
+- [ComplyAdvantage Custom Lists API](https://apis.io/apis/complyadvantage/complyadvantage-custom-lists-api/) — The Custom Lists API from ComplyAdvantage — 6 operation(s) for custom lists.
+- [ComplyAdvantage Customers API](https://apis.io/apis/complyadvantage/complyadvantage-customers-api/) — The Customers API from ComplyAdvantage — 13 operation(s) for customers.
+- [ComplyAdvantage Email Configurations API](https://apis.io/apis/complyadvantage/complyadvantage-email-configurations-api/) — The Email Configurations API from ComplyAdvantage — 3 operation(s) for email configurations.
+- [ComplyAdvantage Enrichment API](https://apis.io/apis/complyadvantage/complyadvantage-enrichment-api/) — The Enrichment API from ComplyAdvantage — 10 operation(s) for enrichment.
+- [ComplyAdvantage Exports API](https://apis.io/apis/complyadvantage/complyadvantage-exports-api/) — The Exports API from ComplyAdvantage — 3 operation(s) for exports.
+- [ComplyAdvantage IAM API](https://apis.io/apis/complyadvantage/complyadvantage-iam-api/) — The IAM API from ComplyAdvantage — 5 operation(s) for iam.
+- [ComplyAdvantage Labels API](https://apis.io/apis/complyadvantage/complyadvantage-labels-api/) — The Labels API from ComplyAdvantage — 3 operation(s) for labels.
+- [ComplyAdvantage Onboarding API](https://apis.io/apis/complyadvantage/complyadvantage-onboarding-api/) — The Onboarding API from ComplyAdvantage — 3 operation(s) for onboarding.
+- [ComplyAdvantage Payment Screening API](https://apis.io/apis/complyadvantage/complyadvantage-payment-screening-api/) — The Payment Screening API from ComplyAdvantage — 7 operation(s) for payment screening.
+- [ComplyAdvantage Regulatory Reporting API](https://apis.io/apis/complyadvantage/complyadvantage-regulatory-reporting-api/) — The Regulatory Reporting API from ComplyAdvantage — 4 operation(s) for regulatory reporting.
+- [ComplyAdvantage Screening Configurations API](https://apis.io/apis/complyadvantage/complyadvantage-screening-configurations-api/) — The Screening Configurations API from ComplyAdvantage — 4 operation(s) for screening configurations.
+- [ComplyAdvantage Transactions API](https://apis.io/apis/complyadvantage/complyadvantage-transactions-api/) — The Transactions API from ComplyAdvantage — 10 operation(s) for transactions.
+- [ComplyAdvantage Webhooks API](https://apis.io/apis/complyadvantage/complyadvantage-webhooks-api/) — The Webhooks API from ComplyAdvantage — 3 operation(s) for webhooks.
 
-- **Created:** 2026-07-11
-- **Modified:** 2026-07-11
+### Published properties
 
-## APIs
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-### ComplyAdvantage Search API
+#### AsyncAPI (1)
 
-Screen a person, company, organisation, vessel, or aircraft against ComplyAdvantage's sanctions, watchlists, warnings, fitness and probity, PEP, and adverse media data. Create searches with fuzziness control, exact-match mode, and filters (entity type, birth year, country codes, risk types), list and retrieve past searches, pull full hit details and paginated entities, update match status, risk level, and whitelisting on hits, and download a search certificate PDF for your audit trail.
+Event-driven and webhook contracts.
 
-- **Human URL:** [https://docs.complyadvantage.com/api-docs/](https://docs.complyadvantage.com/api-docs/)
-- **Base URL:** `https://api.complyadvantage.com`
+- [Complyadvantage Webhooks](https://apis.io/asyncapis/complyadvantage/complyadvantage-webhooks/)
 
-#### Tags
+#### MCP servers (1)
 
-- Sanctions Screening
-- PEP Screening
-- Adverse Media
-- AML
+Model Context Protocol servers that expose the API to agents.
 
-#### Properties
+- [ComplyAdvantage Mesh Documentation MCP Server](https://apis.io/servers/complyadvantage/complyadvantage-mesh-documentation-mcp-server/)
 
-- [Documentation](https://docs.complyadvantage.com/)
-- [API Reference](https://docs.complyadvantage.com/api-docs/)
-- [OpenAPI](openapi/complyadvantage-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-- [Postman Collection](collections/complyadvantage.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/complyadvantage.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+#### Agentic access (1)
 
-### ComplyAdvantage Monitored Search API
+Which operations an agent can call, which act, and which need a human in the loop.
 
-Turn any search into ongoing monitoring so customers are automatically re-screened as sanctions lists, PEP registries, and adverse media change. Start and stop monitoring on a search, swap the associated search profile, retrieve what changed (new, updated, and removed matching entities), and acknowledge changes. The `monitored_search_updated` webhook pushes change notifications to your systems.
+- [Complyadvantage Agentic Access](https://apis.io/agentic-access/complyadvantage/complyadvantage-agentic-access/)
 
-- **Human URL:** [https://docs.complyadvantage.com/api-docs/](https://docs.complyadvantage.com/api-docs/)
-- **Base URL:** `https://api.complyadvantage.com`
+#### Collections (5)
 
-#### Tags
+Postman and Open Collection request collections.
 
-- Ongoing Monitoring
-- AML
-- Alerts
+- [ComplyAdvantage API](https://apis.io/collections/complyadvantage/open-complyadvantage/)
+- [ComplyAdvantage Case Management API](https://apis.io/collections/complyadvantage/open-complyadvantage-case-management-api/)
+- [ComplyAdvantage Case Management Monitored Searches API](https://apis.io/collections/complyadvantage/open-complyadvantage-monitored-searches-api/)
+- [ComplyAdvantage Case Management Searches API](https://apis.io/collections/complyadvantage/open-complyadvantage-searches-api/)
+- [ComplyAdvantage Case Management Users API](https://apis.io/collections/complyadvantage/open-complyadvantage-users-api/)
 
-#### Properties
+#### Overlays (5)
 
-- [API Reference](https://docs.complyadvantage.com/api-docs/)
-- [OpenAPI](openapi/complyadvantage-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-- [Postman Collection](collections/complyadvantage.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/complyadvantage.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+OpenAPI overlays, including conversational phrasing for each operation.
 
-### ComplyAdvantage Case Management API
+- [Complyadvantage Case Management Api Overlay](https://apis.io/overlays/complyadvantage/complyadvantage-case-management-api-overlay/)
+- [Complyadvantage Mesh Api Overlay](https://apis.io/overlays/complyadvantage/complyadvantage-mesh-api-overlay/)
+- [Complyadvantage Monitored Searches Api Overlay](https://apis.io/overlays/complyadvantage/complyadvantage-monitored-searches-api-overlay/)
+- [Complyadvantage Searches Api Overlay](https://apis.io/overlays/complyadvantage/complyadvantage-searches-api-overlay/)
+- [Complyadvantage Users Api Overlay](https://apis.io/overlays/complyadvantage/complyadvantage-users-api-overlay/)
 
-Treat screening results as managed compliance cases - assign a search to an analyst, set match status (potential match, true positive, false positive, no match) and risk level, add and retrieve comments on a search, attach and detach key-value tags, and use client references for client-scoped whitelisting of recurring false positives.
+#### Security (2)
 
-- **Human URL:** [https://docs.complyadvantage.com/api-docs/](https://docs.complyadvantage.com/api-docs/)
-- **Base URL:** `https://api.complyadvantage.com`
+Authentication, trust centre, and vulnerability disclosure.
 
-#### Tags
+- [Complyadvantage Authentication](https://apis.io/security/complyadvantage/complyadvantage-authentication/)
+- [Complyadvantage Domain Security](https://apis.io/security/complyadvantage/complyadvantage-domain-security/)
 
-- Case Management
-- Compliance
-- Audit Trail
+#### OAuth scopes (1)
 
-#### Properties
+The permissions the API asks for.
 
-- [API Reference](https://docs.complyadvantage.com/api-docs/)
-- [OpenAPI](openapi/complyadvantage-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-- [Postman Collection](collections/complyadvantage.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/complyadvantage.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+- [Complyadvantage Scopes](https://apis.io/scopes/complyadvantage/complyadvantage-scopes/)
 
-### ComplyAdvantage Users API
+#### Plans and pricing (1)
 
-List the users on your ComplyAdvantage account so searches and cases can be assigned to the right analyst by user ID.
+Published plans, tiers and prices.
 
-- **Human URL:** [https://docs.complyadvantage.com/api-docs/](https://docs.complyadvantage.com/api-docs/)
-- **Base URL:** `https://api.complyadvantage.com`
+- [Complyadvantage Plans Pricing](https://apis.io/plans/complyadvantage/complyadvantage-plans-pricing/)
 
-#### Tags
+#### Rate limits (1)
 
-- Users
-- Administration
+Published request limits.
 
-#### Properties
+- [Complyadvantage Rate Limits](https://apis.io/rate-limits/complyadvantage/complyadvantage-rate-limits/)
 
-- [API Reference](https://docs.complyadvantage.com/api-docs/)
-- [OpenAPI](openapi/complyadvantage-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-- [Postman Collection](collections/complyadvantage.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/complyadvantage.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+#### FinOps (1)
 
-### ComplyAdvantage Mesh Platform API
+What the API costs to run, by operation.
 
-ComplyAdvantage's newer Mesh platform API, authenticated with OAuth2 bearer tokens (24-hour validity). Covers the full customer lifecycle - customer creation and screening (sync or async), risk scoring, cases and alerts with stage transitions and assignments, transaction screening and monitoring for payments fraud, custom and lookup lists, webhook and email notifications, data exports, user and role administration, and regulatory reporting (CTR/SAR prefill). Documented separately at [docs.mesh.complyadvantage.com](https://docs.mesh.complyadvantage.com/) with its own OpenAPI schema for customers.
+- [Complyadvantage Finops](https://apis.io/finops/complyadvantage/complyadvantage-finops/)
 
-- **Human URL:** [https://docs.mesh.complyadvantage.com/](https://docs.mesh.complyadvantage.com/)
-- **Base URL:** `https://api.mesh.complyadvantage.com`
+## Where to find this API
 
-#### Tags
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
 
-- Customer Screening
-- Transaction Monitoring
-- Fraud Detection
-- Cases
-
-#### Properties
-
-- [Documentation](https://docs.mesh.complyadvantage.com/)
-
-## Common Properties
-
-- [GitHub Organization](https://github.com/complyadvantage)
-- [LinkedIn](https://www.linkedin.com/company/complyadvantage)
 - [Website](https://complyadvantage.com)
 - [Documentation](https://docs.complyadvantage.com)
+- [Getting started](https://docs.mesh.complyadvantage.com/docs/getting-started)
+- [API reference](https://docs.mesh.complyadvantage.com/reference/)
 - [Pricing](https://complyadvantage.com/pricing/)
-- [Plans](plans/complyadvantage-plans-pricing.yml)
-- [Rate Limits](rate-limits/complyadvantage-rate-limits.yml)
-- [Fin Ops](finops/complyadvantage-finops.yml)
+- [Sign up](https://complyadvantage.com/starter-plan/)
+- [Support](https://support.complyadvantage.com/)
 - [Blog](https://complyadvantage.com/insights/)
+- [Terms of service](https://complyadvantage.com/terms-and-conditions/)
+- [Privacy policy](https://complyadvantage.com/privacy-notice/)
+- [GitHub](https://github.com/complyadvantage)
 
-## Maintainers
+## API Evangelist rating
 
-**FN:** Kin Lane
-**Email:** kin@apievangelist.com
+**Kin Score 63.2** — strong · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 75.0 |
+| Contract quality | 59.0 |
+| Contract governance | 18.2 |
+| Operational transparency | 50.0 |
+| Developer ergonomics | 57.7 |
+| Access clarity | 76.3 |
+
+**Agent readiness 49.1** — agent-native
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | platform (partial credit) |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | verified |
+| Error Semantics | verified |
+| OpenAPI Examples | verified |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | yes |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | yes |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | paginated |
+| Operation Distinctiveness | mostly |
+
+**Regulatory alignment 34.3** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/complyadvantage/](https://apis.io/providers/complyadvantage/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for ComplyAdvantage: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/complyadvantage/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
